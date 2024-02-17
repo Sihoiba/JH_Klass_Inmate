@@ -1,72 +1,72 @@
 register_blueprint "resource_rage"
 {
-	flags = { EF_NOPICKUP }, 
-	text = {
-		name   = "Rage",
-		desc   = "PASSIVE SKILL - Inmate resource",
-		full   = "INTERNAL!",
-		abbr   = "Rage",
-	},
-	attributes = {
-		value  = 40,
-		max    = 40,
-		amount = 1
-	},
-	resource = {
-		color = LIGHTRED,
-		block_size = 5,
-	},
-	callbacks = {
-		on_receive_damage = [[
+    flags = { EF_NOPICKUP },
+    text = {
+        name   = "Rage",
+        desc   = "PASSIVE SKILL - Inmate resource",
+        full   = "INTERNAL!",
+        abbr   = "Rage",
+    },
+    attributes = {
+        value  = 40,
+        max    = 40,
+        amount = 1
+    },
+    resource = {
+        color = LIGHTRED,
+        block_size = 5,
+    },
+    callbacks = {
+        on_receive_damage = [[
             function ( self, entity, source, weapon, amount )
-                nova.log("on_recieve_damage")
+
                 if not entity then return end
                 if not entity.data or not entity.data.is_player then return end
                 if amount < 5 then return end
-                nova.log("on_recieve_damage past guard")
-                local restore = math.floor( amount * 0.2 )                
+
+                local restore_bonus = entity.attributes.rage_bonus or 0
+                local restore = math.floor( amount * 0.2 ) + restore_bonus
                 local resource = entity:child( "resource_rage" )
 
                 local rattr = resource.attributes
                 if rattr.value < rattr.max then
-                    nova.log("restoring")
                     rattr.value = math.min( rattr.value + restore, rattr.max )
                 end
             end
         ]],
-	},
+    },
 }
 
 register_blueprint "ktrait_always_angry"
 {
-	blueprint = "trait",
-	text = {
-		name   = "Always Angry",
-		desc   = "PASSIVE SKILL - restore 50% rage every time you enter a level",
-		full   = "INTERNAL!",
-		abbr   = "Ten",
-	},
-	callbacks = {
-		on_activate = [=[
-			function(self,entity)
-				entity:attach( "ktrait_always_angry" )
-			end
-		]=],
-		on_enter_level = [=[
-			function ( self, entity, reenter )
-				if reenter then return end
-				local resource = entity:child( "resource_rage" )
+    blueprint = "trait",
+    text = {
+        name   = "Always Angry",
+        desc   = "PASSIVE SKILL - restore 50% rage every time you enter a level",
+        full   = "INTERNAL!",
+        abbr   = "Ten",
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self,entity)
+                entity:attach( "ktrait_always_angry" )
+            end
+        ]=],
+        on_enter_level = [=[
+            function ( self, entity, reenter )
+                if reenter then return end
+                local resource = entity:child( "resource_rage" )
 
-				local rattr = resource.attributes
+                local rattr = resource.attributes
                 if rattr.value < rattr.max then
-					rattr.value = rattr.value + (rattr.max * 0.5)
-					if rattr.value > rattr.max then
-						rattr.value = rattr.max
-					end
-				end
-			end
-		]=],
-	},
+                    rattr.value = rattr.value + (rattr.max * 0.5)
+                    if rattr.value > rattr.max then
+                        rattr.value = rattr.max
+                    end
+                end
+            end
+        ]=],
+    },
 }
 
 register_blueprint "buff_inmate_berserk_base"
@@ -145,12 +145,20 @@ register_blueprint "buff_inmate_berserk_base"
                 end
             end
         ]],
+        on_detach = [[
+            function( self, parent )
+                if parent and parent.attributes and parent.attributes.grace_period then
+                    parent.attributes.grace_period = false
+                    buff = world:add_buff( parent, "buff_inmate_berserk_grace_period", 300 )
+                end
+            end
+        ]]
     },
 }
 
 register_blueprint "buff_inmate_berserk_skill_1"
 {
-	blueprint = "buff_inmate_berserk_base", 
+    blueprint = "buff_inmate_berserk_base",
     attributes = {
         damage_mult = 10.0,
         accuracy    = 10,
@@ -174,7 +182,7 @@ register_blueprint "buff_inmate_berserk_skill_1"
 
 register_blueprint "buff_inmate_berserk_skill_2"
 {
-	blueprint = "buff_inmate_berserk_base", 
+    blueprint = "buff_inmate_berserk_base",
     attributes = {
         damage_mult = 10.0,
         accuracy    = 10,
@@ -198,7 +206,7 @@ register_blueprint "buff_inmate_berserk_skill_2"
 
 register_blueprint "buff_inmate_berserk_skill_3"
 {
-	blueprint = "buff_inmate_berserk_base", 
+    blueprint = "buff_inmate_berserk_base",
     attributes = {
         damage_mult = 12.0,
         accuracy    = 15,
@@ -220,135 +228,164 @@ register_blueprint "buff_inmate_berserk_skill_3"
     }
 }
 
+register_blueprint "buff_inmate_berserk_grace_period"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name = "Grace!",
+        desc = "Short lived damage resistance to get to safety.",
+    },
+    ui_buff = {
+        color     = BLUE,
+        priority  = 200,
+        style     = 3,
+    },
+    attributes = {
+        dodge_value = 30,
+        dodge_max   = 30,
+        resist = {
+            slash = 80,
+            impact = 80,
+            pierce = 80,
+            plasma = 80,
+        },
+    }
+}
+
 register_blueprint "ktrait_berserk"
 {
-	blueprint = "trait",
-	text = {
-		name   = "Berserk",
-		desc   = "ACTIVE SKILL - for Fury you can heal and convert your pain into health",
-		full   = "Sometimes when they hurt you you hurt them right back! From time to time you heal a bit and convert your pain value into health. Additionally you become immune to pain for 5 seconds.",
-		abbr   = "Adr",
-		cant_use = "Adrenaline can be used only when wounded or in pain",
-	},
-	callbacks = {
-		on_activate = [=[
-			function(self,entity)
-				entity:attach( "ktrait_berserk" )
-			end
-		]=],
-		on_use = [=[
-			function ( self, entity, level, target )				
-				if entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 1 then
-					world:add_buff( entity, "buff_inmate_berserk_skill_1", 1000 )
-				elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 2 then
-					world:add_buff( entity, "buff_inmate_berserk_skill_2", 2000 )
-				elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 3 then
-					world:add_buff( entity, "buff_inmate_berserk_skill_3", 2000 )
-				else
-					world:add_buff( entity, "buff_inmate_berserk_base", 1000 )
-				end	
-				world:lua_callback( entity, "on_inmate_berserk" )
-				return 1
-			end
-		]=],
-	},
-	data = {
-		is_free_use = true,
-	},
-	skill = {
-		resource = "resource_rage",
-		fail_vo  = "vo_no_fury",
-		cooldown = 500,
-		cost     = 25,
-	},
+    blueprint = "trait",
+    text = {
+        name   = "Berserk",
+        desc   = "ACTIVE SKILL - for Fury you can heal and convert your pain into health",
+        full   = "Sometimes when they hurt you you hurt them right back! From time to time you heal a bit and convert your pain value into health. Additionally you become immune to pain for 5 seconds.",
+        abbr   = "Adr",
+        cant_use = "Adrenaline can be used only when wounded or in pain",
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self,entity)
+                entity:attach( "ktrait_berserk" )
+            end
+        ]=],
+        on_use = [=[
+            function ( self, entity, level, target )
+                local buff
+                local duration_bonus = (entity.attributes.berserk_duration_bonus or 0) + 1
+                if entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 1 then
+                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", 1000 * duration_bonus )
+                elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 2 then
+                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", 2000 * duration_bonus )
+                elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 3 then
+                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", 2000 * duration_bonus )
+                else
+                    buff = world:add_buff( entity, "buff_inmate_berserk_base", 1000 * duration_bonus )
+                end
+                if entity.attributes.berserk_action_bonus then
+                    buff.attributes.speed = 1.0 + entity.attributes.berserk_action_bonus
+                end
+                world:lua_callback( entity, "on_inmate_berserk" )
+                return 1
+            end
+        ]=],
+    },
+    data = {
+        is_free_use = true,
+    },
+    skill = {
+        resource = "resource_rage",
+        fail_vo  = "vo_no_fury",
+        cooldown = 500,
+        cost     = 25,
+    },
 }
 
 register_blueprint "ktrait_skilled_inmate"
 {
-	blueprint = "trait",
-	text = {
-		name   = "Skilled",
-		desc   = "PASSIVE SKILL - improve your class traits",
-		full   = "You were locked up for a reason. Each level of this skill improves your berserk active skill.\n\n{!LEVEL 1} - bigger melee damage bonus, better resistances, faster move speed\n{!LEVEL 2} - double Beserk duration, dodge bonus while berserk\n{!LEVEL 3} - even more melee damage, damage resistance and dodge",
-		abbr   = "Skl",
-	},
-	callbacks = {
-		on_activate = [=[
-			function(self,entity)
-				local attr  = entity.attributes
-				attr.skilled_bonus = ( attr.skilled_bonus or 0 ) + 1	
-			end
-		]=],
-	},
+    blueprint = "trait",
+    text = {
+        name   = "Skilled",
+        desc   = "PASSIVE SKILL - improve your class traits",
+        full   = "You were locked up for a reason. Each level of this skill improves your berserk active skill.\n\n{!LEVEL 1} - bigger melee damage bonus, better resistances, faster move speed\n{!LEVEL 2} - double Beserk duration, dodge bonus while berserk\n{!LEVEL 3} - even more melee damage, damage resistance and dodge",
+        abbr   = "Skl",
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self,entity)
+                local attr  = entity.attributes
+                attr.skilled_bonus = ( attr.skilled_bonus or 0 ) + 1
+            end
+        ]=],
+    },
 }
 
 register_blueprint "klass_inmate"
 {
-	text = {
-		name  = "Inmate",
-		short = "Inmate",
-		desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore 50% {!Rage}.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost.\n\n{!GEAR} - Inmates start with a pipe wrench but no guns.",
-		abbr = "M",
-	},
-	callbacks = {
-		on_activate = [=[
-			function(self,entity)
-				entity:attach( "resource_rage" )
-				entity:attach( "ktrait_always_angry" )
-				local adr = entity:attach( "ktrait_berserk" )
-				adr.skill.cost = 30
-				entity:attach( "pipe_wrench" )
-			end
-		]=],
-	},
-	klass = {
-		id     = "inmate",
-		entity = "player_inmate",
-		traits = {
-			{ "ktrait_skilled_inmate", max = 3, }, -- makes berserk better
-			{ "ktrait_dash", max = 3, }, -- as scout
-			{ "ktrait_grenadier", max = 3, }, -- as tech
-			{ "trait_juggler", max = 3, }, -- as standard
-			-- { "ktrait_gambler", max = 3, }, -- level 1 50% chance to refund terminal cost, level 2/3? 
-			-- { "ktrait_desperado", max = 3, }, -- bonus damage based on gun clipsize/shotcost
-			-- { "ktrait_smuggler", max = 3, }, -- find ammo in destructable environments
-			-- { "ktrait_cutter", max = 3, }, -- level 1 convert small med pack into combat pack, level 2 convert small med pack into stim pack, level 3?
-			-- { "ktrait_mule", max = 3, }, -- level 1 +1 inventory and exits, level 2 +2 inventory, level 3 +2 inventory and loot boxes
-			-- { "ktrait_brute", max = 3, }, -- level +2 armour, level 2 +3 armour 25% explosion resist, level 3 +4 armour 50% explosion resist
+    text = {
+        name  = "Inmate",
+        short = "Inmate",
+        desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore 50% {!Rage}.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost.\n\n{!GEAR} - Inmates start with a pipe wrench but no guns.",
+        abbr = "M",
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self,entity)
+                entity:attach( "resource_rage" )
+                entity:attach( "ktrait_always_angry" )
+                local adr = entity:attach( "ktrait_berserk" )
+                adr.skill.cost = 30
+                entity:attach( "pipe_wrench" )
+            end
+        ]=],
+    },
+    klass = {
+        id     = "inmate",
+        entity = "player_inmate",
+        traits = {
+            { "ktrait_skilled_inmate", max = 3, }, -- makes berserk better
+            { "ktrait_dash", max = 3, }, -- as scout
+            { "ktrait_grenadier", max = 3, }, -- as tech
+            { "trait_juggler", max = 3, }, -- as standard
+            -- { "ktrait_gambler", max = 3, }, -- level 1 50% chance to refund terminal cost, level 2/3?
+            -- { "ktrait_desperado", max = 3, }, -- bonus damage based on gun clipsize/shotcost
+            -- { "ktrait_smuggler", max = 3, }, -- find ammo in destructable environments
+            -- { "ktrait_cutter", max = 3, }, -- level 1 convert small med pack into combat pack, level 2 convert small med pack into stim pack, level 3?
+            -- { "ktrait_mule", max = 3, }, -- level 1 +1 inventory and exits, level 2 +2 inventory, level 3 +2 inventory and loot boxes
+            -- { "ktrait_brute", max = 3, }, -- level +2 armour, level 2 +3 armour 25% explosion resist, level 3 +4 armour 50% explosion resist
 
-			-- { "ktrait_first_rule",  max = 3, require = { ktrait_brute = 1, } }, -- level 1 shows location of 5 enemies with most health, -- level 2 same plus exalted in different colour, level 3 --all enemies
-			-- { "ktrait_burgler",    max = 3, require = { ktrait_smuggler = 2, } }, -- level 1 open doors at range, level 2 close doors at line of sight, level 3 red access, and locked mini branch access
-			-- { "ktrait_sucker_punch",    max = 3, require = { ktrait_skilled_inmate = 1, } }, -- non blade melee weapon attacks at 0.9 speed, level 2 0.8, level 3 0.6. Some sort of guaranteed axe?
-			-- { "ktrait_dealer",   max = 3, require = { ktrait_cutter = 1, } }, -- increases duration of positive boons per level
-			-- { "trait_whizkid",       max = 3, require = { ktrait_gambler = 1, } }, -- as standard
-			-- { "",         max = 3, require = { trait_hellrunner = 1, } },
-			-- { "",      max = 3, require = { ktrait_furious = 1, } },
+            -- { "ktrait_first_rule",  max = 3, require = { ktrait_brute = 1, } }, -- level 1 shows location of 5 enemies with most health, -- level 2 same plus exalted in different colour, level 3 --all enemies
+            -- { "ktrait_burgler",    max = 3, require = { ktrait_smuggler = 2, } }, -- level 1 open doors at range, level 2 close doors at line of sight, level 3 red access, and locked mini branch access
+            -- { "ktrait_sucker_punch",    max = 3, require = { ktrait_skilled_inmate = 1, } }, -- non blade melee weapon attacks at 0.9 speed, level 2 0.8, level 3 0.6. Some sort of guaranteed axe?
+            -- { "ktrait_dealer",   max = 3, require = { ktrait_cutter = 1, } }, -- increases duration of positive boons per level
+            -- { "trait_whizkid",       max = 3, require = { ktrait_gambler = 1, } }, -- as standard
+            -- { "",         max = 3, require = { trait_hellrunner = 1, } },
+            -- { "",      max = 3, require = { ktrait_furious = 1, } },
 
-			-- { "ktrait_master_berserker", max = 3, master = true, require = { -- berserk triggers on damage/gibbing
-				-- ktrait_skilled_inmate = 2, level = 6, level_inc = 4,
-			-- } },
-			-- { "ktrait_master_chemist", max = 3, master = true, require = { -- acid immune, add acid to aoe, acid affinity
-				-- ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4,
-			-- } },
-			-- { "ktrait_master_gbh", max = 3, master = true, require = { -- bleed immune, attacks do bleed, bleed affinity
-				-- ktrait_dash = 1, ktrait_brute = 1, level = 6, level_inc = 4,
-			-- } },
-			-- { "ktrait_master_fraudster", max = 3, master = true, require = { -- make decoys uses ancient fx
-				-- ktrait_burgler = 1, level = 6, level_inc = 4,
-			-- } },
-			-- { "ktrait_master_ghost_gun", max = 3, master = true, require = { -- something with pistol/smg, increase shot size to clip size
-				-- ktrait_desperado = 1, ktrait_smuggler = 1, level = 6, level_inc = 4,
-			-- } },
-		},
-	},
+            -- { "ktrait_master_berserker", max = 3, master = true, require = { -- berserk triggers on damage/gibbing
+                -- ktrait_skilled_inmate = 2, level = 6, level_inc = 4,
+            -- } },
+            -- { "ktrait_master_chemist", max = 3, master = true, require = { -- acid immune, add acid to aoe, acid affinity
+                -- ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4,
+            -- } },
+            -- { "ktrait_master_gbh", max = 3, master = true, require = { -- bleed immune, attacks do bleed, bleed affinity
+                -- ktrait_dash = 1, ktrait_brute = 1, level = 6, level_inc = 4,
+            -- } },
+            -- { "ktrait_master_fraudster", max = 3, master = true, require = { -- make decoys uses ancient fx
+                -- ktrait_burgler = 1, level = 6, level_inc = 4,
+            -- } },
+            -- { "ktrait_master_ghost_gun", max = 3, master = true, require = { -- something with pistol/smg, increase shot size to clip size
+                -- ktrait_desperado = 1, ktrait_smuggler = 1, level = 6, level_inc = 4,
+            -- } },
+        },
+    },
 }
 
 register_blueprint "player_inmate"
 {
-	blueprint = "player",
-	text = {
-		name = "you",
-		namep = "you",
-		killed_by = "suicide",
-	},
+    blueprint = "player",
+    text = {
+        name = "you",
+        namep = "you",
+        killed_by = "suicide",
+    },
 }

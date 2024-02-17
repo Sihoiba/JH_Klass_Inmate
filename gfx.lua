@@ -64,5 +64,40 @@ register_gfx_blueprint "player_inmate"
 			material = "data/texture/security/suicider/security_suicider_body_01_A",
 		},
 	},
+}
 
+register_gfx_blueprint "exo_kaxe_inmate"
+{
+	uisprite = {
+		icon = "data/texture/ui/icons/ui_weapon_axe_medium",
+		color = vec4( 0.6, 0.0, 0.6, 1.0 ),
+	},
+	weapon_fx = {
+		advance   = 0.5,
+	},
+	equip = {
+		animation  = "to_machete",
+		target     = "RigRHandWeaponMount",
+		alt_target = "RigLHandWeaponMount",
+	},
+	vision = {
+		pure_floor = true,
+	},
+	scene = {},
+	{
+        render = {
+			mesh     = "data/model/axe_medium.nmd:axe_medium_01",
+			material = "data/texture/weapons/melee/axe_medium_01/A/axe_medium_01",
+		},
+	},
+}
+
+register_gfx_blueprint "exo_armor_inmate"
+{
+	blueprint = "exo_armor_blue_base",
+}
+
+register_gfx_blueprint "exo_helmet_inmate"
+{
+	blueprint = "exo_helmet_battle",
 }
