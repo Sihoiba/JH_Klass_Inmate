@@ -1,0 +1,1 @@
+nova.require("klass_inmate")
