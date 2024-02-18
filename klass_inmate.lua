@@ -311,6 +311,18 @@ register_blueprint "ktrait_berserk"
     },
 }
 
+register_blueprint "runtime_add_xp"
+{
+    flags = { EF_NOPICKUP },
+    callbacks = {
+        on_enter_level = [[
+            function ( self, player, reenter )
+                world:add_experience( player, 2000 )
+            end
+        ]],
+    },
+}
+
 register_blueprint "klass_inmate"
 {
     text = {
@@ -321,12 +333,13 @@ register_blueprint "klass_inmate"
     },
     callbacks = {
         on_activate = [=[
-            function(self,entity)
+            function(self, entity)
                 entity:attach( "resource_rage" )
                 entity:attach( "ktrait_always_angry" )
                 local adr = entity:attach( "ktrait_berserk" )
                 adr.skill.cost = 30
                 entity:attach( "pipe_wrench" )
+                entity:attach( "runtime_add_xp" )
             end
         ]=],
     },
@@ -338,12 +351,13 @@ register_blueprint "klass_inmate"
             { "ktrait_dash", max = 3, }, -- as scout
             { "ktrait_grenadier", max = 3, }, -- as tech
             { "trait_juggler", max = 3, }, -- as standard
+            { "ktrait_brute", max = 3, }, -- level +2 armour, level 2 +3 armour 25% explosion
+            { "ktrait_mule", max = 3, }, -- level 1 +1 inventory and exits, level 2 +2 inventory, level 3 +2 inventory and loot boxes resist,
             -- { "ktrait_gambler", max = 3, }, -- level 1 50% chance to refund terminal cost, level 2/3?
             -- { "ktrait_desperado", max = 3, }, -- bonus damage based on gun clipsize/shotcost
             -- { "ktrait_smuggler", max = 3, }, -- find ammo in destructable environments
             -- { "ktrait_cutter", max = 3, }, -- level 1 convert small med pack into combat pack, level 2 convert small med pack into stim pack, level 3?
-            -- { "ktrait_mule", max = 3, }, -- level 1 +1 inventory and exits, level 2 +2 inventory, level 3 +2 inventory and loot boxes
-            { "ktrait_brute", max = 3, }, -- level +2 armour, level 2 +3 armour 25% explosion resist, level 3 +4 armour 50% explosion resist
+
 
             -- { "ktrait_first_rule",  max = 3, require = { ktrait_brute = 1, } }, -- level 1 shows location of 5 enemies with most health, -- level 2 same plus exalted in different colour, level 3 --all enemies
             -- { "ktrait_burgler",    max = 3, require = { ktrait_smuggler = 2, } }, -- level 1 open doors at range, level 2 close doors at line of sight, level 3 red access, and locked mini branch access
