@@ -354,8 +354,8 @@ register_blueprint "klass_inmate"
             { "ktrait_brute", max = 3, }, -- level +2 armour, level 2 +3 armour 25% explosion
             { "ktrait_mule", max = 3, }, -- level 1 +1 inventory and exits, level 2 +2 inventory, level 3 +2 inventory and loot boxes resist,
             { "ktrait_smuggler", max = 3, }, -- find ammo in destructable environments
+            { "ktrait_desperado", max = 3, }, -- bonus damage based on gun clipsize/shotcost
             -- { "ktrait_gambler", max = 3, }, -- level 1 50% chance to refund terminal cost, level 2/3?
-            -- { "ktrait_desperado", max = 3, }, -- bonus damage based on gun clipsize/shotcost
             -- { "ktrait_cutter", max = 3, }, -- level 1 convert small med pack into combat pack, level 2 convert small med pack into stim pack, level 3?
 
 

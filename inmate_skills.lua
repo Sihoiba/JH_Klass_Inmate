@@ -23,7 +23,7 @@ register_blueprint "ktrait_brute"
     text = {
         name = "Brute",
         desc = "Increases armour and splash damaage resistnace",
-        full = "You're the guy everyone avoided in the yard. You'll shrug off hits that would stagger others.\n\n{!LEVEL 1} - {!2} points of armour versus all damage\n{!LEVEL 2} - {!3} points of armour, {!%-25} slash damage \n{!LEVEL 3} - {!4} points of armour, {!%-50} slash damage",
+        full = "You're the guy everyone avoided in the yard. You'll shrug off hits that would stagger others.\n\n{!LEVEL 1} - {!2} points of armour versus all damage\n{!LEVEL 2} - {!3} points of armour, {!%-25} splash damage \n{!LEVEL 3} - {!4} points of armour, {!%-50} splash damage",
         abbr = "Bru",
     },
     armor = {},
@@ -106,7 +106,7 @@ register_blueprint "ktrait_smuggler"
         name   = "Smuggler",
         desc   = "Find ammo in descructable environment objects",
         full   = "You know where the black market stashes items!\n\n{!LEVEL 1} - small amount of ammo in every object for current weapon, except grenades and rockets\n{!LEVEL 2} - medium amount of ammo, grenades can be found \n{!LEVEL 3} - large amount of ammo, rockets can be found",
-        abbr   = "Smg",
+        abbr   = "Sm",
     },
     attributes = {
         level   = 1,
@@ -167,5 +167,48 @@ register_blueprint "ktrait_smuggler"
                 end
             end
         ]],
+    },
+}
+
+register_blueprint "ktrait_desperado"
+{
+    blueprint = "trait",
+    text = {
+        name = "Desperado",
+        desc = "Damage bonus based on weapon shot cost versus clip size. No affect on melee.",
+        full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots in the clip, the fewer the better.\n\n{!LEVEL 1} - {!+25%} times shot cost/clip\n{!LEVEL 2} - {!+50%} times shot cost/clip\n{!LEVEL 3} - {!+100%} times shot cost/clip",
+        abbr = "Des",
+    },
+    attributes = {
+        level   = 1,
+        damage_mult = 1.0,
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self, entity)
+                gtk.upgrade_trait( entity, "ktrait_desperado" )
+            end
+        ]=],
+        on_aim = [=[
+            function ( self, entity, target, weapon )
+                local tlevel = self.attributes.level or 0
+                local bonus = 0.25
+                
+                if tlevel == 2 then
+                    bonus = 0.5
+                elseif tlevel == 3 then
+                    bonus = 1.0
+                end                                     
+                
+                if target and weapon and weapon.attributes and weapon.attributes.clip_size then
+                    local shot_cost = weapon.weapon.shot_cost or 1
+                    local cost_per_shot = shot_cost * weapon.attributes.shots
+                    local shot_clip_percent = cost_per_shot /  weapon.attributes.clip_size
+                    local damage_bonus = 1 + (shot_clip_percent * bonus)
+                    
+                    self.attributes.damage_mult = damage_bonus
+                end
+            end
+        ]=],
     },
 }
