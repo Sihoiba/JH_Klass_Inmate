@@ -24,7 +24,7 @@ register_blueprint "resource_rage"
                 if not entity.data or not entity.data.is_player then return end
                 if amount < 5 then return end
 
-                local restore_bonus = entity.attributes.rage_bonus or 0
+                local restore_bonus = entity:attribute( "rage_bonus") or 0
                 local restore = math.floor( amount * 0.2 ) + restore_bonus
                 local resource = entity:child( "resource_rage" )
 
@@ -252,6 +252,14 @@ register_blueprint "buff_inmate_berserk_grace_period"
     }
 }
 
+register_blueprint "buff_inmate_berserk_speed_boost"
+{
+    flags = { EF_NOPICKUP },
+    attributes = {
+        speed = 1.1
+    }
+}
+
 register_blueprint "ktrait_berserk"
 {
     blueprint = "trait",
@@ -271,18 +279,21 @@ register_blueprint "ktrait_berserk"
         on_use = [=[
             function ( self, entity, level, target )
                 local buff
-                local duration_bonus = (entity.attributes.berserk_duration_bonus or 0) + 1
+                local duration_bonus = (entity:attribute( "berserk_duration_bonus") or 0) + 1
+                local duration = 1000 * duration_bonus
                 if entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 1 then
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", 1000 * duration_bonus )
+                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", duration )
                 elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 2 then
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", 2000 * duration_bonus )
+                    duration = duration * 2
+                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", duration )
                 elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 3 then
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", 2000 * duration_bonus )
+                    duration = duration * 2
+                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", duration )
                 else
-                    buff = world:add_buff( entity, "buff_inmate_berserk_base", 1000 * duration_bonus )
+                    buff = world:add_buff( entity, "buff_inmate_berserk_base", duration )
                 end
-                if entity.attributes.berserk_action_bonus then
-                    buff.attributes.speed = 1.0 + entity.attributes.berserk_action_bonus
+                if entity:attribute( "berserk_action_bonus" ) then
+                    world:add_buff( entity, "buff_inmate_berserk_speed_boost", duration )
                 end
                 world:lua_callback( entity, "on_inmate_berserk" )
                 return 1
@@ -297,25 +308,6 @@ register_blueprint "ktrait_berserk"
         fail_vo  = "vo_no_fury",
         cooldown = 500,
         cost     = 25,
-    },
-}
-
-register_blueprint "ktrait_skilled_inmate"
-{
-    blueprint = "trait",
-    text = {
-        name   = "Skilled",
-        desc   = "PASSIVE SKILL - improve your class traits",
-        full   = "You were locked up for a reason. Each level of this skill improves your berserk active skill.\n\n{!LEVEL 1} - bigger melee damage bonus, better resistances, faster move speed\n{!LEVEL 2} - double Beserk duration, dodge bonus while berserk\n{!LEVEL 3} - even more melee damage, damage resistance and dodge",
-        abbr   = "Skl",
-    },
-    callbacks = {
-        on_activate = [=[
-            function(self,entity)
-                local attr  = entity.attributes
-                attr.skilled_bonus = ( attr.skilled_bonus or 0 ) + 1
-            end
-        ]=],
     },
 }
 
@@ -351,7 +343,7 @@ register_blueprint "klass_inmate"
             -- { "ktrait_smuggler", max = 3, }, -- find ammo in destructable environments
             -- { "ktrait_cutter", max = 3, }, -- level 1 convert small med pack into combat pack, level 2 convert small med pack into stim pack, level 3?
             -- { "ktrait_mule", max = 3, }, -- level 1 +1 inventory and exits, level 2 +2 inventory, level 3 +2 inventory and loot boxes
-            -- { "ktrait_brute", max = 3, }, -- level +2 armour, level 2 +3 armour 25% explosion resist, level 3 +4 armour 50% explosion resist
+            { "ktrait_brute", max = 3, }, -- level +2 armour, level 2 +3 armour 25% explosion resist, level 3 +4 armour 50% explosion resist
 
             -- { "ktrait_first_rule",  max = 3, require = { ktrait_brute = 1, } }, -- level 1 shows location of 5 enemies with most health, -- level 2 same plus exalted in different colour, level 3 --all enemies
             -- { "ktrait_burgler",    max = 3, require = { ktrait_smuggler = 2, } }, -- level 1 open doors at range, level 2 close doors at line of sight, level 3 red access, and locked mini branch access

@@ -13,7 +13,7 @@ register_blueprint "perk_cb_runaway_train"
     },
     attributes = {
         level = 2,
-        berserk_action_bonus = 0.1,
+        berserk_action_bonus = 1,
     },
 }
 
@@ -60,7 +60,7 @@ register_blueprint "perk_cb_healing_rage"
         name = "Healing Rage",
         desc = "Activating Berserk heals by 20%",
     },
-    attributes = {
+    callbacks = {
         on_inmate_berserk = [[
             function ( self, entity )
                 local attr  = entity.attributes
