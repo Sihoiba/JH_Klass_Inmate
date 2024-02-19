@@ -122,7 +122,7 @@ register_blueprint "ktrait_smuggler"
                 local level = world:get_level()
                 local tlevel = self.attributes.level or 0
                 local wep = entity:get_weapon()
-                if target and wep and wep.weapon and not (target.data and target.data.ai) and not target.hazard and wep.weapon.type ~= world:hash("melee") and wep.clip and wep.clip.ammo then
+                if target and wep and wep.weapon and not (target.data and target.data.ai) and not target.hazard and (target.text and target.text.name ~= "door") and wep.weapon.type ~= world:hash("melee") and wep.clip and wep.clip.ammo then
 
                     local ammos  =
                     {
@@ -193,22 +193,114 @@ register_blueprint "ktrait_desperado"
             function ( self, entity, target, weapon )
                 local tlevel = self.attributes.level or 0
                 local bonus = 0.25
-                
+
                 if tlevel == 2 then
                     bonus = 0.5
                 elseif tlevel == 3 then
                     bonus = 1.0
-                end                                     
-                
+                end
+
                 if target and weapon and weapon.attributes and weapon.attributes.clip_size then
                     local shot_cost = weapon.weapon.shot_cost or 1
                     local cost_per_shot = shot_cost * weapon.attributes.shots
                     local shot_clip_percent = cost_per_shot /  weapon.attributes.clip_size
                     local damage_bonus = 1 + (shot_clip_percent * bonus)
-                    
+
                     self.attributes.damage_mult = damage_bonus
                 end
             end
         ]=],
     },
+}
+
+register_blueprint "ktrait_gambler"
+{
+    blueprint = "trait",
+    text = {
+        name = "Gambler",
+        desc = "Chance to refund charges when using a terminal; excluding extract multitools.",
+        full = "You cannot resist a game of chance, hacking them into things when they don't otherwise exist.\n\n{!LEVEL 1} - {!+50%} chance to refund the cost when using a station\n{!LEVEL 2} - {!+10%} chance the station will drop a multitool when using it, and reveal terminals\n{!LEVEL 3} - {!+75%} chance to refund the cost when using a station.",
+        abbr = "Gmb",
+    },
+    attributes = {
+        level   = 1,
+    },
+    data = {
+        stations_and_terminals = {},
+        multitool_count = 0,
+    },
+    callbacks = {
+        on_activate = [[
+            function(self, entity)
+                gtk.upgrade_trait( entity, "ktrait_gambler" )
+            end
+        ]],
+        on_enter_level = [[
+            function ( self, entity, reenter )
+                if reenter then return end
+                self.data.stations_and_terminals = {}
+                for e in world:get_level():entities() do
+                    if e.attributes and e.attributes.charges then
+                        self.data.stations_and_terminals[world:get_id(e)] = e.attributes.charges
+                    end
+                end
+                local tlevel = self.attributes.level
+                if tlevel > 1 then
+                    leveltk.reveal_terminals_and_stations( world:get_level() )
+                end
+            end
+        ]],
+        on_pre_command = [[
+            function ( self, entity, command, weapon )
+                self.data.multitool_count = world:has_item( entity, "kit_multitool" )
+            end
+        ]],
+        on_post_command = [[
+            function ( self, entity, command, weapon, time )
+                if next(self.data.stations_and_terminals) == nil then
+                    nova.log("No stations or ammo terminals")
+                    return 0
+                end
+
+                local tlevel = self.attributes.level or 0
+
+                for e in world:get_level():entities() do
+                    for k, v in pairs(self.data.stations_and_terminals) do
+                        if k == world:get_id(e) then
+                            if v > e.attributes.charges then
+                                if self.data.multitool_count < world:has_item( entity, "kit_multitool" ) then
+                                    self.data.multitool_count = world:has_item( entity, "kit_multitool" )
+                                else
+                                    local lucky = math.random(2)
+
+                                    if tlevel == 3 then
+                                        lucky = math.random(4)
+                                    end
+
+                                    if lucky == 1 then
+                                        self.data.stations_and_terminals[world:get_id(e)] = e.attributes.charges
+                                    elseif lucky > 1 then
+                                        world:play_sound( "vending_hit_reward", e )
+                                        e.attributes.charges = v
+                                        uitk.station_activate( entity, e, true )
+                                    end
+
+                                    if tlevel > 1 then
+                                        local mtlucky = math.random(10)
+                                        if mtlucky == 10 then
+                                            world:play_sound( "vending_hit_reward", e )
+                                            entity:pickup( "kit_multitool", true )
+                                            uitk.station_activate( entity, e, true )
+                                        end
+                                    end
+                                end
+                            elseif v < e.attributes.charges then
+                                self.data.stations_and_terminals[world:get_id(e)] = e.attributes.charges
+                            end
+                        end
+                    end
+                end
+            end
+        ]],
+     },
 }

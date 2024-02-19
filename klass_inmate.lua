@@ -339,7 +339,7 @@ register_blueprint "klass_inmate"
                 local adr = entity:attach( "ktrait_berserk" )
                 adr.skill.cost = 30
                 entity:attach( "pipe_wrench" )
-                entity:attach( "runtime_add_xp" )
+                entity:attach( "runtime_add_xp" )				
             end
         ]=],
     },
@@ -355,7 +355,7 @@ register_blueprint "klass_inmate"
             { "ktrait_mule", max = 3, }, -- level 1 +1 inventory and exits, level 2 +2 inventory, level 3 +2 inventory and loot boxes resist,
             { "ktrait_smuggler", max = 3, }, -- find ammo in destructable environments
             { "ktrait_desperado", max = 3, }, -- bonus damage based on gun clipsize/shotcost
-            -- { "ktrait_gambler", max = 3, }, -- level 1 50% chance to refund terminal cost, level 2/3?
+            { "ktrait_gambler", max = 3, }, -- level 1 50% chance to refund terminal cost, level 2/3?
             -- { "ktrait_cutter", max = 3, }, -- level 1 convert small med pack into combat pack, level 2 convert small med pack into stim pack, level 3?
 
 
@@ -364,7 +364,7 @@ register_blueprint "klass_inmate"
             -- { "ktrait_sucker_punch",    max = 3, require = { ktrait_skilled_inmate = 1, } }, -- non blade melee weapon attacks at 0.9 speed, level 2 0.8, level 3 0.6. Some sort of guaranteed axe?
             -- { "ktrait_dealer",   max = 3, require = { ktrait_cutter = 1, } }, -- increases duration of positive boons per level
             -- { "trait_whizkid",       max = 3, require = { ktrait_gambler = 1, } }, -- as standard
-            -- { "",         max = 3, require = { trait_hellrunner = 1, } },
+            -- { "trait_hitman",         max = 3, require = { ktrait_desperado = 1, } }, -- lvl 1 improved min range, lvl 2 explosive weapons/grenades are safe, lvl 3 ignore cover
             -- { "",      max = 3, require = { ktrait_furious = 1, } },
 
             -- { "ktrait_master_berserker", max = 3, master = true, require = { -- berserk triggers on damage/gibbing
