@@ -432,3 +432,225 @@ register_blueprint "ktrait_cutter"
         level = 1,
     },
 }
+
+register_blueprint "ktrait_first_rule"
+{
+    blueprint = "trait",
+    text = {
+        name   = "First Rule",
+        desc   = "Highlight most dangerous enemies on the minimap",
+        full   = "First rule as an inmate, find the biggest guy in prison and make him your bitch.\n\n{!LEVEL 1} - the three toughest enemies will be visible on the mini map\n{!LEVEL 2} - exalted enemies are visible on the mini map and highlighted out of view in a different colour\n{!LEVEL 3} - always know where {!all} enemies are",
+        abbr   = "FRu",
+    },
+    attributes = {
+        level        = 1,
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self,entity)
+                gtk.upgrade_trait( entity, "ktrait_first_rule" )
+            end
+        ]=],
+        on_enter_level = [=[
+            function ( self, entity, reenter )
+                if reenter then return end
+                local level = world:get_level()
+                if self.attributes.level == 3 then
+                    leveltk.reveal_enemies( world:get_level() )
+                elseif self.attributes.level >= 1 then
+                    local toughest = {}
+                    local toughest3 = {}
+                    local track_count = 0
+                    for e in level:enemies() do
+                        local danger = e.attributes.health + e.attributes.experience_value
+                        if self.attributes.level == 2 and e.text and not string.find(e.text.name, "exalted") then
+                            table.insert(toughest, {entity = e, danger = danger})
+                            track_count = track_count + 1
+                        elseif self.attributes.level == 1 then
+                            table.insert(toughest, {entity = e, danger = danger})
+                            track_count = track_count + 1
+                        end
+                    end
+
+                    table.sort( toughest, function ( a, b ) return a.danger > b.danger end )
+
+                    for i = 1,3 do
+                        if toughest[i] then
+                            toughest3[toughest[i].entity] = toughest[i].danger
+                        end
+                    end
+
+                    for e in level:enemies() do
+                        if toughest3[e] then
+                            e:equip("tracker")
+                            e.minimap.always = true
+                        end
+                    end
+                end
+                if self.attributes.level >= 2 then
+                    for e in level:enemies() do
+                        if e.text and string.find(e.text.name, "exalted") then
+                            local tracker = e:child("tracker")
+                            if tracker then
+                                world:mark_destroy( tracker )
+                            end
+                            local etracker = e:equip("exalted_tracker")
+                            e.minimap.color = etracker.minimap.color
+                            e.minimap.always = true
+                        end
+                    end
+                    world:flush_destroy()
+                end
+            end
+        ]=],
+    },
+}
+
+register_blueprint "ktrait_burgler_open_close"
+{
+    blueprint = "trait",
+    text = {
+        name  = "Open doors",
+        name2 = "Open/close doors",
+        name3 = "Open/close/unlock doors",
+        desc  = "ACTIVE SKILL - open near by doors",
+        abbr  = "Open doors",
+    },
+    callbacks = {
+        on_use = [=[
+            function ( self, entity, level, target )
+                local level = world:get_level()
+                local tlevel = self.attributes.level
+                for e in level:entities() do
+                    if e.text and e.text.name == "door" then
+                        local coord = world:get_position(e)
+                        local distance = level:distance(entity, e)
+                        local visible = level:is_visible(coord)
+                        local closed = e.flags.data[ EF_NOMOVE ]
+                        local broken = e.flags.data[ EF_KILLED ]
+                        local locked = ecs:child( e, "door_locked" )
+
+                        if tlevel == 1 and distance < 3 and visible and closed and not broken and not locked then
+                            e.flags.data = { EF_ACTION },
+                            world:play_sound( "door_open", e )
+                            world:set_state( e, "open" )
+                        elseif tlevel > 1 and visible and closed and not broken and not locked then
+                            e.flags.data = { EF_ACTION },
+                            world:play_sound( "door_open", e )
+                            world:set_state( e, "open" )
+                        elseif tlevel > 1 and visible and not closed and not broken and level:can_close( e ) then
+                            e.flags.data = { EF_NOSIGHT, EF_NOMOVE, EF_NOFLY, EF_NOSHOOT, EF_BUMPACTION, EF_ACTION }
+                            world:play_sound( "door_close", e )
+                            world:set_state( e, "closed" )
+                        end
+                        if tlevel == 3 and visible and not broken and ecs:child( e, "door_locked" ) then
+                            e.flags.data = { EF_ACTION },
+                            level:change_state( e, {
+                                door_locked    = "door_unlocked",
+                            })
+                            world:play_sound( "door_open", e )
+                            world:set_state( e, "open" )
+                        end
+                    end
+                    if tlevel == 3 then
+                        local elevators = { elevator_01 = true, elevator_01_off = true, elevator_01_branch = true, elevator_01_special = true, elevator_01_mini = true }
+                        for e in level:entities() do
+                            local coord = world:get_position(e)
+                            local visible = level:is_visible(coord)
+                            if visible and elevators[ world:get_id(e) ] then
+                                local locked = e:child( "elevator_inactive" ) or e:child( "elevator_locked" ) or e:child("elevator_secure")
+                                if locked then
+                                    world:set_state( e, "open" )
+                                    world:play_sound( "door_open_03", e )
+                                    world:mark_destroy( locked )
+                                    world:flush_destroy()
+                                end
+                            end
+                        end
+                    end
+                end
+                return 1
+            end
+        ]=],
+        is_usable = [=[
+            function ( self, user )
+                local level = world:get_level()
+                local tlevel = self.attributes.level
+                for e in level:entities() do
+                    if e.text and e.text.name == "door" then
+                        local coord = world:get_position(e)
+                        local distance = level:distance(user, e)
+                        local visible = level:is_visible(coord)
+                        local closed = e.flags.data[ EF_NOMOVE ]
+                        local broken = e.flags.data[ EF_KILLED ]
+                        local locked = ecs:child( e, "door_locked" )
+
+                        if tlevel == 1 and distance < 3 and visible and closed and not broken and not locked then
+                            return 1
+                        elseif tlevel > 1 and visible and closed and not broken and not locked then
+                            return 1
+                        elseif tlevel > 1 and visible and not closed and not broken and level:can_close( e ) then
+                            return 1
+                        end
+                        if tlevel == 3 and visible and not broken and ecs:child( e, "door_locked" ) then
+                            return 1
+                        end
+                    end
+                    if tlevel == 3 then
+                        local elevators = { elevator_01 = true, elevator_01_off = true, elevator_01_branch = true, elevator_01_special = true, elevator_01_mini = true }
+                        for e in level:entities() do
+                            local coord = world:get_position(e)
+                            local visible = level:is_visible(coord)
+                            if visible and elevators[ world:get_id(e) ] then
+                                local locked = e:child( "elevator_inactive" ) or e:child( "elevator_locked" ) or e:child("elevator_secure")
+                                if locked then
+                                    return 1
+                                end
+                            end
+                        end
+                    end
+                end
+                return 0
+            end
+        ]=],
+    },
+    data = {
+        is_free_use = true,
+    },
+    attributes = {
+        level = 1,
+    },
+    skill = {
+        cooldown = 1000,
+        cost     = 0,
+    },
+}
+
+register_blueprint "ktrait_burgler"
+{
+    blueprint = "trait",
+    text = {
+        name   = "Burgler",
+        desc   = "ACTIVE SKILL - open doors from a distance",
+        full   = "There's no where you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance\n{!LEVEL 2} - open or close all doors in sight\n{!LEVEL 3} - open red key card locked doors and elevators, open locked mini level elevators in sight",
+        abbr   = "Bur",
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self,entity)
+                gtk.upgrade_trait( entity, "ktrait_burgler" )
+                local tlevel, burg = gtk.upgrade_trait( entity, "ktrait_burgler_open_close" )
+                if tlevel == 2 then
+                    burg.text.name = burg.text.name2
+                    burg.text.abbr = burg.text.name2
+                elseif tlevel == 3 then
+                    burg.text.name = burg.text.name3
+                    burg.text.abbr = burg.text.name3
+                end
+            end
+        ]=]
+    },
+    attributes = {
+        level = 1,
+    }
+}

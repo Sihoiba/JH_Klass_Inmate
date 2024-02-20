@@ -101,3 +101,16 @@ register_gfx_blueprint "exo_helmet_inmate"
 {
     blueprint = "exo_helmet_battle",
 }
+
+register_gfx_blueprint "exalted_tracker"
+{
+    equip = {},
+    scene = {},
+    uisprite = {
+        icon       = "data/texture/ui/icons/ui_telegraph_01",
+        animation  = "PULSE",
+        propagate  = true,
+        color      = vec4( 1.5, 0.75, 2.25, 1.0 ),
+        visibility = "OOV_ONLY",
+    },
+}

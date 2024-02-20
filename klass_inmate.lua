@@ -352,15 +352,14 @@ register_blueprint "klass_inmate"
             { "ktrait_grenadier", max = 3, },
             { "trait_juggler", max = 3, },
             { "ktrait_brute", max = 3, },
-            { "ktrait_mule", max = 3, }, 
-            { "ktrait_smuggler", max = 3, }, 
-            { "ktrait_desperado", max = 3, }, 
+            { "ktrait_mule", max = 3, },
+            { "ktrait_smuggler", max = 3, },
+            { "ktrait_desperado", max = 3, },
             { "ktrait_gambler", max = 3, },
-            { "ktrait_cutter", max = 3, }, 
+            { "ktrait_cutter", max = 3, },
 
-
-            -- { "ktrait_first_rule",  max = 3, require = { ktrait_brute = 1, } }, -- level 1 shows location of 5 enemies with most health, -- level 2 same plus exalted in different colour, level 3 --all enemies
-            -- { "ktrait_burgler",    max = 3, require = { ktrait_smuggler = 2, } }, -- level 1 open doors at range, level 2 close doors at line of sight, level 3 red access, and locked mini branch access
+            { "ktrait_first_rule",  max = 3, require = { ktrait_brute = 1, } }, -- level 1 shows location of 5 enemies with most health, -- level 2 same plus exalted in different colour, level 3 --all enemies
+            { "ktrait_burgler",    max = 3, require = { ktrait_smuggler = 2, } }, -- level 1 open doors at range, level 2 close doors at line of sight, level 3 red access, and locked mini branch access
             -- { "ktrait_sucker_punch",    max = 3, require = { ktrait_skilled_inmate = 1, } }, -- non blade melee weapon attacks at 0.9 speed, level 2 0.8, level 3 0.6. Some sort of guaranteed axe?
             -- { "ktrait_dealer",   max = 3, require = { ktrait_cutter = 1, } }, -- increases duration of positive boons per level
             { "trait_whizkid",       max = 3, require = { ktrait_gambler = 1, } },
