@@ -1,10 +1,10 @@
 nova.require "data/lua/core/common"
 
-register_blueprint "perk_cb_runaway_train"
+register_blueprint "perk_ca_runaway_train"
 {
     blueprint = "perk",
     lists = {
-        group    = "perk_cb",
+        group    = "perk_ca",
         keywords = { "inmate", "amp", "armor", },
     },
     text = {

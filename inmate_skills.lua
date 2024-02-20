@@ -22,8 +22,8 @@ register_blueprint "ktrait_brute"
     blueprint = "trait",
     text = {
         name = "Brute",
-        desc = "Increases armour and splash damaage resistnace",
-        full = "You're the guy everyone avoided in the yard. You'll shrug off hits that would stagger others.\n\n{!LEVEL 1} - {!2} points of armour versus all damage\n{!LEVEL 2} - {!3} points of armour, {!%-25} splash damage \n{!LEVEL 3} - {!4} points of armour, {!%-50} splash damage",
+        desc = "Increases armour and splash damage resistance",
+        full = "You're the guy everyone avoided in the yard. You'll shrug off hits that would stagger others.\n\n{!LEVEL 1} - {!2} points of armour versus all damage\n{!LEVEL 2} - {!3} points of armour, {!-25%} splash damage \n{!LEVEL 3} - {!4} points of armour, {!-50%} splash damage",
         abbr = "Bru",
     },
     armor = {},
@@ -57,7 +57,7 @@ register_blueprint "ktrait_mule"
     text = {
         name   = "Mule",
         desc   = "Gain extra inventory slots, locate exits and lootboxes",
-        full   = "You are the go to guy to move contraband around callisto!\n\n{!LEVEL 1} - {!+1} inventory slot, reveal elevators\n{!LEVEL 2} - {!+3} inventory slots\n{!LEVEL 3} - {!+5} inventory slots, reveal lost boxes",
+        full   = "You are the go to guy to move contraband around Callisto!\n\n{!LEVEL 1} - {!+1} inventory slot, reveal elevators\n{!LEVEL 2} - {!+3} inventory slots\n{!LEVEL 3} - {!+5} inventory slots, reveal lootboxes",
         abbr   = "Mul",
     },
     attributes = {
@@ -104,8 +104,8 @@ register_blueprint "ktrait_smuggler"
     blueprint = "trait",
     text = {
         name   = "Smuggler",
-        desc   = "Find ammo in descructable environment objects",
-        full   = "You know where the black market stashes items!\n\n{!LEVEL 1} - small amount of ammo in every object for current weapon, except grenades and rockets\n{!LEVEL 2} - medium amount of ammo, grenades can be found \n{!LEVEL 3} - large amount of ammo, rockets can be found",
+        desc   = "Find ammo in destructable environment objects",
+        full   = "You know where the black market stashes items! Break boxes, plants, and chairs to find ammo.\n\n{!LEVEL 1} - small amount of ammo in every object for current weapon, except 40mm grenades and rockets\n{!LEVEL 2} - medium amount of ammo, 40mm grenades can be found \n{!LEVEL 3} - large amount of ammo, rockets can be found",
         abbr   = "Sm",
     },
     attributes = {
@@ -303,4 +303,132 @@ register_blueprint "ktrait_gambler"
             end
         ]],
      },
+}
+
+function run_cutter_ui( self, user, level, return_entity )
+    local list = {}
+
+    local max_len = 1
+    if level >= 1 and world:has_item( user, "medkit_small" ) > 0 then
+        max_len = math.max( max_len, string.len( "Make combat pack" ) )
+        table.insert( list, {
+            name = "Make combat pack",
+            target = self,
+            parameter = world:create_entity("combatpack_small"),
+            confirm = true,
+       })
+    end
+    if level >= 2 and world:has_item( user, "medkit_small" ) > 0  then
+        max_len = math.max( max_len, string.len( "Make stimpack" ) )
+        table.insert( list, {
+            name = "Make stimpack",
+            target = self,
+            parameter = world:create_entity("stimpack_small"),
+            confirm = true,
+       })
+    end
+    if level == 3 and world:has_item( user, "medkit_large" ) > 0  then
+        max_len = math.max( max_len, string.len( "Breakdown large medkit" ) )
+        table.insert( list, {
+            name = "Breakdown large medkit",
+            target = self,
+            parameter = world:create_entity("medkit_small"),
+            confirm = true,
+       })
+    end
+
+    table.insert( list, {
+        name = ui:text("ui.lua.common.cancel"),
+        target = self,
+        cancel = true,
+    })
+    list.title = "Convert medkits"
+    list.size  = coord( math.max( 30, max_len + 6 ), 0 )
+    list.confirm = "Are you sure you want to convert a medkit?"
+    ui:terminal( user, nil, list )
+end
+
+register_blueprint "ktrait_cutter_skill"
+{
+    blueprint = "trait",
+    text = {
+        name  = "Cut Medkits",
+        desc  = "ACTIVE SKILL - convert medkits into other item",
+        abbr  = "Cut skill",
+    },
+    callbacks = {
+        on_use = [=[
+            function( self, entity )
+                if entity == world:get_player() then
+                    nova.log("Run UI")
+                    run_cutter_ui( self, entity, self.attributes.level, entity )
+                    return -1
+                else
+                    return -1
+                end
+            end
+        ]=],
+        on_activate = [=[
+            function ( self, who, level, param )
+                nova.log("on activate")
+                if param then
+                    nova.log("param"..tostring(param.text.name))
+                    if param.text.name == "combat pack" and world:has_item( who, "medkit_small" ) > 0 then
+                        world:remove_items( who, "medkit_small", 1 )
+                        who:pickup( "combatpack_small", true )
+                    elseif param.text.name == "stimpack" and world:has_item( who, "medkit_small" ) > 0  then
+                        world:remove_items( who, "medkit_small", 1 )
+                        who:pickup( "stimpack_small", true )
+                    elseif param.text.name == "small medkit" and world:has_item( who, "medkit_large" ) > 0  then
+                        world:remove_items( who, "medkit_large", 1 )
+                        who:pickup( "medkit_small", true )
+                        who:pickup( "medkit_small", true )
+                        who:pickup( "medkit_small", true )
+                    end
+                end
+            end
+        ]=],
+        is_usable = [=[
+            function ( self, user )
+                local tlevel = self.attributes.level or 0
+                if tlevel >= 1 and world:has_item( user, "medkit_small" ) > 0 then
+                    return 1
+                elseif tlevel == 3 and world:has_item( user, "medkit_large" ) > 0 then
+                    return 1
+                end
+                return 0
+            end
+        ]=],
+    },
+    data = {
+        is_free_use = true,
+    },
+    attributes = {
+        level = 1,
+    },
+    skill = {
+        cooldown = 0,
+    }
+}
+
+register_blueprint "ktrait_cutter"
+{
+    blueprint = "trait",
+    text = {
+        name  = "Cutter",
+        desc  = "You can convert medkits into better drugs",
+        full  = "You know how to convert standard civilian medkits into something much more potent\n\n{!LEVEL 1} - convert small medkits into combat packs\n{!LEVEL 2} - convert small medkits into stimpacks\n{!LEVEL 3} - convert large medkits into three small medkits",
+        abbr  = "Cut",
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self, entity)
+                gtk.upgrade_trait( entity, "ktrait_cutter" )
+                gtk.upgrade_trait( entity, "ktrait_cutter_skill" )
+            end
+        ]=],
+    },
+    attributes = {
+        level = 1,
+    },
 }
