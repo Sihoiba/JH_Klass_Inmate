@@ -654,3 +654,61 @@ register_blueprint "ktrait_burgler"
         level = 1,
     }
 }
+
+register_blueprint "ktrait_sucker_punch"
+{
+    blueprint = "trait",
+    text = {
+        name   = "Sucker punch",
+        desc   = "They never see the first blow coming",
+        full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non bladed melee weapons you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non bladed one.\n\n{!LEVEL 1} - {!90%} attack time with non bladed melee weapons\n{!LEVEL 2} - {!80%} attack time with non bladed melee weapons, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time with non bladed melee weapons, melee weapon lootboxes contain large axes",
+        abbr   = "Bda",
+    },
+    attributes = {
+        level = 1,
+        melee_speed = 1.11,
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self,entity)
+                local tlevel, t = gtk.upgrade_trait( entity, "ktrait_sucker_punch" )
+                local attr = t.attributes
+                if tlevel == 2 then
+                    attr.melee_speed = 1.25
+                elseif tlevel == 3 then
+                    attr.melee_speed = 1.67
+                end
+            end
+        ]=],
+        on_post_command = [=[
+            function ( self, actor, cmt, tgt, time )
+                if time <= 0 then return end
+                if cmt == COMMAND_USE then
+                    local weapon = actor:get_weapon()
+                    if weapon and weapon.weapon and weapon.weapon.type == world:hash("melee")
+                    and not gtk.is_blade( weapon ) then
+                        self.attributes.speed = self.attributes.melee_speed
+                    end
+                else
+                    self.attributes.speed = 1.0
+                end
+            end
+        ]=],
+        on_lootbox_open = [=[
+            function(self, who, what)
+                local tlevel  = self.attributes.level
+                local melee_box = false
+                for c in ecs:children( what ) do
+                    if c.weapon and c.weapon.type == world:hash("melee") then
+                        melee_box = true
+                    end
+                end
+                if tlevel == 2 and melee_box then
+                    what:attach("axe")
+                elseif tlevel == 3 and melee_box then
+                    what:attach("axe_large")
+                end
+            end
+        ]=],
+    },
+}
