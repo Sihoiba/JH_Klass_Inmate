@@ -358,12 +358,12 @@ register_blueprint "klass_inmate"
             { "ktrait_gambler", max = 3, },
             { "ktrait_cutter", max = 3, },
 
-			{ "ktrait_sucker_punch",    max = 3, require = { ktrait_skilled_inmate = 1, } }, 
+            { "ktrait_sucker_punch",    max = 3, require = { ktrait_skilled_inmate = 1, } },
             { "ktrait_first_rule",  max = 3, require = { ktrait_brute = 1, } },
-            { "ktrait_burgler",    max = 3, require = { ktrait_smuggler = 2, } }, 
+            { "ktrait_burgler",    max = 3, require = { ktrait_smuggler = 2, } },
             { "trait_whizkid",       max = 3, require = { ktrait_gambler = 1, } },
-            -- { "ktrait_dealer",   max = 3, require = { ktrait_cutter = 1, } }, -- increases duration of positive boons per level
-            
+            { "ktrait_dealer",   max = 3, require = { ktrait_cutter = 1, } }, -- increases duration of positive boons per level
+
             -- { "trait_hitman",         max = 3, require = { ktrait_desperado = 1, } }, -- lvl 1 improved min range, lvl 2 explosive weapons/grenades are safe, lvl 3 ignore cover
             -- { "",      max = 3, require = { ktrait_furious = 1, } },
 

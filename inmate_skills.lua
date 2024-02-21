@@ -736,3 +736,59 @@ register_blueprint "ktrait_sucker_punch"
         ]=],
     },
 }
+
+dealer = {
+    data = {
+        buffs = {},
+    }
+}
+
+function dealer.record_buff( entity )
+    if entity and entity.text then
+        if entity.text.name == "Stimmed" or entity.text.name == "Juiced" or entity.text.name == "Enviro" then
+            table.insert(dealer.data.buffs, entity)
+        end
+    end
+end
+
+register_blueprint "ktrait_dealer"
+{
+    blueprint = "trait",
+    text = {
+        name = "Dealer",
+        desc = "Increases duration of postive buffs from items.",
+        full = "When your fellow prisoners want better drugs, you are the person they turn to. When you use items that grant buffs like stim packs the duraction is increased\n\n{!LEVEL 1} - Positive buff duration increased by {!50%} \n{!LEVEL 2} - increase is now {!100%} \n{!LEVEL 3} - increase is now {!200%}s",
+        abbr = "Des",
+    },
+    attributes = {
+        level   = 1,
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self, entity)
+                local tlevel = gtk.upgrade_trait( entity, "ktrait_dealer" )
+                if tlevel == 1 then
+                    world.register_on_entity( dealer.record_buff )
+                end
+            end
+        ]=],
+        on_post_command = [=[
+            function ( self, actor, cmt, tgt, time )
+                if world:get_player() ~= actor then
+                    return 0
+                end
+                local increase = {1.5, 2.0, 3.0}
+                for k,e in pairs(dealer.data.buffs) do
+                    if e.lifetime then
+                        e.lifetime.time_left = e.lifetime.time_left * increase[self.attributes.level]
+                    end
+
+                    table.remove(dealer.data.buffs, k)
+                end
+                return 0
+            end
+        ]=],
+    },
+
+
+}
