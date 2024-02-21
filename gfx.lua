@@ -114,3 +114,30 @@ register_gfx_blueprint "exalted_tracker"
         visibility = "OOV_ONLY",
     },
 }
+
+register_gfx_blueprint "adv_crowbar"
+{
+    blueprint = "crowbar",
+    uisprite = {
+        icon = "data/texture/ui/icons/ui_weapon_crowbar",
+        color = vec4( 0.0, 1.0, 1.0, 1.0 ),
+    },
+}
+
+register_gfx_blueprint "adv_axe"
+{
+    blueprint = "axe",
+    uisprite = {
+        icon = "data/texture/ui/icons/ui_weapon_axe_medium",
+        color = vec4( 0.0, 1.0, 1.0, 1.0 ),
+    },
+}
+
+register_gfx_blueprint "adv_axe_large"
+{
+    blueprint = "axe_large",
+    uisprite = {
+        icon = "data/texture/ui/icons/ui_weapon_axe_large",
+        color = vec4( 0.0, 1.0, 1.0, 1.0 ),
+    },
+}

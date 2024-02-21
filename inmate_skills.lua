@@ -139,27 +139,27 @@ register_blueprint "ktrait_smuggler"
                     local grenades = "ammo_40"
                     local rockets = "ammo_rockets"
 
-                    if tlevel == 1 and ammo.id ~= grenades and ammo.id ~= rockets then
+                    if tlevel == 1 and ammo and ammo.id ~= grenades and ammo.id ~= rockets then
                         local e = world:create_entity( ammo.id )
                         e.stack.amount = 1 + math.random(2)
                         level:drop_entity( e, coord )
-                    elseif tlevel == 2 and ammo.id == grenades then
+                    elseif tlevel == 2 and ammo and ammo.id == grenades then
                         local e = world:create_entity( ammo.id )
                         e.stack.amount = 1 + math.random(2)
                         level:drop_entity( e, coord )
-                    elseif tlevel == 2 and ammo.id ~= grenades and ammo.id ~= rockets then
+                    elseif tlevel == 2 and ammo and ammo.id ~= grenades and ammo.id ~= rockets then
                         local e = world:create_entity( ammo.id )
                         e.stack.amount = 5 + math.random(5)
                         level:drop_entity( e, coord )
-                    elseif tlevel == 3 and ammo.id == grenades then
+                    elseif tlevel == 3 and ammo and ammo.id == grenades then
                         local e = world:create_entity( ammo.id )
                         e.stack.amount = 3 + math.random(3)
                         level:drop_entity( e, coord )
-                    elseif tlevel == 3 and ammo.id == rockets then
+                    elseif tlevel == 3 and ammo and ammo.id == rockets then
                         local e = world:create_entity( ammo.id )
                         e.stack.amount = 1 + math.random(2)
                         level:drop_entity( e, coord )
-                    elseif tlevel == 3 and ammo.id ~= grenades and ammo.id ~= rockets then
+                    elseif tlevel == 3 and ammo and ammo.id ~= grenades and ammo.id ~= rockets then
                         local e = world:create_entity( ammo.id )
                         e.stack.amount = 10 + math.random(10)
                         level:drop_entity( e, coord )
@@ -462,7 +462,8 @@ register_blueprint "ktrait_first_rule"
                     local toughest3 = {}
                     local track_count = 0
                     for e in level:enemies() do
-                        local danger = e.attributes.health + e.attributes.experience_value
+                        local xp = e.attributes.experience_value or 0
+                        local danger = e.attributes.health + xp
                         if self.attributes.level == 2 and e.text and not string.find(e.text.name, "exalted") then
                             table.insert(toughest, {entity = e, danger = danger})
                             track_count = track_count + 1
@@ -698,15 +699,38 @@ register_blueprint "ktrait_sucker_punch"
             function(self, who, what)
                 local tlevel  = self.attributes.level
                 local melee_box = false
+                local melee_adv = false
+                local melee_adv_prefix = ""
                 for c in ecs:children( what ) do
-                    if c.weapon and c.weapon.type == world:hash("melee") then
+                        if c.weapon and c.weapon.type == world:hash("melee") then
                         melee_box = true
+                        if c.data and not melee_adv then
+                            melee_adv = c.data.adv
+                            melee_adv_prefix = c.text.prefix
+                        end
                     end
                 end
+                nova.log(melee_adv_prefix)
+                local tier = 0
+                if melee_adv_prefix == "AV1" then
+                    tier = 1
+                elseif melee_adv_prefix == "AV2" then
+                    tier = 2
+                elseif melee_adv_prefix == "AV3" then
+                    tier = 3
+                end
                 if tlevel == 2 and melee_box then
-                    what:attach("axe")
+                    if melee_adv then
+                        what:attach("adv_axe", nil, tier)
+                    else
+                        what:attach("axe")
+                    end
                 elseif tlevel == 3 and melee_box then
-                    what:attach("axe_large")
+                    if melee_adv then
+                        what:attach("adv_axe_large", nil, tier)
+                    else
+                        what:attach("axe_large")
+                    end
                 end
             end
         ]=],
