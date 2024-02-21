@@ -131,3 +131,105 @@ register_blueprint "perk_ta_capacitor"
         ]],
     }
 }
+
+register_blueprint "buff_kneecapped"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name  = "Kneecapped",
+        desc  = "quarter move speed",
+    },
+    ui_buff = {
+        color     = LIGHTRED,
+    },
+    attributes = {
+        move_time   = 1.5,
+    },
+}
+
+register_blueprint "perk_wb_kneecap"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name = "Kneecapping",
+        desc = "debuffs biological enemies with the {!Kneecapped} status, reducing their move speed by {!25%}",
+    },
+    attributes = {
+        level = 1,
+    },
+    callbacks = {
+        on_damage = [=[
+            function ( unused, weapon, who, amount, source )
+                if who and who.data and ( not who.data.is_mechanical ) then
+                    world:add_buff( who, "buff_kneecapped", 150, true )
+                end
+            end
+        ]=],
+    },
+}
+
+register_blueprint "buff_panicked"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name  = "Panicked",
+        desc  = "reduces enemy accuracy by 25%",
+    },
+    ui_buff = {
+        color     = LIGHTRED,
+    },
+    attributes = {
+        accuracy = -25,
+    },
+}
+
+register_blueprint "perk_we_panic"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name = "Panicing",
+        desc = "debuffs biological enemies with the {!Panicked} status, reducing their accuracy by 25%",
+    },
+    callbacks = {
+        on_damage = [=[
+            function ( unused, weapon, who, amount, source )
+                if who and who.data and ( not who.data.is_mechanical ) then
+                    world:add_buff( who, "buff_panicked", 150, true )
+                end
+            end
+        ]=],
+    },
+}
+
+register_blueprint "buff_stunned"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name  = "Stunned",
+        desc  = "damage dealt by this entity is reduced by 25%",
+    },
+    ui_buff = {
+        color     = LIGHTRED,
+    },
+    attributes = {
+        damage_mult = 0.75,
+    },
+}
+
+register_blueprint "perk_we_stun"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name = "Stunning",
+        desc = "debuffs biological enemies with the {!Stunned} status, reducing their damage by 25%",
+    },
+    callbacks = {
+        on_damage = [=[
+            function ( unused, weapon, who, amount, source )
+                if who and who.data and ( not who.data.is_mechanical ) then
+                    world:add_buff( who, "buff_stunned", 150, true )
+                end
+            end
+        ]=],
+    },
+}

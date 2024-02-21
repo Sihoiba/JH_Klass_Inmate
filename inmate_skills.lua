@@ -846,3 +846,65 @@ register_blueprint "ktrait_hitman"
         ]=],
     },
 }
+
+register_blueprint "ktrait_kneecap"
+{
+    blueprint = "trait",
+    text = {
+        name   = "Kneecap",
+        desc   = "PISTOL/SMG/SEMI SKILL - weaken biological enemies on hit",
+        full   = "You know where to shoot someone to give them a bad day!\n\n{!LEVEL 1} - enemies shot are slowed\n{!LEVEL 2} - enemies shot have reduced accuracy\n{!LEVEL 3} - enemies shot do reduced damage\n",
+        abbr   = "Kne",
+    },
+    attributes = {
+        level = 1,
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self, entity)
+                local tlevel = gtk.upgrade_master( entity, "ktrait_kneecap" )
+                local index = 0
+                repeat
+                    local w   = world:get_weapon( entity, index, true )
+                    if not w then break end
+                    local wd = w.weapon
+                    if wd then
+                        if gtk.is_weapon_group( w, {"pistols","smgs","semi"} ) then
+                            if tlevel >= 1 and not w:child("perk_wb_kneecap") then
+                                generator.add_perk( w, "perk_wb_kneecap" )
+                            end
+                            if tlevel >= 2 and not w:child("perk_we_panic") then
+                                generator.add_perk( w, "perk_we_panic" )
+                            end
+                            if tlevel == 3 and not w:child("perk_we_stun")  then
+                                generator.add_perk( w, "perk_we_stun" )
+                            end
+                        end
+                    end
+                    index = index + 1
+                until false
+            end
+        ]=],
+        on_pickup = [=[
+            function ( self, user, w )
+                if w and w.weapon and ( not w.stack ) then
+                    local tlevel = self.attributes.level
+                    local wd     = w.weapon
+                    if wd then
+                        if gtk.is_weapon_group( w, {"pistols","smgs","semi"} ) then
+                            if tlevel >= 1 and not w:child("perk_wb_kneecap") then
+                                generator.add_perk( w, "perk_wb_kneecap" )
+                            end
+                            if tlevel >= 2 and not w:child("perk_we_panic") then
+                                generator.add_perk( w, "perk_we_panic" )
+                            end
+                            if tlevel == 3 and not w:child("perk_we_stun")  then
+                                generator.add_perk( w, "perk_we_stun" )
+                            end
+                        end
+                    end
+                end
+            end
+        ]=],
+    },
+}

@@ -364,8 +364,8 @@ register_blueprint "klass_inmate"
             { "trait_whizkid",       max = 3, require = { ktrait_gambler = 1, } },
             { "ktrait_dealer",   max = 3, require = { ktrait_cutter = 1, } },
 
-            { "ktrait_hitman",         max = 3, require = { ktrait_desperado = 1, } }, -- lvl 1 improved min range, lvl 2 explosive weapons/grenades are safe, lvl 3 ignore cover
-            -- { "",      max = 3, require = { ktrait_furious = 1, } },
+            { "ktrait_hitman",         max = 3, require = { ktrait_desperado = 1, } },
+            { "ktrait_kneecap",      max = 3, require = { ktrait_dash = 1, } },
 
             -- { "ktrait_master_berserker", max = 3, master = true, require = { -- berserk triggers on damage/gibbing
                 -- ktrait_skilled_inmate = 2, level = 6, level_inc = 4,
@@ -374,7 +374,7 @@ register_blueprint "klass_inmate"
                 -- ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4,
             -- } },
             -- { "ktrait_master_gbh", max = 3, master = true, require = { -- bleed immune, attacks do bleed, bleed affinity
-                -- ktrait_dash = 1, ktrait_brute = 1, level = 6, level_inc = 4,
+                -- ktrait_kneecap = 1, level = 6, level_inc = 4,
             -- } },
             -- { "ktrait_master_fraudster", max = 3, master = true, require = { -- make decoys uses ancient fx
                 -- ktrait_burgler = 1, level = 6, level_inc = 4,
