@@ -176,7 +176,7 @@ register_blueprint "ktrait_desperado"
     text = {
         name = "Desperado",
         desc = "Damage bonus based on weapon shot cost versus clip size. No affect on melee.",
-        full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots in the clip, the fewer the better.\n\n{!LEVEL 1} - {!+25%} times shot cost/clip\n{!LEVEL 2} - {!+50%} times shot cost/clip\n{!LEVEL 3} - {!+100%} times shot cost/clip",
+        full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots in the clip, the fewer the better.\n\n{!LEVEL 1} - {!+25%} times shot cost/clip\n{!LEVEL 2} - {!+50%} times shot cost/clip\n{!LEVEL 3} - {!+75%} times shot cost/clip",
         abbr = "Des",
     },
     attributes = {
@@ -197,7 +197,7 @@ register_blueprint "ktrait_desperado"
                 if tlevel == 2 then
                     bonus = 0.5
                 elseif tlevel == 3 then
-                    bonus = 1.0
+                    bonus = 0.75
                 end
 
                 if target and weapon and weapon.attributes and weapon.attributes.clip_size then
@@ -219,7 +219,7 @@ register_blueprint "ktrait_gambler"
     text = {
         name = "Gambler",
         desc = "Chance to refund charges when using a terminal; excluding extract multitools.",
-        full = "You cannot resist a game of chance, hacking them into things when they don't otherwise exist.\n\n{!LEVEL 1} - {!+50%} chance to refund the cost when using a station\n{!LEVEL 2} - {!+10%} chance the station will drop a multitool when using it, and reveal terminals\n{!LEVEL 3} - {!+75%} chance to refund the cost when using a station.",
+        full = "You cannot resist a game of chance, hacking them into things when they don't otherwise exist.\n\n{!LEVEL 1} - {!+40%} chance to refund the cost when using a station\n{!LEVEL 2} - {!+10%} chance the station will drop a multitool when using it, and reveal terminals\n{!LEVEL 3} - {!+80%} chance to refund the cost when using a station.",
         abbr = "Gmb",
     },
     attributes = {
@@ -271,15 +271,15 @@ register_blueprint "ktrait_gambler"
                                 if self.data.multitool_count < world:has_item( entity, "kit_multitool" ) then
                                     self.data.multitool_count = world:has_item( entity, "kit_multitool" )
                                 else
-                                    local lucky = math.random(2)
-
+                                    local lucky = math.random(5)
+                                    local good_luck = 2
                                     if tlevel == 3 then
-                                        lucky = math.random(4)
+                                        good_luck = 4
                                     end
 
-                                    if lucky == 1 then
+                                    if lucky > good_luck then
                                         self.data.stations_and_terminals[world:get_id(e)] = e.attributes.charges
-                                    elseif lucky > 1 then
+                                    elseif lucky <= good_luck then
                                         world:play_sound( "vending_hit_reward", e )
                                         e.attributes.charges = v
                                         uitk.station_activate( entity, e, true )
