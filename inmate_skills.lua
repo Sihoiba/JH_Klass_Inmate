@@ -663,7 +663,7 @@ register_blueprint "ktrait_sucker_punch"
         name   = "Sucker punch",
         desc   = "They never see the first blow coming",
         full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non bladed melee weapons you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non bladed one.\n\n{!LEVEL 1} - {!90%} attack time with non bladed melee weapons\n{!LEVEL 2} - {!80%} attack time with non bladed melee weapons, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time with non bladed melee weapons, melee weapon lootboxes contain large axes",
-        abbr   = "Bda",
+        abbr   = "SPu",
     },
     attributes = {
         level = 1,
@@ -758,7 +758,7 @@ register_blueprint "ktrait_dealer"
         name = "Dealer",
         desc = "Increases duration of postive buffs from items.",
         full = "When your fellow prisoners want better drugs, you are the person they turn to. When you use items that grant buffs like stim packs the duraction is increased\n\n{!LEVEL 1} - Positive buff duration increased by {!50%} \n{!LEVEL 2} - increase is now {!100%} \n{!LEVEL 3} - increase is now {!200%}s",
-        abbr = "Des",
+        abbr = "Del",
     },
     attributes = {
         level   = 1,
@@ -789,6 +789,60 @@ register_blueprint "ktrait_dealer"
             end
         ]=],
     },
+}
 
-
+register_blueprint "ktrait_hitman"
+{
+    blueprint = "trait",
+    text = {
+        name   = "Hitman",
+        desc   = "Improved accuracy and safe explosive usage",
+        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down the elevator shaft. Each level of this trait improves your ability to fight at close range.\n\n{!LEVEL 1} - {!-3} minimum distance\n{!LEVEL 2} - grenade launchers, rocket launchers and grenades are safe at close distance\n{!LEVEL 3} - enemy cover is only {!20%} effective",
+        abbr   = "Hit",
+    },
+    attributes = {
+        level   = 1,
+        min_distance = 0,
+        cover_mult   = 1.0,
+        player_splash_mod = 1.0
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self,entity)
+                local hit, t = gtk.upgrade_trait( entity, "ktrait_hitman" )
+                local attr  = t.attributes
+                if hit == 1 then
+                    attr.min_distance = -3
+                else
+                    attr.cover_mult   = 0.2
+                end
+            end
+        ]=],
+        on_aim = [=[
+            function ( self, entity, target, weapon )
+                if self.attributes.level < 2 then return end
+                local weapon = entity:get_weapon()
+                if weapon and weapon.weapon and weapon.attributes and weapon.attributes.explosion then
+                    weapon.attributes.splash_mod = 0.0
+                end
+            end
+        ]=],
+        on_pre_command = [=[
+            function ( self, entity, command, weapon )
+                if command == COMMAND_USE then
+                    if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") then
+                        self.attributes.player_splash_mod = entity.attributes.splash_mod
+                        entity.attributes.splash_mod = 0.0
+                    end
+                end
+            end
+        ]=],
+        on_post_command = [=[
+            function ( self, actor, cmt, tgt, time )
+                if command == COMMAND_USE then
+                    actor.attributes.splash_mod = self.attributes.player_splash_mod
+                end
+            end
+        ]=],
+    },
 }

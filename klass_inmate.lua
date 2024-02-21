@@ -362,9 +362,9 @@ register_blueprint "klass_inmate"
             { "ktrait_first_rule",  max = 3, require = { ktrait_brute = 1, } },
             { "ktrait_burgler",    max = 3, require = { ktrait_smuggler = 2, } },
             { "trait_whizkid",       max = 3, require = { ktrait_gambler = 1, } },
-            { "ktrait_dealer",   max = 3, require = { ktrait_cutter = 1, } }, -- increases duration of positive boons per level
+            { "ktrait_dealer",   max = 3, require = { ktrait_cutter = 1, } },
 
-            -- { "trait_hitman",         max = 3, require = { ktrait_desperado = 1, } }, -- lvl 1 improved min range, lvl 2 explosive weapons/grenades are safe, lvl 3 ignore cover
+            { "ktrait_hitman",         max = 3, require = { ktrait_desperado = 1, } }, -- lvl 1 improved min range, lvl 2 explosive weapons/grenades are safe, lvl 3 ignore cover
             -- { "",      max = 3, require = { ktrait_furious = 1, } },
 
             -- { "ktrait_master_berserker", max = 3, master = true, require = { -- berserk triggers on damage/gibbing
