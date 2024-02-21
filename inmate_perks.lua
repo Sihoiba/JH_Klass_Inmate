@@ -150,13 +150,6 @@ register_blueprint "buff_kneecapped"
 register_blueprint "perk_wb_kneecap"
 {
     flags = { EF_NOPICKUP },
-    text = {
-        name = "Kneecapping",
-        desc = "debuffs biological enemies with the {!Kneecapped} status, reducing their move speed by {!25%}",
-    },
-    attributes = {
-        level = 1,
-    },
     callbacks = {
         on_damage = [=[
             function ( unused, weapon, who, amount, source )
@@ -186,10 +179,6 @@ register_blueprint "buff_panicked"
 register_blueprint "perk_we_panic"
 {
     flags = { EF_NOPICKUP },
-    text = {
-        name = "Panicing",
-        desc = "debuffs biological enemies with the {!Panicked} status, reducing their accuracy by 25%",
-    },
     callbacks = {
         on_damage = [=[
             function ( unused, weapon, who, amount, source )
@@ -219,10 +208,6 @@ register_blueprint "buff_stunned"
 register_blueprint "perk_we_stun"
 {
     flags = { EF_NOPICKUP },
-    text = {
-        name = "Stunning",
-        desc = "debuffs biological enemies with the {!Stunned} status, reducing their damage by 25%",
-    },
     callbacks = {
         on_damage = [=[
             function ( unused, weapon, who, amount, source )
