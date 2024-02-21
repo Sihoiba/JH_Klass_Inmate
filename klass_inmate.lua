@@ -367,9 +367,7 @@ register_blueprint "klass_inmate"
             { "ktrait_hitman",         max = 3, require = { ktrait_desperado = 1, } },
             { "ktrait_kneecap",      max = 3, require = { ktrait_dash = 1, } },
 
-            -- { "ktrait_master_berserker", max = 3, master = true, require = { -- berserk triggers on damage/gibbing
-                -- ktrait_skilled_inmate = 2, level = 6, level_inc = 4,
-            -- } },
+            { "ktrait_master_berserker", max = 3, master = true, require = { ktrait_skilled_inmate = 2, level = 6, level_inc = 4, } }, -- berserk triggers on damage/gibbing
             -- { "ktrait_master_chemist", max = 3, master = true, require = { -- acid immune, add acid to aoe, acid affinity
                 -- ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4,
             -- } },

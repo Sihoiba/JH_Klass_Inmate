@@ -1,5 +1,6 @@
 nova.require("klass_inmate")
-nova.require("inmate_skills")
+nova.require("inmate_traits")
+nova.require("inmate_master_traits")
 nova.require("inmate_perks")
 nova.require("inmate_items")
 nova.require("inmate_other")
