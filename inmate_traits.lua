@@ -522,6 +522,7 @@ register_blueprint "ktrait_burgler_open_close"
             function ( self, entity, level, target )
                 local level = world:get_level()
                 local tlevel = self.attributes.level
+                local return_val = 0
                 for e in level:entities() do
                     if e.text and e.text.name == "door" then
                         local coord = world:get_position(e)
@@ -535,14 +536,17 @@ register_blueprint "ktrait_burgler_open_close"
                             e.flags.data = { EF_ACTION },
                             world:play_sound( "door_open", e )
                             world:set_state( e, "open" )
+                            return_val = 1
                         elseif tlevel > 1 and visible and closed and not broken and not locked then
                             e.flags.data = { EF_ACTION },
                             world:play_sound( "door_open", e )
                             world:set_state( e, "open" )
+                            return_val = 1
                         elseif tlevel > 1 and visible and not closed and not broken and level:can_close( e ) then
                             e.flags.data = { EF_NOSIGHT, EF_NOMOVE, EF_NOFLY, EF_NOSHOOT, EF_BUMPACTION, EF_ACTION }
                             world:play_sound( "door_close", e )
                             world:set_state( e, "closed" )
+                            return_val = 1
                         end
                         if tlevel == 3 and visible and not broken and ecs:child( e, "door_locked" ) then
                             e.flags.data = { EF_ACTION },
@@ -551,6 +555,7 @@ register_blueprint "ktrait_burgler_open_close"
                             })
                             world:play_sound( "door_open", e )
                             world:set_state( e, "open" )
+                            return_val = 1
                         end
                     end
                     if tlevel == 3 then
@@ -565,55 +570,22 @@ register_blueprint "ktrait_burgler_open_close"
                                     world:play_sound( "door_open_03", e )
                                     world:mark_destroy( locked )
                                     world:flush_destroy()
+                                    return_val = 1
                                 end
                             end
                         end
                     end
                 end
-                return 1
-            end
-        ]=],
-        is_usable = [=[
-            function ( self, user )
-                local level = world:get_level()
-                local tlevel = self.attributes.level
-                for e in level:entities() do
-                    if e.text and e.text.name == "door" then
-                        local coord = world:get_position(e)
-                        local distance = level:distance(user, e)
-                        local visible = level:is_visible(coord)
-                        local closed = e.flags.data[ EF_NOMOVE ]
-                        local broken = e.flags.data[ EF_KILLED ]
-                        local locked = ecs:child( e, "door_locked" )
-
-                        if tlevel == 1 and distance < 3 and visible and closed and not broken and not locked then
-                            return 1
-                        elseif tlevel > 1 and visible and closed and not broken and not locked then
-                            return 1
-                        elseif tlevel > 1 and visible and not closed and not broken and level:can_close( e ) then
-                            return 1
-                        end
-                        if tlevel == 3 and visible and not broken and ecs:child( e, "door_locked" ) then
-                            return 1
-                        end
-                    end
-                    if tlevel == 3 then
-                        local elevators = { elevator_01 = true, elevator_01_off = true, elevator_01_branch = true, elevator_01_special = true, elevator_01_mini = true }
-                        for e in level:entities() do
-                            local coord = world:get_position(e)
-                            local visible = level:is_visible(coord)
-                            if visible and elevators[ world:get_id(e) ] then
-                                local locked = e:child( "elevator_inactive" ) or e:child( "elevator_locked" ) or e:child("elevator_secure")
-                                if locked then
-                                    return 1
-                                end
-                            end
-                        end
+                if return_val == 0 then
+                    if tlevel == 1 then
+                        ui:set_hint( "No doors can be interacted with or the doors are too far away", 50, 1 )
+                    else
+                        ui:set_hint( "No doors can be interacted with", 50, 1 )
                     end
                 end
-                return 0
+                return return_val
             end
-        ]=],
+        ]=]
     },
     data = {
         is_free_use = true,
