@@ -44,7 +44,7 @@ register_blueprint "ktrait_always_angry"
         name   = "Always Angry",
         desc   = "PASSIVE SKILL - restore 50% rage every time you enter a level",
         full   = "INTERNAL!",
-        abbr   = "Ten",
+        abbr   = "AAn",
     },
     callbacks = {
         on_activate = [=[
@@ -267,7 +267,7 @@ register_blueprint "ktrait_berserk"
         name   = "Berserk",
         desc   = "ACTIVE SKILL - for Fury you can heal and convert your pain into health",
         full   = "Sometimes when they hurt you you hurt them right back! From time to time you heal a bit and convert your pain value into health. Additionally you become immune to pain for 5 seconds.",
-        abbr   = "Adr",
+        abbr   = "Ber",
         cant_use = "Adrenaline can be used only when wounded or in pain",
     },
     callbacks = {
@@ -389,19 +389,11 @@ register_blueprint "klass_inmate"
             { "ktrait_hitman",         max = 3, require = { ktrait_desperado = 1, } },
             { "ktrait_kneecap",      max = 3, require = { ktrait_dash = 1, } },
 
-            { "ktrait_master_berserker", max = 3, master = true, require = { ktrait_skilled_inmate = 2, level = 6, level_inc = 4, } }, -- berserk triggers on damage/gibbing
-            -- { "ktrait_master_chemist", max = 3, master = true, require = { -- acid immune, add acid to aoe, acid affinity
-                -- ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4,
-            -- } },
-            -- { "ktrait_master_gbh", max = 3, master = true, require = { -- bleed immune, attacks do bleed, bleed affinity
-                -- ktrait_kneecap = 1, level = 6, level_inc = 4,
-            -- } },
-            -- { "ktrait_master_fraudster", max = 3, master = true, require = { -- make decoys uses ancient fx
-                -- ktrait_burgler = 1, level = 6, level_inc = 4,
-            -- } },
-            -- { "ktrait_master_ghost_gun", max = 3, master = true, require = { -- something with pistol/smg, increase shot size to clip size
-                -- ktrait_desperado = 1, ktrait_smuggler = 1, level = 6, level_inc = 4,
-            -- } },
+            { "ktrait_master_berserker", max = 3, master = true, require = { ktrait_skilled_inmate = 2, level = 6, level_inc = 4, } },
+            { "ktrait_master_chemist", max = 3, master = true, require = { ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4, } },  -- acid immune, add acid to aoe, acid affinity
+            -- { "ktrait_master_gbh", max = 3, master = true, require = { ktrait_kneecap = 1, level = 6, level_inc = 4, } }, -- bleed immune, attacks do bleed, bleed affinity
+            -- { "ktrait_master_fraudster", max = 3, master = true, require = {  ktrait_burgler = 1, level = 6, level_inc = 4, } }, -- make decoys uses ancient fx
+            -- { "ktrait_master_ghost_gun", max = 3, master = true, require = { ktrait_desperado = 1, ktrait_smuggler = 1, level = 6, level_inc = 4, } }, -- something with pistol/smg, increase shot size to clip size
         },
     },
 }
