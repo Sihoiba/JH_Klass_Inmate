@@ -85,7 +85,7 @@ function corrode_along_line(self, level, source, end_point, tlevel)
             for e in level:entities( corrode_point ) do
                 if e.data and e.data.ai then
                     if tlevel == 3 then
-                        world:add_buff( e, "corroded", 1000 )
+                        world:add_buff( e, "buff_corroded", 1000 )
                     end
                     local pool = level:get_entity(corrode_point, "acid_pool" )
                     if not pool then
@@ -97,7 +97,7 @@ function corrode_along_line(self, level, source, end_point, tlevel)
     end
 end
 
-register_blueprint "corroded"
+register_blueprint "buff_corroded"
 {
     flags = { EF_NOPICKUP },
     text = {
@@ -129,8 +129,8 @@ register_blueprint "kperk_chemist"
             function ( self, source, who )
                 if who and who.data and who.data.ai then
                     local clevel = world:get_player():child("ktrait_master_chemist").attributes.level
-                    if clevel == 3 and not who:child("corroded") then
-                        world:add_buff( who, "corroded", 1000 )
+                    if clevel == 3 and not who:child("buff_corroded") then
+                        world:add_buff( who, "buff_corroded", 1000 )
                     end
                 end
             end
@@ -144,8 +144,8 @@ register_blueprint "kperk_chemist"
                     else
                         for e in level:entities( c ) do
                             if e.data and e.data.ai then
-                                if clevel == 3 and not e:child("corroded") then
-                                    world:add_buff( e, "corroded", 1000 )
+                                if clevel == 3 and not e:child("buff_corroded") then
+                                    world:add_buff( e, "buff_corroded", 1000 )
                                 end
                             end
                         end
@@ -271,6 +271,124 @@ register_blueprint "ktrait_master_gbh"
                 if who and who.data and who.data.can_bleed then
                     local slevel = core.get_status_value( 4, "bleed", source )
                     core.apply_damage_status( who, "bleed", "bleed", slevel, source )
+                end
+            end
+        ]=],
+    },
+}
+
+-- GHOST GUN
+
+register_blueprint "buff_ghost_gun"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name    = "GHOST GUN",
+        desc    = "fire all bullets from your pistol/SMGs",
+    },
+    ui_buff = {
+       color     = LIGHTBLUE,
+    },
+}
+
+register_blueprint "ktrait_master_ghost_gun"
+{
+    blueprint = "trait",
+    text = {
+        name   = "GHOST GUN",
+        desc   = "MASTER TRAIT - PISTOL/SMG ONLY - ACTIVE SKILL - empty full clip when firing",
+        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets.\n{!LEVEL 2} - Automatically reload pistol/SMGs when empty at {!halved} ammo consumption.\n{!LEVEL 3} reload ammo consumption is {!20%} for pistol/SMGs.\n\nYou can pick only one MASTER trait per character.",
+        abbr   = "MGG",
+    },
+    attributes = {
+        level    = 1,
+        reload_mod = {
+            pistols = 1.0,
+            smgs = 1.0,
+        },
+        shots = 0
+    },
+    data = {
+        is_free_use = true,
+        active = false
+    },
+    skill = {
+        cooldown = 0,
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self,entity)
+                local lvl, v = gtk.upgrade_master( entity, "ktrait_master_ghost_gun" )
+                local attr = v.attributes
+                if lvl == 2 then
+                    attr["pistols.reload_mod"] = 0.50
+                    attr["smgs.reload_mod"]    = 0.50
+                elseif lvl == 3 then
+                    attr["pistols.reload_mod"] = 0.20
+                    attr["smgs.reload_mod"]    = 0.20
+                end
+            end
+        ]=],
+        on_post_command = [=[
+            function ( self, actor, cmt, tgt, time )
+                if time <= 0 then return end
+                local tlevel = self.attributes.level
+                if tlevel > 1 and cmt == COMMAND_USE then
+                    local weapon = actor:get_weapon()
+                    if weapon and gtk.is_weapon_group( weapon, {"pistols","smgs"} ) then
+                        local wd = weapon.weapon
+                        if not wd then return 0 end
+                        local cd = weapon.clip
+                        if cd and cd.count == 0 then
+                            world:get_level():reload( actor, weapon, true )
+                        end
+                    end
+                end
+                self.attributes.shots = 0
+            end
+        ]=],
+        on_aim = [=[
+            function ( self, entity, target, weapon )
+                if self.data and self.data.active and target and weapon and gtk.is_weapon_group( weapon, {"pistols", "smgs"} ) and weapon.weapon and weapon.attributes and weapon.attributes.clip_size and weapon.attributes.shots then
+                    local shots = weapon.attributes.shots
+                    local clipsize = weapon.attributes.clip_size
+                    local shot_cost = weapon.weapon.shot_cost or 1
+                    if shot_cost == 1 then
+                        self.attributes.shots = weapon.attributes.clip_size - weapon.attributes.shots
+                    else
+                        self.attributes.shots = math.floor(weapon.attributes.clip_size/shot_cost) - weapon.attributes.shots
+                    end
+                end
+            end
+        ]=],
+        on_use = [=[
+            function ( self, entity )
+                if self.data and self.data.active then
+                    self.data.active = false
+                    local gg = entity:child("buff_ghost_gun")
+                    world:mark_destroy( gg )
+                    world:flush_destroy()
+                else
+                    self.data.active = true
+                    world:add_buff( entity, "buff_ghost_gun" )
+                end
+                return 1
+            end
+        ]=],
+        is_usable = [=[
+            function ( self, user )
+                if gtk.is_weapon_group( user:get_weapon(), {"pistols","smgs"} ) then
+                    return 1
+                end
+                return 0
+            end
+        ]=],
+        on_rearm = [=[
+            function( self, entity, weapon )
+                if not gtk.is_weapon_group( weapon, {"pistols","smgs"} ) then
+                    local gg = entity:child("buff_ghost_gun")
+                    world:mark_destroy( gg )
+                    world:flush_destroy()
                 end
             end
         ]=],

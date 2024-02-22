@@ -201,8 +201,14 @@ register_blueprint "ktrait_desperado"
                 end
 
                 if target and weapon and weapon.attributes and weapon.attributes.clip_size then
+                    local shots = weapon.attributes["shots"]
+                    local gg = entity:child("ktrait_master_ghost_gun")
+                    if gg then
+                        local e_shots = gg.attributes.shots or 0
+                        shots = shots + e_shots
+                    end
                     local shot_cost = weapon.weapon.shot_cost or 1
-                    local cost_per_shot = shot_cost * weapon.attributes.shots
+                    local cost_per_shot = shot_cost * shots
                     local shot_clip_percent = cost_per_shot /  weapon.attributes.clip_size
                     local damage_bonus = 1 + (shot_clip_percent * bonus)
 
