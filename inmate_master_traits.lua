@@ -234,3 +234,45 @@ register_blueprint "ktrait_master_chemist"
         ]=],
     },
 }
+
+-- GBH
+
+register_blueprint "ktrait_master_gbh"
+{
+    blueprint = "trait",
+    text = {
+        name   = "GBH",
+        desc   = "MASTER TRAIT - bleed immunity and afflict bleed on attacks.",
+        full   = "Grevious bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - bleed effects are {!100%} stronger.\n\nYou can pick only one MASTER trait per character.",
+        abbr   = "MGB",
+    },
+    attributes = {
+        level    = 1,
+        resist = {
+            bleed = 100,
+        },
+        affinity = {
+            bleed = 0,
+        },
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self, entity)
+                local tlevel, t = gtk.upgrade_master( entity, "ktrait_master_gbh" )
+                if tlevel == 2 then
+                    t.attributes["bleed.affinity"] = 50
+                elseif tlevel == 3 then
+                    t.attributes["bleed.affinity"] = 100
+                end
+            end
+        ]=],
+        on_apply_damage = [=[
+            function ( self, source, who )
+                if who and who.data and who.data.can_bleed then
+                    local slevel = core.get_status_value( 4, "bleed", source )
+                    core.apply_damage_status( who, "bleed", "bleed", slevel, source )
+                end
+            end
+        ]=],
+    },
+}

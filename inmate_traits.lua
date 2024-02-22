@@ -834,7 +834,7 @@ register_blueprint "ktrait_kneecap"
     callbacks = {
         on_activate = [=[
             function(self, entity)
-                local tlevel = gtk.upgrade_master( entity, "ktrait_kneecap" )
+                local tlevel = gtk.upgrade_trait( entity, "ktrait_kneecap" )
                 local index = 0
                 repeat
                     local w   = world:get_weapon( entity, index, true )
