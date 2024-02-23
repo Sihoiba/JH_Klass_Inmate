@@ -533,7 +533,7 @@ register_blueprint "ktrait_first_rule"
     },
 }
 
-register_blueprint "kskill_burgler_open_close"
+register_blueprint "kskill_burglar_open_close"
 {
     blueprint = "trait",
     text = {
@@ -625,7 +625,7 @@ register_blueprint "kskill_burgler_open_close"
     },
 }
 
-register_blueprint "ktrait_burgler"
+register_blueprint "ktrait_burglar"
 {
     blueprint = "trait",
     text = {
@@ -637,8 +637,8 @@ register_blueprint "ktrait_burgler"
     callbacks = {
         on_activate = [=[
             function(self,entity)
-                gtk.upgrade_trait( entity, "ktrait_burgler" )
-                local tlevel, burg = gtk.upgrade_trait( entity, "kskill_burgler_open_close" )
+                gtk.upgrade_trait( entity, "ktrait_burglar" )
+                local tlevel, burg = gtk.upgrade_trait( entity, "kskill_burglar_open_close" )
                 if tlevel == 2 then
                     burg.text.name = burg.text.name2
                     burg.text.abbr = burg.text.name2
