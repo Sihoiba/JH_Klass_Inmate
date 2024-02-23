@@ -360,7 +360,6 @@ register_blueprint "klass_inmate"
                 local adr = entity:attach( "ktrait_berserk" )
                 adr.skill.cost = 30
                 entity:attach( "pipe_wrench" )
-                entity:attach( "runtime_add_xp" )
             end
         ]=],
     },
