@@ -27,7 +27,7 @@ register_gfx_blueprint "player_inmate"
     blueprint = "player",
     slot_base = {
         { target    = "armor", blueprint = "armor_shirt_01_A_part", },
-        { target    = "head",  blueprint = "player_marine_head_part", },
+        { target    = "head",  blueprint = "player_inmate_head_part", },
     },
     {
         tag = "head",
@@ -58,6 +58,104 @@ register_gfx_blueprint "player_inmate"
         },
     },
     {
+        tag    = "armor",
+        render = {
+            mesh     = "data/model/player_male_mesh.nmd:player_body",
+            material = "data/texture/security/suicider/security_suicider_body_01_A",
+        },
+    }
+}
+
+register_gfx_blueprint "fx_on_fire_decoy_destruct_slash"
+{
+    lifetime = {
+        duration = 3.0,
+    },
+    light = {
+        color       = vec4(4.0,1.0,1.0,1.0),
+        range       = 2.0,
+    },
+    fade = {
+        fade_out = 1.0,
+    },
+    physics_explosion = {
+        radius = 1.0,
+    },
+    "ps_explosion_focused",
+    "ps_explosion_crater",
+}
+
+register_gfx_blueprint "decoy_self_destruct_slash"
+{
+    weapon_fx = {
+        on_fire    = "fx_on_fire_decoy_destruct_slash",
+    },
+}
+
+register_gfx_blueprint "decoy_light" {
+    tag = "glow",
+    equip = {},
+    light = {
+        position    = vec3(0,0.2,0),
+        color       = vec4(0.5,0.0,1.0,2),
+        range       = 2.0,
+    }
+}
+
+register_gfx_blueprint "decoy_head_part"
+{
+    skeleton = "data/model/player_male_mesh.nmd",
+    {
+        tag = "head",
+        scale = {
+            scale = 0.8,
+        },
+        render = {
+            mesh     = "data/model/player_male_mesh.nmd:player_head_01",
+            material = "data/texture/player/male/body_01/A/player_head_01",
+        },
+    },
+}
+
+register_gfx_blueprint "decoy" {
+    blueprint = "player",
+    slot_base = {
+        { target    = "armor", blueprint = "armor_shirt_01_A_part", },
+        { target    = "head",  blueprint = "decoy_head_part", },
+    },
+    {
+        tag = "head",
+        scale = {
+            scale = 0.8,
+        },
+        render = {
+            mesh     = "data/model/player_male_mesh.nmd:player_head_01",
+            material = "data/texture/player/male/body_01/A/player_head_01",
+        },
+    },
+    {
+        scale = {
+            scale = 0.8,
+        },
+        render = {
+            mesh = "data/model/player_male_mesh.nmd:shoes_01",
+            material = "data/texture/player/male/shoes_01/A/shoes_01_A",
+        },
+    },
+    {
+        scale = {
+            scale = 0.8,
+        },
+        tag    = "armor",
+        render = {
+            mesh = "data/model/player_male_mesh.nmd:player_trousers_01",
+            material = "data/texture/player/male/trousers_01/B/trousers_01_B",
+        },
+    },
+    {
+        scale = {
+            scale = 0.8,
+        },
         tag    = "armor",
         render = {
             mesh     = "data/model/player_male_mesh.nmd:player_body",

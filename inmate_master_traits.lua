@@ -394,3 +394,179 @@ register_blueprint "ktrait_master_ghost_gun"
         ]=],
     },
 }
+
+-- FRAUDSTER
+
+
+register_blueprint "decoy_light" {
+    flags = { EF_NOPICKUP },
+    callbacks = {
+        on_die = [[
+            function ( self )
+                world:mark_destroy( self )
+            end
+        ]],
+    }
+}
+
+register_blueprint "decoy_self_destruct_slash"
+{
+    attributes = {
+        damage    = 20,
+        explosion = 2,
+        gib_factor= 2,
+    },
+    weapon = {
+        group = "env",
+        damage_type = "slash",
+        natural = true,
+        fire_sound = "explosion",
+    },
+    noise = {
+        use = 15,
+    },
+}
+
+register_blueprint "decoy_self_destruct_emp"
+{
+    attributes = {
+        damage    = 20,
+        explosion = 2,
+        gib_factor= 2,
+    },
+    weapon = {
+        group = "env",
+        damage_type = "emp",
+        natural = true,
+        slevel    = { emp = 5, },
+    },
+    callbacks = {
+        on_create = [=[
+            function( self )
+                self:attach( "apply_emp" )
+            end
+        ]=],
+    },
+}
+
+register_blueprint "decoy" {
+    flags = { EF_NOMOVE, EF_NOFLY, EF_TARGETABLE, EF_ALIVE, EF_IFF },
+    lists = {
+        group = "being",
+    },
+    text = {
+        name = "decoy",
+    },
+    ascii     = {
+        glyph     = "d",
+        color     = BLUE,
+    },
+    health    = {},
+    data = {
+        level = 1,
+        ai = {
+            aware = false,
+            group = "player",
+            state = "idle",
+        },
+    },
+    attributes = {
+        health = 25,
+    },
+    callbacks = {
+        on_pre_command = [[
+            function ( self, actor, cmt )
+                if cmt == COMMAND_WAIT then return 0 end
+                world:command( COMMAND_WAIT, actor )
+                return -1
+            end
+        ]],
+        on_die = [=[
+            function( self, killer, current, weapon )
+                if self.data.level == 3 then
+                    local w_slash = world:create_entity( "decoy_self_destruct_slash" )
+                    world:attach( self, w_slash )
+                    world:get_level():fire( self, world:get_position( self ), w_slash, 200 )
+                    local w_emp = world:create_entity( "decoy_self_destruct_emp" )
+                    world:attach( self, w_emp )
+                    world:get_level():fire( self, world:get_position( self ), w_emp, 200 )
+                end
+            end
+        ]=],
+        on_timer = [=[
+            function ( self, first )
+                if first then return 1 end
+                if not self then return 0 end
+                local level = world:get_level()
+                for e in level:entities() do
+                    if level:can_see_entity(self, e, 8) and e.target and e.target.entity == world:get_player() then
+                        e.target.entity = self
+                    end
+                end
+            end
+        ]=],
+    }
+}
+
+register_blueprint "kskill_fraudster_create_decoy"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name   = "Create decoy",
+    },
+    data = {
+        is_free_use = true
+    },
+    skill = {
+        cooldown = 2000,
+    },
+    callbacks = {
+        on_use = [=[
+            function ( self, entity, level )
+                local fraudster = entity:child("ktrait_master_fraudster")
+                local tlevel = fraudster.attributes.level
+                local sc = gtk.random_near_coord( entity:get_position(), 2 )
+                local summon = level:add_entity( "decoy", sc )
+                summon:equip( "decoy_light" )
+                if tlevel > 1 then
+                    summon.attributes.health = 50
+                    summon.health.current = 50
+                end
+                summon.data.level = tlevel
+                world:remove_from_max_kills( summon )
+                return 1
+            end
+        ]=],
+    }
+}
+
+register_blueprint "ktrait_master_fraudster"
+{
+    blueprint = "trait",
+    text = {
+        name   = "FRAUDSTER",
+        desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire",
+        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!25}.\n{!LEVEL 2} - cooldown {!10}, decoy health {!50}.\n{!LEVEL 3} cooldown {!5}, decoy explodes on death.\n\nYou can pick only one MASTER trait per character.",
+        abbr   = "MFr",
+    },
+    attributes = {
+        level    = 1,
+    },
+    callbacks = {
+        on_activate = [=[
+            function(self, entity)
+                local lvl, v = gtk.upgrade_master( entity, "ktrait_master_fraudster" )
+                if lvl == 1 then
+                    entity:attach( "kskill_fraudster_create_decoy" )
+                end
+                if lvl == 2 then
+                    local cd = entity:child( "kskill_fraudster_create_decoy" )
+                    cd.skill.cooldown = 1000
+                elseif lvl == 3 then
+                    local cd = entity:child( "kskill_fraudster_create_decoy" )
+                    cd.skill.cooldown = 500
+                end
+            end
+        ]=],
+    },
+}

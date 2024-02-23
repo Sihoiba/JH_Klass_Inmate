@@ -382,7 +382,7 @@ register_blueprint "klass_inmate"
 
             { "ktrait_sucker_punch", max = 3, require = { ktrait_skilled_inmate = 1, } },
             { "ktrait_first_rule", max = 3, require = { ktrait_brute = 1, } },
-            { "ktrait_burgler", max = 3, require = { ktrait_smuggler = 2, } },
+            { "ktrait_burgler", max = 3, require = { ktrait_smuggler = 1, } },
             { "ktrait_dealer", max = 3, require = { ktrait_cutter = 1, } },
             { "ktrait_kneecap", max = 3, require = { ktrait_dash = 1, } },
             { "ktrait_hitman", max = 3, require = { ktrait_desperado = 1, } },
@@ -390,9 +390,9 @@ register_blueprint "klass_inmate"
 
             { "ktrait_master_berserker", max = 3, master = true, require = { ktrait_skilled_inmate = 2, level = 6, level_inc = 4, } },
             { "ktrait_master_chemist", max = 3, master = true, require = { ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4, } },
-            { "ktrait_master_gbh", max = 3, master = true, require = { ktrait_kneecap = 1, level = 6, level_inc = 4, } }, 
-            -- { "ktrait_master_fraudster", max = 3, master = true, require = {  ktrait_burgler = 1, level = 6, level_inc = 4, } }, -- make decoys uses ancient fx
-            { "ktrait_master_ghost_gun", max = 3, master = true, require = { ktrait_desperado = 1, ktrait_smuggler = 1, level = 6, level_inc = 4, } }, 
+            { "ktrait_master_gbh", max = 3, master = true, require = { ktrait_kneecap = 1, level = 6, level_inc = 4, } },
+            { "ktrait_master_fraudster", max = 3, master = true, require = {  ktrait_burgler = 1, level = 6, level_inc = 4, } },
+            { "ktrait_master_ghost_gun", max = 3, master = true, require = { ktrait_desperado = 1, ktrait_smuggler = 1, level = 6, level_inc = 4, } },
         },
     },
 }
