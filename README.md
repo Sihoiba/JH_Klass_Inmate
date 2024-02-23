@@ -3,7 +3,7 @@ A Jupiter Hell mod to add a new player character class.
 
 The inmate is one of the prisoners who has been sent to Calisto. He had planned an escape for months, only for everything to go wrong as he was taking a shuttle away from the moon.
 
-The inmate draws upon his criminal past to survive the demonic incursion across Jupiter. Traits will turn him into a close range damage dealer, a sneaky burgler, a drug dealing chemist, a cunning fraudster or just the kind of guy you go to when you want someone to have an accident in an elevator shaft.
+The inmate draws upon his criminal past to survive the demonic incursion across Jupiter. Traits will turn him into a close range damage dealer, a sneaky burglar, a drug dealing chemist, a cunning fraudster or just the kind of guy you go to when you want someone to have an accident in an elevator shaft.
 
 The inmates ACTION skill is Berserk. At the cost of Rage. This gives him a short lived buff that massively increases his melee damage, grants him damage and status resistance.
 
