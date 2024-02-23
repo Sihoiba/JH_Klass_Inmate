@@ -354,7 +354,7 @@ function run_cutter_ui( self, user, level, return_entity )
     ui:terminal( user, nil, list )
 end
 
-register_blueprint "ktrait_cutter_skill"
+register_blueprint "kskill_cutter"
 {
     blueprint = "trait",
     text = {
@@ -430,7 +430,7 @@ register_blueprint "ktrait_cutter"
         on_activate = [=[
             function(self, entity)
                 gtk.upgrade_trait( entity, "ktrait_cutter" )
-                gtk.upgrade_trait( entity, "ktrait_cutter_skill" )
+                gtk.upgrade_trait( entity, "kskill_cutter" )
             end
         ]=],
     },
@@ -513,7 +513,7 @@ register_blueprint "ktrait_first_rule"
     },
 }
 
-register_blueprint "ktrait_burgler_open_close"
+register_blueprint "kskill_burgler_open_close"
 {
     blueprint = "trait",
     text = {
@@ -618,7 +618,7 @@ register_blueprint "ktrait_burgler"
         on_activate = [=[
             function(self,entity)
                 gtk.upgrade_trait( entity, "ktrait_burgler" )
-                local tlevel, burg = gtk.upgrade_trait( entity, "ktrait_burgler_open_close" )
+                local tlevel, burg = gtk.upgrade_trait( entity, "kskill_burgler_open_close" )
                 if tlevel == 2 then
                     burg.text.name = burg.text.name2
                     burg.text.abbr = burg.text.name2

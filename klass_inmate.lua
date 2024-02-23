@@ -265,10 +265,9 @@ register_blueprint "ktrait_berserk"
     blueprint = "trait",
     text = {
         name   = "Berserk",
-        desc   = "ACTIVE SKILL - for Fury you can heal and convert your pain into health",
-        full   = "Sometimes when they hurt you you hurt them right back! From time to time you heal a bit and convert your pain value into health. Additionally you become immune to pain for 5 seconds.",
+        desc   = "ACTIVE SKILL - spend your rage to go Berserk!",
+        full   = "You're a barely controlled simmering ball of anger. It doesn't take much to send you into a berserker rage that earned you a reputation as someone not to mess with. When berserk you do increased melee damage, have damage and status resistance, but your too mad to waste time using gun when you could hurt people with your hands.",
         abbr   = "Ber",
-        cant_use = "Adrenaline can be used only when wounded or in pain",
     },
     callbacks = {
         on_activate = [=[
