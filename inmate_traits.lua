@@ -105,7 +105,7 @@ register_blueprint "ktrait_smuggler"
     text = {
         name   = "Smuggler",
         desc   = "Find ammo in destructable environment objects",
-        full   = "You know where the black market stashes items! Break boxes, plants, and chairs to find ammo.\n\n{!LEVEL 1} - small amount of ammo in every object for current weapon, except 40mm grenades and rockets\n{!LEVEL 2} - medium amount of ammo, 40mm grenades can be found \n{!LEVEL 3} - large amount of ammo, rockets can be found",
+        full   = "You know where the black market stashes items! Break boxes, plants, and chairs to find ammo for the current held weapon, or a random carried weapon if current weapon is melee.\n\n{!LEVEL 1} - small amount of ammo in every object for current weapon, except 40mm grenades and rockets\n{!LEVEL 2} - medium amount of ammo, 40mm grenades can be found \n{!LEVEL 3} - large amount of ammo, rockets can be found",
         abbr   = "Sm",
     },
     attributes = {
@@ -122,7 +122,7 @@ register_blueprint "ktrait_smuggler"
                 local level = world:get_level()
                 local tlevel = self.attributes.level or 0
                 local wep = entity:get_weapon()
-                if target and wep and wep.weapon and not (target.data and target.data.ai) and not target.hazard and (target.text and target.text.name ~= "door") and wep.weapon.type ~= world:hash("melee") and wep.clip and wep.clip.ammo then
+                if target and wep and wep.weapon and not (target.data and target.data.ai) and not target.hazard and (target.text and target.text.name ~= "door")  then
 
                     local ammos  =
                     {
@@ -135,9 +135,29 @@ register_blueprint "ktrait_smuggler"
                         [world:hash("ammo_rockets")] = { id = "ammo_rockets", },
                     }
 
-                    local ammo = ammos[wep.clip.ammo]
                     local grenades = "ammo_40"
                     local rockets = "ammo_rockets"
+
+                    local ammo = nil
+                    if wep.weapon.type ~= world:hash("melee") and wep.clip and wep.clip.ammo then
+                        ammo = ammos[wep.clip.ammo]
+                    elseif wep.weapon.type == world:hash("melee") then
+                        local slots         = { "1", "2", "3" }
+                        local weapons = {}
+                        for _,slot_id in ipairs( slots ) do
+                            local slot     = entity:get_slot( slot_id )
+                            if slot and slot.weapon and slot.weapon.type ~= world:hash("melee") then
+                                table.insert(weapons, slot)
+                            end
+                        end
+                        if next(weapons) then
+                            local w = table.remove( weapons, math.random( #weapons ) )
+                            nova.log("weapon name "..tostring(w.text.name))
+                            if w and w.clip and w.clip.ammo then
+                                ammo = ammos[w.clip.ammo]
+                            end
+                        end
+                    end
 
                     if tlevel == 1 and ammo and ammo.id ~= grenades and ammo.id ~= rockets then
                         local e = world:create_entity( ammo.id )

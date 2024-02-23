@@ -266,12 +266,12 @@ register_blueprint "ktrait_berserk"
     text = {
         name   = "Berserk",
         desc   = "ACTIVE SKILL - spend your rage to go Berserk!",
-        full   = "You're a barely controlled simmering ball of anger. It doesn't take much to send you into a berserker rage that earned you a reputation as someone not to mess with. When berserk you do increased melee damage, have damage and status resistance, but your too mad to waste time using gun when you could hurt people with your hands.",
+        full   = "You're a barely controlled simmering ball of anger. It doesn't take much to send you into a berserker rage that earned you a reputation as someone not to mess with. When berserk you do increased melee damage, have damage and status resistance, but your too mad to waste time using gun when you could hurt people with your hands. Activating berserk will automatically swap to the first carried melee weapon if present",
         abbr   = "Ber",
     },
     callbacks = {
         on_activate = [=[
-            function(self,entity)
+            function(self, entity)
                 entity:attach( "ktrait_berserk" )
             end
         ]=],
@@ -295,6 +295,21 @@ register_blueprint "ktrait_berserk"
                     world:add_buff( entity, "buff_inmate_berserk_speed_boost", duration )
                 end
                 world:lua_callback( entity, "on_inmate_berserk" )
+
+                local index = 0
+                local melee = nil
+                repeat
+                    melee = world:get_weapon( entity, index, true )
+                    if not melee then break end
+                    if melee.weapon and melee.weapon.type == world:hash("melee") then
+                        break
+                    end
+                    index = index + 1
+                until false
+                if melee then
+                    level:swap_weapon( entity, index )
+                end
+
                 return 1
             end
         ]=],
