@@ -71,10 +71,14 @@ register_blueprint "ktrait_mule"
                 attr.mule_level = mule
                 if mule == 1 then
                     attr.inv_capacity = attr.inv_capacity + 1
+                    for c in world:get_level():coords( { "elevator", "portal", "floor_exit", "elevator_branch", "elevator_special" } ) do
+                        world:get_level():set_explored( c, true )
+                    end
                 elseif mule == 2 then
                     attr.inv_capacity = attr.inv_capacity + 2
                 elseif mule == 3 then
                     attr.inv_capacity = attr.inv_capacity + 2
+                    leveltk.reveal_lootboxes( world:get_level() )
                 end
                 entity:attach( "ktrait_mule" )
             end
@@ -264,7 +268,10 @@ register_blueprint "ktrait_gambler"
     callbacks = {
         on_activate = [[
             function(self, entity)
-                gtk.upgrade_trait( entity, "ktrait_gambler" )
+                local tlevel = gtk.upgrade_trait( entity, "ktrait_gambler" )
+                if tlevel == 2 then
+                    leveltk.reveal_terminals_and_stations( world:get_level() )
+                end
             end
         ]],
         on_enter_level = [[
