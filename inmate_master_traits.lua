@@ -339,8 +339,11 @@ register_blueprint "ktrait_master_ghost_gun"
                         local wd = weapon.weapon
                         if not wd then return 0 end
                         local cd = weapon.clip
+                        local clipsize = weapon.attributes.clip_size or 0
                         if cd and cd.count == 0 then
-                            world:get_level():reload( actor, weapon, true )
+                            while cd.count < clipsize do
+                                world:get_level():reload( actor, weapon, true )
+                            end
                         end
                     end
                 end
