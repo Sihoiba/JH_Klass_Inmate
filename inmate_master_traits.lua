@@ -356,6 +356,9 @@ register_blueprint "ktrait_master_ghost_gun"
                             shots = shots + c.attributes.shots
                         end
                     end
+                    if weapon:child("perk_wu_void") then
+                        shots = shots * (self.attributes.level + 1)
+                    end
 
                     local clip_size = weapon.attributes.clip_size or shots
                     local shot_cost = weapon.weapon.shot_cost or 1
