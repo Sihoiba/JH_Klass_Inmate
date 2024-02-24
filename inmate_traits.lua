@@ -479,8 +479,57 @@ register_blueprint "ktrait_first_rule"
     },
     callbacks = {
         on_activate = [=[
-            function(self,entity)
-                gtk.upgrade_trait( entity, "ktrait_first_rule" )
+            function(self, entity)
+                local tlevel = gtk.upgrade_trait( entity, "ktrait_first_rule" )
+
+                local level = world:get_level()
+                if tlevel == 3 then
+                    leveltk.reveal_enemies( world:get_level() )
+                elseif tlevel >= 1 then
+                    local toughest = {}
+                    local toughest3 = {}
+                    local track_count = 0
+                    for e in level:enemies() do
+                        local xp = e.attributes.experience_value or 0
+                        local danger = e.attributes.health + xp
+                        if tlevel == 2 and e.text and not string.find(e.text.name, "exalted") then
+                            table.insert(toughest, {entity = e, danger = danger})
+                            track_count = track_count + 1
+                        elseif tlevel == 1 then
+                            table.insert(toughest, {entity = e, danger = danger})
+                            track_count = track_count + 1
+                        end
+                    end
+
+                    table.sort( toughest, function ( a, b ) return a.danger > b.danger end )
+
+                    for i = 1,3 do
+                        if toughest[i] then
+                            toughest3[toughest[i].entity] = toughest[i].danger
+                        end
+                    end
+
+                    for e in level:enemies() do
+                        if toughest3[e] then
+                            e:equip("tracker")
+                            e.minimap.always = true
+                        end
+                    end
+                end
+                if tlevel >= 2 then
+                    for e in level:enemies() do
+                        if e.text and string.find(e.text.name, "exalted") then
+                            local tracker = e:child("tracker")
+                            if tracker then
+                                world:mark_destroy( tracker )
+                            end
+                            local etracker = e:equip("exalted_tracker")
+                            e.minimap.color = etracker.minimap.color
+                            e.minimap.always = true
+                        end
+                    end
+                    world:flush_destroy()
+                end
             end
         ]=],
         on_enter_level = [=[
