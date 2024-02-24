@@ -267,7 +267,7 @@ register_blueprint "ktrait_gambler"
                 self.data.stations_and_terminals = {}
                 for e in world:get_level():entities() do
                     if e.attributes and e.attributes.charges then
-                        self.data.stations_and_terminals[world:get_id(e)] = e.attributes.charges
+                        self.data.stations_and_terminals[e] = e.attributes.charges
                     end
                 end
                 local tlevel = self.attributes.level
@@ -292,7 +292,7 @@ register_blueprint "ktrait_gambler"
 
                 for e in world:get_level():entities() do
                     for k, v in pairs(self.data.stations_and_terminals) do
-                        if k == world:get_id(e) then
+                        if k == e then
                             if v > e.attributes.charges then
                                 if self.data.multitool_count < world:has_item( entity, "kit_multitool" ) then
                                     self.data.multitool_count = world:has_item( entity, "kit_multitool" )
@@ -304,7 +304,7 @@ register_blueprint "ktrait_gambler"
                                     end
 
                                     if lucky > good_luck then
-                                        self.data.stations_and_terminals[world:get_id(e)] = e.attributes.charges
+                                        self.data.stations_and_terminals[e] = e.attributes.charges
                                     elseif lucky <= good_luck then
                                         world:play_sound( "vending_hit_reward", e )
                                         e.attributes.charges = v
@@ -321,7 +321,7 @@ register_blueprint "ktrait_gambler"
                                     end
                                 end
                             elseif v < e.attributes.charges then
-                                self.data.stations_and_terminals[world:get_id(e)] = e.attributes.charges
+                                self.data.stations_and_terminals[e] = e.attributes.charges
                             end
                         end
                     end
