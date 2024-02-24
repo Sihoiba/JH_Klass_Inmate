@@ -220,8 +220,14 @@ register_blueprint "ktrait_desperado"
                     bonus = 0.75
                 end
 
-                if target and weapon and weapon.attributes and weapon.attributes.clip_size then
-                    local shots = weapon.attributes["shots"]
+                if target and weapon and weapon.attributes and weapon.weapon and weapon.weapon.type ~= world:hash("melee") then
+                    local shots = weapon.attributes["shots"] or 0
+                    for c in weapon:children() do
+                        if c.attributes and c.attributes.shots then
+                            shots = shots + c.attributes.shots
+                        end
+                    end
+                    local clip_size = weapon.attributes.clip_size or shots
                     local gg = entity:child("ktrait_master_ghost_gun")
                     if gg then
                         local e_shots = gg.attributes.shots or 0
@@ -229,7 +235,7 @@ register_blueprint "ktrait_desperado"
                     end
                     local shot_cost = weapon.weapon.shot_cost or 1
                     local cost_per_shot = shot_cost * shots
-                    local shot_clip_percent = cost_per_shot /  weapon.attributes.clip_size
+                    local shot_clip_percent = cost_per_shot / clip_size
                     local damage_bonus = 1 + (shot_clip_percent * bonus)
 
                     self.attributes.damage_mult = damage_bonus

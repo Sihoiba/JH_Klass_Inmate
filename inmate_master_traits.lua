@@ -349,14 +349,20 @@ register_blueprint "ktrait_master_ghost_gun"
         ]=],
         on_aim = [=[
             function ( self, entity, target, weapon )
-                if self.data and self.data.active and target and weapon and gtk.is_weapon_group( weapon, {"pistols", "smgs"} ) and weapon.weapon and weapon.attributes and weapon.attributes.clip_size and weapon.attributes.shots then
+                if self.data and self.data.active and target and weapon and gtk.is_weapon_group( weapon, {"pistols", "smgs"} ) and weapon.weapon and weapon.attributes and weapon.attributes.shots then
                     local shots = weapon.attributes.shots
-                    local clipsize = weapon.attributes.clip_size
+                    for c in weapon:children() do
+                        if c.attributes and c.attributes.shots then
+                            shots = shots + c.attributes.shots
+                        end
+                    end
+
+                    local clip_size = weapon.attributes.clip_size or shots
                     local shot_cost = weapon.weapon.shot_cost or 1
                     if shot_cost == 1 then
-                        self.attributes.shots = weapon.attributes.clip_size - weapon.attributes.shots
+                        self.attributes.shots = clip_size - shots
                     else
-                        self.attributes.shots = math.floor(weapon.attributes.clip_size/shot_cost) - weapon.attributes.shots
+                        self.attributes.shots = math.floor(clip_size/shot_cost) - shots
                     end
                 end
             end
