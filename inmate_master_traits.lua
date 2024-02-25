@@ -296,7 +296,7 @@ register_blueprint "ktrait_master_ghost_gun"
     blueprint = "trait",
     text = {
         name   = "GHOST GUN",
-        desc   = "MASTER TRAIT - PISTOL/SMG ONLY - ACTIVE SKILL - empty full clip when firing",
+        desc   = "MASTER TRAIT - PISTOL/SMG ONLY - ACTIVE SKILL Toggle On/Off - empty full clip when firing",
         full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets.\n{!LEVEL 2} - Automatically reload pistol/SMGs when empty at {!halved} ammo consumption.\n{!LEVEL 3} reload ammo consumption is {!20%} for pistol/SMGs.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGG",
     },
@@ -442,15 +442,15 @@ register_blueprint "decoy_self_destruct_slash"
 register_blueprint "decoy_self_destruct_emp"
 {
     attributes = {
-        damage    = 20,
-        explosion = 2,
-        gib_factor= 2,
+        damage     = 20,
+        explosion  = 3,
+        gib_factor = 0,
+        slevel     = { emp = 5, },
     },
     weapon = {
         group = "env",
         damage_type = "emp",
         natural = true,
-        slevel    = { emp = 5, },
     },
     callbacks = {
         on_create = [=[
@@ -497,10 +497,10 @@ register_blueprint "decoy" {
             function( self, killer, current, weapon )
                 if self.data.level == 3 then
                     local w_slash = world:create_entity( "decoy_self_destruct_slash" )
-                    world:attach( self, w_slash )
-                    world:get_level():fire( self, world:get_position( self ), w_slash, 200 )
                     local w_emp = world:create_entity( "decoy_self_destruct_emp" )
+                    world:attach( self, w_slash )
                     world:attach( self, w_emp )
+                    world:get_level():fire( self, world:get_position( self ), w_slash, 200 )
                     world:get_level():fire( self, world:get_position( self ), w_emp, 200 )
                 end
             end
@@ -532,21 +532,32 @@ register_blueprint "kskill_fraudster_create_decoy"
     skill = {
         cooldown = 2000,
     },
+    ui_target = {
+        type = "mortar",
+        opt_distance = 6,
+        max_distance = 6,
+        range = 6,
+    },
     callbacks = {
         on_use = [=[
             function ( self, entity, level )
                 local fraudster = entity:child("ktrait_master_fraudster")
                 local tlevel = fraudster.attributes.level
-                local sc = gtk.random_near_coord( entity:get_position(), 2 )
-                local summon = level:add_entity( "decoy", sc )
-                summon:equip( "decoy_light" )
-                if tlevel > 1 then
-                    summon.attributes.health = 50
-                    summon.health.current = 50
+                local tcoord = ui:get_target()
+                if world:get_level():is_visible(tcoord) then
+                    local summon = level:add_entity( "decoy", tcoord )
+                    summon:equip( "decoy_light" )
+                    if tlevel > 1 then
+                        summon.attributes.health = 50
+                        summon.health.current = 50
+                    end
+                    summon.data.level = tlevel
+                    world:remove_from_max_kills( summon )
+                    return 1
+                else
+                    world:play_voice( "vo_refuse" )
+                    return 0
                 end
-                summon.data.level = tlevel
-                world:remove_from_max_kills( summon )
-                return 1
             end
         ]=],
     }

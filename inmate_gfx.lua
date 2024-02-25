@@ -69,7 +69,7 @@ register_gfx_blueprint "player_inmate"
 register_gfx_blueprint "fx_on_fire_decoy_destruct_slash"
 {
     lifetime = {
-        duration = 3.0,
+        duration = 2.0,
     },
     light = {
         color       = vec4(4.0,1.0,1.0,1.0),
@@ -89,6 +89,36 @@ register_gfx_blueprint "decoy_self_destruct_slash"
 {
     weapon_fx = {
         on_fire    = "fx_on_fire_decoy_destruct_slash",
+    },
+}
+
+register_gfx_blueprint "fx_on_fire_decoy_destruct_emp"
+{
+    blueprint = "ps_explosion_large",
+    lifetime = {
+        duration = 4.0,
+    },
+    particle = {
+        material       = "data/texture/particles/electric_01/electric_01",
+        group_id       = "pgroup_fx",
+        tiling         = 8,
+    },
+    light = {
+        color       = vec4(2.0,2.0,4.0,1.0),
+        range       = 2.0,
+    },
+    fade = {
+        fade_out = 1.0,
+    },
+    physics_explosion = {
+        radius = 2.0,
+    },
+}
+
+register_gfx_blueprint "decoy_self_destruct_emp"
+{
+    weapon_fx = {
+        on_fire    = "fx_on_fire_decoy_destruct_emp",
     },
 }
 
