@@ -912,7 +912,7 @@ register_blueprint "ktrait_kneecap"
     blueprint = "trait",
     text = {
         name   = "Kneecap",
-        desc   = "PISTOL/SMG/SEMI SKILL - weaken biological enemies on hit",
+        desc   = "PISTOL/SMG/SEMI/AUTO SKILL - weaken biological enemies on hit",
         full   = "You know where to shoot someone to give them a bad day!\n\n{!LEVEL 1} - enemies shot are slowed\n{!LEVEL 2} - enemies shot have reduced accuracy\n{!LEVEL 3} - enemies shot do reduced damage\n",
         abbr   = "Kne",
     },
@@ -929,7 +929,7 @@ register_blueprint "ktrait_kneecap"
                     if not w then break end
                     local wd = w.weapon
                     if wd then
-                        if gtk.is_weapon_group( w, {"pistols","smgs","semi"} ) then
+                        if gtk.is_weapon_group( w, { "pistols", "smgs", "semi", "auto" } ) then
                             if tlevel >= 1 and not w:child("perk_wb_kneecap") then
                                 generator.add_perk( w, "perk_wb_kneecap" )
                             end
@@ -951,7 +951,7 @@ register_blueprint "ktrait_kneecap"
                     local tlevel = self.attributes.level
                     local wd     = w.weapon
                     if wd then
-                        if gtk.is_weapon_group( w, {"pistols","smgs","semi"} ) then
+                        if gtk.is_weapon_group( w, { "pistols", "smgs", "semi", "auto" } ) then
                             if tlevel >= 1 and not w:child("perk_wb_kneecap") then
                                 generator.add_perk( w, "perk_wb_kneecap" )
                             end

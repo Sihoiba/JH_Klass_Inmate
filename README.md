@@ -32,7 +32,7 @@ In addition to the new Klass, this mod adds AV versions of the Crowbar, Axe and 
  - First Rule; requires Brute 1: Level 1 highlights 3 most dangerous enemies on the minimap, level 2 also reveals exalted on the mini map, level 3 reveals all enemies.
  - Burglar; requires Smuggler 1: Open doors from a distance. Higher levels let you close doors from a distance and unlock locked doors and elevators for free.
  - Dealer; requires Cutter 1: Increased the duration of the Juiced, Stimmed and Enviro buffs from Combat Packs, Stimpacks and Enviropacks.
- - Kneecap; requires Dash 1: PISTOL/SMG/SEMI: Debuffs enemies on hit. Level 1 slowed, level 2 accuracy malus, level 3 damage malus
+ - Kneecap; requires Dash 1: PISTOL/SMG/SEMI/AUTO: Debuffs enemies on hit. Level 1 slowed, level 2 accuracy malus, level 3 damage malus
  - Hitman; requires Desperado = 1: Improves close range combat. Level 1 massively reduced minimum range, Level 2 explosive weapons/grenades are Safe, Level 3 ignore enemy cover
  - Whizkid; requires Gambler 1: As standard
 
