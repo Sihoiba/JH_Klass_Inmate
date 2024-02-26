@@ -443,8 +443,10 @@ register_blueprint "ktrait_master_ghost_gun"
                             end
                         end
                         if cd and cd.count == 0 then
-                            while cd.count < clipsize do
+                            local reload_attempts = 0
+                            while cd.count < clipsize and reload_attempts < 10 do
                                 world:get_level():reload( actor, weapon, true )
+                                reload_attempts = reload_attempts + 1
                             end
                         end
                     end
