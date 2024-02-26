@@ -314,6 +314,11 @@ register_blueprint "buff_ghost_gun"
                     end
 
                     local clip_size = weapon.attributes.clip_size or shots
+                    for c in weapon:children() do
+                        if c.attributes and c.attributes.clip_size then
+                            clip_size = clip_size + c.attributes.clip_size
+                        end
+                    end
                     local shot_cost = weapon.weapon.shot_cost or 1
                     if shot_cost == 1 then
                         self.attributes.shots = clip_size - shots
@@ -432,6 +437,11 @@ register_blueprint "ktrait_master_ghost_gun"
                         if not wd then return 0 end
                         local cd = weapon.clip
                         local clipsize = weapon.attributes.clip_size or 0
+                        for c in weapon:children() do
+                            if c.attributes and c.attributes.clip_size then
+                                clipsize = clipsize + c.attributes.clip_size
+                            end
+                        end
                         if cd and cd.count == 0 then
                             while cd.count < clipsize do
                                 world:get_level():reload( actor, weapon, true )
