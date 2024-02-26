@@ -230,6 +230,7 @@ register_blueprint "ktrait_master_chemist"
                         end
                     end
                 end
+                return 0
             end
         ]=],
     },
@@ -294,6 +295,16 @@ register_blueprint "buff_ghost_gun"
         shots = 0
     },
     callbacks = {
+        on_pre_command = [=[
+            function ( self, entity, command, weapon )
+                if command == COMMAND_USE then
+                    if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") then
+                        self.attributes.shots = 0
+                    end
+                end
+                return 0
+            end
+        ]=],
         on_post_command = [=[
             function ( self, actor, cmt, tgt, time )
                 if time <= 0 then return end

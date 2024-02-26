@@ -292,6 +292,7 @@ register_blueprint "ktrait_gambler"
         on_pre_command = [[
             function ( self, entity, command, weapon )
                 self.data.multitool_count = world:has_item( entity, "kit_multitool" )
+                return 0
             end
         ]],
         on_post_command = [[
@@ -895,6 +896,7 @@ register_blueprint "ktrait_hitman"
                         entity.attributes.splash_mod = 0.0
                     end
                 end
+                return 0
             end
         ]=],
         on_post_command = [=[
