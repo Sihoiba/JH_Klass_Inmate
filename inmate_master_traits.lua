@@ -289,6 +289,105 @@ register_blueprint "buff_ghost_gun"
     ui_buff = {
        color     = LIGHTBLUE,
     },
+    attributes = {
+        level = 1,
+        shots = 0
+    },
+    callbacks = {
+        on_post_command = [=[
+            function ( self, actor, cmt, tgt, time )
+                if time <= 0 then return end
+                self.attributes.shots = 0
+            end
+        ]=],
+        on_aim = [=[
+            function ( self, entity, target, weapon )
+                if target and weapon and gtk.is_weapon_group( weapon, {"pistols", "smgs"} ) and weapon.weapon and weapon.attributes and weapon.attributes.shots then
+                    local shots = weapon.attributes.shots
+                    for c in weapon:children() do
+                        if c.attributes and c.attributes.shots then
+                            shots = shots + c.attributes.shots
+                        end
+                    end
+                    if weapon:child( "perk_wu_void" ) then
+                        shots = shots * (self.attributes.level + 1)
+                    end
+
+                    local clip_size = weapon.attributes.clip_size or shots
+                    local shot_cost = weapon.weapon.shot_cost or 1
+                    if shot_cost == 1 then
+                        self.attributes.shots = clip_size - shots
+                    else
+                        self.attributes.shots = math.floor(clip_size/shot_cost) - shots
+                    end
+                end
+            end
+        ]=],
+        on_rearm = [=[
+            function( self, entity, weapon )
+                if not gtk.is_weapon_group( weapon, {"pistols","smgs"} ) then
+                    world:mark_destroy( self )
+                    world:flush_destroy()
+                end
+            end
+        ]=],
+        on_detach = [=[
+            function( self, parent )
+                local sgg = parent:child("kskill_ghost_gun_toggle")
+                if sgg then
+                    sgg.data.active = false
+                    sgg.text.name = sgg.text.on
+                end
+            end
+        ]=]
+    }
+}
+
+register_blueprint "kskill_ghost_gun_toggle"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name = "Ghost Gun On",
+        on   = "Ghost Gun On",
+        off  = "Ghost Gun Off",
+    },
+    data = {
+        is_free_use = true,
+        active = false
+    },
+    skill = {
+        cooldown = 0,
+    },
+    callbacks = {
+        on_use = [=[
+            function ( self, entity, level )
+                 if self.data and self.data.active then
+                    self.data.active = false
+                    local gg = entity:child( "buff_ghost_gun" )
+                    world:mark_destroy( gg )
+                    world:flush_destroy()
+                    self.text.name = self.text.on
+                else
+                    self.data.active = true
+                    local buff = world:add_buff( entity, "buff_ghost_gun" )
+
+                    local attr = buff.attributes
+                    attr.level = level
+
+                    self.text.name = self.text.off
+                end
+                return 1
+            end
+        ]=],
+        is_usable = [=[
+            function ( self, user )
+                if gtk.is_weapon_group( user:get_weapon(), {"pistols", "smgs"} ) then
+                    return 1
+                end
+                return 0
+            end
+        ]=],
+    }
 }
 
 register_blueprint "ktrait_master_ghost_gun"
@@ -306,26 +405,19 @@ register_blueprint "ktrait_master_ghost_gun"
             pistols = 1.0,
             smgs = 1.0,
         },
-        shots = 0
-    },
-    data = {
-        is_free_use = true,
-        active = false
-    },
-    skill = {
-        cooldown = 0,
     },
     callbacks = {
         on_activate = [=[
-            function(self,entity)
-                local lvl, v = gtk.upgrade_master( entity, "ktrait_master_ghost_gun" )
-                local attr = v.attributes
-                if lvl == 2 then
-                    attr["pistols.reload_mod"] = 0.50
-                    attr["smgs.reload_mod"]    = 0.50
+            function(self, entity)
+                local lvl, gg = gtk.upgrade_master( entity, "ktrait_master_ghost_gun" )
+                if lvl == 1 then
+                    entity:attach( "kskill_ghost_gun_toggle" )
+                elseif lvl == 2 then
+                    gg.attributes["pistols.reload_mod"] = 0.50
+                    gg.attributes["smgs.reload_mod"]    = 0.50
                 elseif lvl == 3 then
-                    attr["pistols.reload_mod"] = 0.20
-                    attr["smgs.reload_mod"]    = 0.20
+                    gg.attributes["pistols.reload_mod"] = 0.20
+                    gg.attributes["smgs.reload_mod"]    = 0.20
                 end
             end
         ]=],
@@ -335,7 +427,7 @@ register_blueprint "ktrait_master_ghost_gun"
                 local tlevel = self.attributes.level
                 if tlevel > 1 and cmt == COMMAND_USE then
                     local weapon = actor:get_weapon()
-                    if weapon and gtk.is_weapon_group( weapon, {"pistols","smgs"} ) then
+                    if weapon and gtk.is_weapon_group( weapon, {"pistols", "smgs"} ) then
                         local wd = weapon.weapon
                         if not wd then return 0 end
                         local cd = weapon.clip
@@ -347,68 +439,12 @@ register_blueprint "ktrait_master_ghost_gun"
                         end
                     end
                 end
-                self.attributes.shots = 0
-            end
-        ]=],
-        on_aim = [=[
-            function ( self, entity, target, weapon )
-                if self.data and self.data.active and target and weapon and gtk.is_weapon_group( weapon, {"pistols", "smgs"} ) and weapon.weapon and weapon.attributes and weapon.attributes.shots then
-                    local shots = weapon.attributes.shots
-                    for c in weapon:children() do
-                        if c.attributes and c.attributes.shots then
-                            shots = shots + c.attributes.shots
-                        end
-                    end
-                    if weapon:child("perk_wu_void") then
-                        shots = shots * (self.attributes.level + 1)
-                    end
-
-                    local clip_size = weapon.attributes.clip_size or shots
-                    local shot_cost = weapon.weapon.shot_cost or 1
-                    if shot_cost == 1 then
-                        self.attributes.shots = clip_size - shots
-                    else
-                        self.attributes.shots = math.floor(clip_size/shot_cost) - shots
-                    end
-                end
-            end
-        ]=],
-        on_use = [=[
-            function ( self, entity )
-                if self.data and self.data.active then
-                    self.data.active = false
-                    local gg = entity:child("buff_ghost_gun")
-                    world:mark_destroy( gg )
-                    world:flush_destroy()
-                else
-                    self.data.active = true
-                    world:add_buff( entity, "buff_ghost_gun" )
-                end
-                return 1
-            end
-        ]=],
-        is_usable = [=[
-            function ( self, user )
-                if gtk.is_weapon_group( user:get_weapon(), {"pistols","smgs"} ) then
-                    return 1
-                end
-                return 0
-            end
-        ]=],
-        on_rearm = [=[
-            function( self, entity, weapon )
-                if not gtk.is_weapon_group( weapon, {"pistols","smgs"} ) then
-                    local gg = entity:child("buff_ghost_gun")
-                    world:mark_destroy( gg )
-                    world:flush_destroy()
-                end
             end
         ]=],
     },
 }
 
 -- FRAUDSTER
-
 
 register_blueprint "decoy_light" {
     flags = { EF_NOPICKUP },

@@ -307,6 +307,12 @@ register_blueprint "ktrait_berserk"
                     index = index + 1
                 until false
                 if melee then
+                    local bgg = entity:child("buff_ghost_gun")
+                    if bgg then
+                        nova.log("GHOST GUN disabled")
+                        world:mark_destroy( bgg )
+                        world:flush_destroy()
+                    end
                     level:swap_weapon( entity, index )
                 end
 
@@ -353,7 +359,7 @@ register_blueprint "runtime_add_xp"
     callbacks = {
         on_enter_level = [[
             function ( self, player, reenter )
-                world:add_experience( player, 2000 )
+                world:add_experience( player, 4000 )
             end
         ]],
     },
