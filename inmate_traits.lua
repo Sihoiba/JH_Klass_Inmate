@@ -224,7 +224,7 @@ register_blueprint "ktrait_desperado"
                     bonus = 0.75
                 end
 
-                if target and weapon and weapon.attributes and weapon.weapon and weapon.weapon.type ~= world:hash("melee") then
+                if target and weapon and weapon.attributes and weapon.weapon and weapon.weapon.type ~= world:hash("melee") and ( not weapon.stack ) then
                     local shots = weapon.attributes["shots"] or 0
                     for c in weapon:children() do
                         if c.attributes and c.attributes.shots then
