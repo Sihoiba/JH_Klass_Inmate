@@ -223,7 +223,7 @@ register_blueprint "ktrait_master_chemist"
             function ( self, entity, command, weapon )
                 if command == COMMAND_USE then
                     local tlevel = self.attributes.level
-                    if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") and tlevel >= 1 then
+                    if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") and tlevel >= 2 then
                         local fp = weapon:child("kperk_chemist")
                         if not fp then
                             weapon:attach("kperk_chemist")
