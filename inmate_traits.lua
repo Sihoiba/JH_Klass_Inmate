@@ -243,6 +243,8 @@ register_blueprint "ktrait_desperado"
                     local damage_bonus = 1 + (shot_clip_percent * bonus)
 
                     self.attributes.damage_mult = damage_bonus
+                else
+                    self.attributes.damage_mult = 1.0
                 end
             end
         ]=],
