@@ -316,6 +316,8 @@ register_blueprint "ktrait_berserk"
                     level:swap_weapon( entity, index )
                 end
 
+                world:lua_callback( entity, "on_berserk" )
+
                 return 1
             end
         ]=],

@@ -218,3 +218,61 @@ register_blueprint "perk_we_stun"
         ]=],
     },
 }
+
+register_blueprint "perk_wb_specialist"
+{
+    blueprint = "perk",
+    lists = {
+        group    = "perk_wb",
+        keywords = { "pistols", "smgs", "auto", "shotguns", "rotary", "explosives", "semi", "weak" },
+    },
+    data = {},
+    text = {
+        name = "Specialist",
+        desc = "{!+100%} damage after class skill use",
+    },
+    attributes = {
+        apply       = 0,
+        damage_mult = 1.0,
+    },
+    callbacks = {
+        on_adrenaline = [=[
+            function(self,entity)
+                self.attributes.apply = 1
+            end
+        ]=],
+        on_stealth = [=[
+            function(self,entity)
+                self.attributes.apply = 1
+            end
+        ]=],
+        on_smoke_screen = [=[
+            function(self,entity)
+                self.attributes.apply = 1
+            end
+        ]=],
+        on_berserk = [=[
+            function(self,entity)
+                self.attributes.apply = 1
+            end
+        ]=],
+        on_post_command = [=[
+            function ( self, actor, cmt, weapon, time )
+                if cmt == COMMAND_USE then
+                    if weapon == self:parent() then
+                        self.attributes.apply = 0
+                    end
+                end
+            end
+        ]=],
+        on_aim = [=[
+            function ( self, entity, target, weapon )
+                local bonus = 1.0
+                if target and self:parent() == weapon and self.attributes.apply == 1 then
+                    bonus = 2.0
+                end
+                self.attributes.damage_mult = bonus
+            end
+        ]=],
+    },
+}
