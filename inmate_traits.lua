@@ -621,7 +621,7 @@ register_blueprint "kskill_burglar_open_close"
                         local visible = level:is_visible(coord)
                         local closed = e.flags.data[ EF_NOMOVE ]
                         local broken = e.flags.data[ EF_KILLED ]
-                        local locked = ecs:child( e, "door_locked" )
+                        local locked = ecs:child( e, "door_locked" ) or ecs:child( e, "door2_locked_l" ) or ecs:child( e, "door2_locked_r" ) or ecs:child( e, "door_red_locked" )
 
                         if tlevel == 1 and distance < 3 and visible and closed and not broken and not locked then
                             e.flags.data = { EF_ACTION },
