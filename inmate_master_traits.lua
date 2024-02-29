@@ -521,7 +521,7 @@ register_blueprint "decoy_self_destruct_emp"
 }
 
 register_blueprint "decoy" {
-    flags = { EF_NOMOVE, EF_NOFLY, EF_TARGETABLE, EF_ALIVE, EF_IFF },
+    flags = { EF_NOMOVE, EF_NOFLY, EF_TARGETABLE, EF_ALIVE, EF_IFF, EF_NOCORPSE },
     lists = {
         group = "being",
     },
@@ -541,6 +541,7 @@ register_blueprint "decoy" {
             state = "idle",
         },
     },
+    target = {},
     attributes = {
         health = 25,
     },
@@ -608,6 +609,8 @@ register_blueprint "kskill_fraudster_create_decoy"
                     local enemy_count = world:get_level().level_info.enemies * 1
                     local summon = level:add_entity( "decoy", tcoord )
                     summon:equip( "decoy_light" )
+                    local friendly = world:create_entity( "friendly" )
+                    world:raw_equip( summon, friendly )
                     if tlevel > 1 then
                         summon.attributes.health = 50
                         summon.health.current = 50
