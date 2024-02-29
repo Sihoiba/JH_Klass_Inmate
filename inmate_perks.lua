@@ -137,7 +137,7 @@ register_blueprint "buff_kneecapped"
     flags = { EF_NOPICKUP },
     text = {
         name  = "Kneecapped",
-        desc  = "quarter move speed",
+        desc  = "reduces enemy move speed by 25%",
     },
     ui_buff = {
         color     = LIGHTRED,
