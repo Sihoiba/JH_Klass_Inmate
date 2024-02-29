@@ -596,8 +596,8 @@ register_blueprint "kskill_fraudster_create_decoy"
         type = "mortar",
     },
     attributes = {
-        opt_distance = 6,
-        max_distance = 6,
+        opt_distance = 8,
+        max_distance = 8,
         range = 0,
     },
     callbacks = {
