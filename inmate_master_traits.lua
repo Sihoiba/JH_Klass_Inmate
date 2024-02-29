@@ -521,9 +521,9 @@ register_blueprint "decoy_self_destruct_emp"
 }
 
 register_blueprint "decoy" {
-    flags = { EF_NOMOVE, EF_NOFLY, EF_TARGETABLE, EF_ALIVE, EF_IFF, EF_NOCORPSE },
+    flags = { EF_NOMOVE, EF_NOFLY, EF_TARGETABLE, EF_ALIVE, EF_NOCORPSE },
     lists = {
-        group = "being",
+        group = "env",
     },
     text = {
         name = "decoy",
