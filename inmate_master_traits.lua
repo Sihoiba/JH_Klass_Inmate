@@ -605,6 +605,7 @@ register_blueprint "kskill_fraudster_create_decoy"
                 local tlevel = fraudster.attributes.level
                 local tcoord = ui:get_target()
                 if world:get_level():is_visible(tcoord) then
+					local enemy_count = world:get_level().level_info.enemies * 1
                     local summon = level:add_entity( "decoy", tcoord )
                     summon:equip( "decoy_light" )
                     local friendly = world:create_entity( "friendly" )
@@ -614,6 +615,7 @@ register_blueprint "kskill_fraudster_create_decoy"
                         summon.health.current = 50
                     end
                     summon.data.level = tlevel
+					world:get_level().level_info.enemies = enemy_count
                     world:remove_from_max_kills( summon )
                     return 1
                 else
