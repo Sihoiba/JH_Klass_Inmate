@@ -349,7 +349,7 @@ register_blueprint "ktrait_berserk"
     },
     skill = {
         resource = "resource_rage",
-        fail_vo  = "vo_no_fury",
+        fail_vo  = "vo_no_rage",
         cooldown = 500,
         cost     = 25,
     },
