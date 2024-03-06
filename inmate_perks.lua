@@ -153,7 +153,7 @@ register_blueprint "perk_wb_kneecap"
     callbacks = {
         on_damage = [=[
             function ( unused, weapon, who, amount, source )
-                if who and who.data and ( not who.data.is_mechanical ) then
+                if who and who.data and ( not who.data.is_mechanical ) and who.data.can_bleed then
                     world:add_buff( who, "buff_kneecapped", 150, true )
                 end
             end
