@@ -136,7 +136,14 @@ register_blueprint "buff_inmate_berserk_base"
         ]],
         on_kill = [[
             function ( self, entity, target, weapon )
-                if target and target.text and target.text.name == "door" then
+                local is_door = false
+                local level = world:get_level()
+                local c = world:get_position(target)
+                local d = level:get_entity(c,"door") or level:get_entity(c,"pdoor") or level:get_entity(c,"door2") or level:get_entity(c,"door2_l") or level:get_entity(c,"door2_r")
+                if d and d == target then
+                    is_door = true
+                end
+                if is_door then
                     ui:set_hint( "{R"..self.text.door_kill_text.."}", 2001, 0 )
                 elseif not (target.data and target.data.ai) then
                     ui:set_hint( "{R"..self.text.environmental_object_kill_text.."}", 2001, 0 )
