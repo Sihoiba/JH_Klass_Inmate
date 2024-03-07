@@ -628,38 +628,40 @@ register_blueprint "kskill_burglar_open_close"
                 local level = world:get_level()
                 local tlevel = self.attributes.level
                 local return_val = 0
-                for e in level:entities() do
-                    if e.text and e.text.name == "door" then
-                        local coord = world:get_position(e)
-                        local distance = level:distance(entity, e)
-                        local visible = level:is_visible(coord)
-                        local closed = e.flags.data[ EF_NOMOVE ]
-                        local broken = e.flags.data[ EF_KILLED ]
-                        local locked = ecs:child( e, "door_locked" ) or ecs:child( e, "door2_locked_l" ) or ecs:child( e, "door2_locked_r" ) or ecs:child( e, "door_red_locked" )
+
+                for c in level:coords( {"door_frame","pdoor_frame","door_frame_l","door_frame_r" } ) do
+                    local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
+
+                    if d then
+                        local distance = level:distance(entity, d)
+                        local visible = level:is_visible(c)
+                        local closed = d.flags.data[ EF_NOMOVE ]
+                        local broken = d.flags.data[ EF_KILLED ]
+                        local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" )
 
                         if tlevel == 1 and distance < 3 and visible and closed and not broken and not locked then
-                            e.flags.data = { EF_ACTION },
-                            world:play_sound( "door_open", e )
-                            world:set_state( e, "open" )
+                            d.flags.data = { EF_ACTION },
+                            world:play_sound( "door_open", d )
+                            world:set_state( d, "open" )
                             return_val = 1
                         elseif tlevel > 1 and visible and closed and not broken and not locked then
-                            e.flags.data = { EF_ACTION },
-                            world:play_sound( "door_open", e )
-                            world:set_state( e, "open" )
+                            d.flags.data = { EF_ACTION },
+                            world:play_sound( "door_open", d )
+                            world:set_state( d, "open" )
                             return_val = 1
-                        elseif tlevel > 1 and visible and not closed and not broken and level:can_close( e ) then
-                            e.flags.data = { EF_NOSIGHT, EF_NOMOVE, EF_NOFLY, EF_NOSHOOT, EF_BUMPACTION, EF_ACTION }
-                            world:play_sound( "door_close", e )
-                            world:set_state( e, "closed" )
+                        elseif tlevel > 1 and visible and not closed and not broken and level:can_close( d ) then
+                            d.flags.data = { EF_NOSIGHT, EF_NOMOVE, EF_NOFLY, EF_NOSHOOT, EF_BUMPACTION, EF_ACTION }
+                            world:play_sound( "door_close", d )
+                            world:set_state( d, "closed" )
                             return_val = 1
                         end
-                        if tlevel == 3 and visible and not broken and ecs:child( e, "door_locked" ) then
-                            e.flags.data = { EF_ACTION },
-                            level:change_state( e, {
-                                door_locked    = "door_unlocked",
+                        if tlevel == 3 and visible and not broken and ecs:child( d, "door_locked" ) then
+                            d.flags.data = { EF_ACTION },
+                            level:change_state( d, {
+                                door_locked = "door_unlocked",
                             })
-                            world:play_sound( "door_open", e )
-                            world:set_state( e, "open" )
+                            world:play_sound( "door_open", d )
+                            world:set_state( d, "open" )
                             return_val = 1
                         end
                     end
@@ -821,10 +823,8 @@ dealer = {
 }
 
 function dealer.record_buff( entity )
-    if entity and entity.text then
-        if entity.text.name == "Stimmed" or entity.text.name == "Juiced" or entity.text.name == "Enviro" then
-            table.insert(dealer.data.buffs, entity)
-        end
+    if entity and entity.flags and entity.flags.data[ EF_NOPICKUP ] and not entity.flags.data[ EF_PERMANENT ] and entity.ui_buff then
+        table.insert(dealer.data.buffs, entity)
     end
 end
 
@@ -856,8 +856,15 @@ register_blueprint "ktrait_dealer"
                 end
                 local increase = {1.5, 2.0, 3.0}
                 for k,e in pairs(dealer.data.buffs) do
-                    if e.lifetime then
-                        e.lifetime.time_left = e.lifetime.time_left * increase[self.attributes.level]
+                    local parent = e:parent()
+                    if e.lifetime and parent and parent == world:get_player() then
+                        local stimmed = parent:child("buff_stimpack")
+                        local juiced = parent:child("buff_combatpack")
+                        local enviro = parent:child("buff_enviro")
+
+                        if (e == stimmed or e == juiced or e == enviro) then
+                            e.lifetime.time_left = e.lifetime.time_left * increase[self.attributes.level]
+                        end
                     end
 
                     table.remove(dealer.data.buffs, k)
