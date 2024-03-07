@@ -429,13 +429,13 @@ register_blueprint "kskill_cutter"
                 nova.log("on activate")
                 if param then
                     nova.log("param"..tostring(param.text.name))
-                    if param.text.name == "combat pack" and world:has_item( who, "medkit_small" ) > 0 then
+                    if world:get_id(param) == "combatpack_small" and world:has_item( who, "medkit_small" ) > 0 then
                         world:remove_items( who, "medkit_small", 1 )
                         who:pickup( "combatpack_small", true )
-                    elseif param.text.name == "stimpack" and world:has_item( who, "medkit_small" ) > 0  then
+                    elseif world:get_id(param) == "stimpack_small" and world:has_item( who, "medkit_small" ) > 0  then
                         world:remove_items( who, "medkit_small", 1 )
                         who:pickup( "stimpack_small", true )
-                    elseif param.text.name == "small medkit" and world:has_item( who, "medkit_large" ) > 0  then
+                    elseif world:get_id(param) == "medkit_small" and world:has_item( who, "medkit_large" ) > 0  then
                         world:remove_items( who, "medkit_large", 1 )
                         who:pickup( "medkit_small", true )
                         who:pickup( "medkit_small", true )
