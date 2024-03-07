@@ -263,14 +263,14 @@ register_blueprint "ktrait_gambler"
     attributes = {
         level   = 1,
     },
-    data = {
-        stations_and_terminals = {},
-        multitool_count = 0,
-    },
     callbacks = {
         on_activate = [[
             function(self, entity)
                 local tlevel = gtk.upgrade_trait( entity, "ktrait_gambler" )
+                if tlevel == 1 then
+                    entity.data.stations_and_terminals = {}
+                    entity.data.multitool_count = 0
+                end
                 if tlevel == 2 then
                     leveltk.reveal_terminals_and_stations( world:get_level() )
                 end
@@ -279,10 +279,10 @@ register_blueprint "ktrait_gambler"
         on_enter_level = [[
             function ( self, entity, reenter )
                 if reenter then return end
-                self.data.stations_and_terminals = {}
+                entity.data.stations_and_terminals = {}
                 for e in world:get_level():entities() do
                     if e.attributes and e.attributes.charges then
-                        self.data.stations_and_terminals[e] = e.attributes.charges
+                        entity.data.stations_and_terminals[e] = e.attributes.charges
                     end
                 end
                 local tlevel = self.attributes.level
@@ -293,13 +293,22 @@ register_blueprint "ktrait_gambler"
         ]],
         on_pre_command = [[
             function ( self, entity, command, weapon )
-                self.data.multitool_count = world:has_item( entity, "kit_multitool" )
+                entity.data.multitool_count = world:has_item( entity, "kit_multitool" )
+                if next(entity.data.stations_and_terminals) == nil and not entity.data.recreated then
+                    entity.data.recreated = true
+                    nova.log("Repopulating terminals")
+                    for e in world:get_level():entities() do
+                        if e.attributes and e.attributes.charges then
+                            entity.data.stations_and_terminals[e] = e.attributes.charges
+                        end
+                    end
+                end
                 return 0
             end
         ]],
         on_post_command = [[
             function ( self, entity, command, weapon, time )
-                if next(self.data.stations_and_terminals) == nil then
+                if next(entity.data.stations_and_terminals) == nil then
                     nova.log("No stations or ammo terminals")
                     return 0
                 end
@@ -307,13 +316,13 @@ register_blueprint "ktrait_gambler"
                 local tlevel = self.attributes.level or 0
 
                 for e in world:get_level():entities() do
-                    for k, v in pairs(self.data.stations_and_terminals) do
+                    for k, v in pairs(entity.data.stations_and_terminals) do
                         if k == e then
                             if v > e.attributes.charges then
                                 nova.log("player multitools "..tostring(world:has_item( entity, "kit_multitool" )))
-                                nova.log("multitool count "..tostring(self.data.multitool_count))
-                                if self.data.multitool_count ~= world:has_item( entity, "kit_multitool" ) then
-                                    self.data.multitool_count = world:has_item( entity, "kit_multitool" )
+                                nova.log("multitool count "..tostring(entity.data.multitool_count))
+                                if entity.data.multitool_count ~= world:has_item( entity, "kit_multitool" ) then
+                                    entity.data.multitool_count = world:has_item( entity, "kit_multitool" )
                                 else
                                     local lucky = math.random(5)
                                     local good_luck = 2
@@ -322,7 +331,7 @@ register_blueprint "ktrait_gambler"
                                     end
 
                                     if lucky > good_luck then
-                                        self.data.stations_and_terminals[e] = e.attributes.charges
+                                        entity.data.stations_and_terminals[e] = e.attributes.charges
                                     elseif lucky <= good_luck then
                                         nova.log("Won the recharge jackpot")
                                         world:play_sound( "vending_hit_reward", e )
@@ -336,13 +345,13 @@ register_blueprint "ktrait_gambler"
                                             nova.log("Won Multitool prize")
                                             world:play_sound( "vending_hit_reward", e )
                                             entity:pickup( "kit_multitool", true )
-                                            self.data.multitool_count = world:has_item( entity, "kit_multitool" )
+                                            entity.data.multitool_count = world:has_item( entity, "kit_multitool" )
                                             uitk.station_activate( entity, e, true )
                                         end
                                     end
                                 end
                             elseif v < e.attributes.charges then
-                                self.data.stations_and_terminals[e] = e.attributes.charges
+                                entity.data.stations_and_terminals[e] = e.attributes.charges
                             end
                         end
                     end
