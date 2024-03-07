@@ -310,7 +310,9 @@ register_blueprint "ktrait_gambler"
                     for k, v in pairs(self.data.stations_and_terminals) do
                         if k == e then
                             if v > e.attributes.charges then
-                                if self.data.multitool_count < world:has_item( entity, "kit_multitool" ) then
+                                nova.log("player multitools "..tostring(world:has_item( entity, "kit_multitool" )))
+                                nova.log("multitool count "..tostring(self.data.multitool_count))
+                                if self.data.multitool_count ~= world:has_item( entity, "kit_multitool" ) then
                                     self.data.multitool_count = world:has_item( entity, "kit_multitool" )
                                 else
                                     local lucky = math.random(5)
@@ -322,6 +324,7 @@ register_blueprint "ktrait_gambler"
                                     if lucky > good_luck then
                                         self.data.stations_and_terminals[e] = e.attributes.charges
                                     elseif lucky <= good_luck then
+                                        nova.log("Won the recharge jackpot")
                                         world:play_sound( "vending_hit_reward", e )
                                         e.attributes.charges = v
                                         uitk.station_activate( entity, e, true )
@@ -330,8 +333,10 @@ register_blueprint "ktrait_gambler"
                                     if tlevel > 1 then
                                         local mtlucky = math.random(10)
                                         if mtlucky == 10 then
+                                            nova.log("Won Multitool prize")
                                             world:play_sound( "vending_hit_reward", e )
                                             entity:pickup( "kit_multitool", true )
+                                            self.data.multitool_count = world:has_item( entity, "kit_multitool" )
                                             uitk.station_activate( entity, e, true )
                                         end
                                     end
