@@ -101,7 +101,7 @@ register_blueprint "buff_inmate_berserk_base"
             impact = 50,
             pierce = 50,
             plasma = 50,
-            fire = 25,
+            ignite = 25,
             cold = 25,
             acid = 25,
             toxin = 25,
