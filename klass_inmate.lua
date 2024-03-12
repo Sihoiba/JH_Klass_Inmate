@@ -74,7 +74,7 @@ register_blueprint "buff_inmate_berserk_base"
     flags = { EF_NOPICKUP },
     text = {
         name = "Berserk!",
-        desc = "Big damage resistance, faster movement, increased melee damage, but melee only white it lasts.",
+        desc = "Big damage resistance, faster movement, increased melee damage, but melee only while it lasts.",
         weapon_fail = "GUNS ARE FOR WUSSES! RIP AND TEAR!",
         kill_text = "RIP AND TEAR! RIP AND TEAR!",
         door_kill_text = "KNOCK, KNOCK. WHO'S THERE? ME!",
