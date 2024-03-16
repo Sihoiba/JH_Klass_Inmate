@@ -112,7 +112,9 @@ register_blueprint "buff_inmate_berserk_base"
             function ( self, entity, command, w, coord )
                 self.attributes.initialized = 1
                 if command == COMMAND_USE then
-                    if w then
+                    if w and w.weapon and w.weapon.group == world:hash("grenades") and entity and entity.data and entity.data.berserk_level > 1 then
+                        return 0
+                    elseif w then
                         if ( w.weapon and w.weapon.type ~= world:hash("melee") ) or ( w.skill and ( w.skill.weapon and ( not w.skill.melee ) ) ) then
                             ui:set_hint( "{R"..self.text.weapon_fail.."}", 2001, 0 )
                             return -1
@@ -126,6 +128,9 @@ register_blueprint "buff_inmate_berserk_base"
             function ( self, entity, target, weapon )
                 if target and weapon then
                     if ( weapon.weapon and weapon.weapon.group == world:hash("env") ) then
+                        return 0
+                    end
+                    if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") and entity and entity.data and entity.data.berserk_level > 1 then
                         return 0
                     end
                     if ( weapon.weapon and weapon.weapon.type ~= world:hash("melee") ) or ( weapon.skill and weapon.skill.weapon and not weapon.skill.melee ) then
@@ -159,7 +164,12 @@ register_blueprint "buff_inmate_berserk_base"
                     buff = world:add_buff( parent, "buff_inmate_berserk_grace_period", 300 )
                 end
             end
-        ]]
+        ]],
+        on_enter_level = [[
+            function ( self )
+                world:mark_destroy( self )
+            end
+        ]],
     },
 }
 
@@ -179,7 +189,7 @@ register_blueprint "buff_inmate_berserk_skill_1"
             impact = 75,
             pierce = 75,
             plasma = 75,
-            fire = 50,
+            ignite = 50,
             cold = 50,
             acid = 50,
             toxin = 50,
@@ -203,7 +213,7 @@ register_blueprint "buff_inmate_berserk_skill_2"
             impact = 75,
             pierce = 75,
             plasma = 75,
-            fire = 50,
+            ignite = 50,
             cold = 50,
             acid = 50,
             toxin = 50,
@@ -227,7 +237,7 @@ register_blueprint "buff_inmate_berserk_skill_3"
             impact = 90,
             pierce = 90,
             plasma = 90,
-            fire = 75,
+            ignite = 75,
             cold = 75,
             acid = 75,
             toxin = 75,
@@ -348,6 +358,20 @@ register_blueprint "ktrait_berserk"
                     world:add_buff( entity, "buff_inmate_berserk_speed_boost", duration )
                 end
                 world:lua_callback( entity, "on_inmate_berserk" )
+
+                local index = 0
+                local melee = nil
+                repeat
+                    melee = world:get_weapon( entity, index, true )
+                    if not melee then break end
+                    if melee.weapon and melee.weapon.type == world:hash("melee") then
+                        break
+                    end
+                    index = index + 1
+                until false
+                if melee then
+                    world:get_level():swap_weapon( entity, index )
+                end
             end
         ]=],
     },
@@ -379,7 +403,7 @@ register_blueprint "klass_inmate"
     text = {
         name  = "Inmate",
         short = "Inmate",
-        desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore 50% {!Rage}.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost.\n\n{!GEAR} - Inmates start with a pipe wrench but no guns.",
+        desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore 50% {!Rage}.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost; however you can only perform melee attacks.\n\n{!GEAR} - Inmates start with a pipe wrench, smoke grenade and stimpack but no guns.",
         abbr = "M",
     },
     callbacks = {
@@ -391,6 +415,7 @@ register_blueprint "klass_inmate"
                 adr.skill.cost = 30
                 entity:attach( "pipe_wrench" )
                 entity:attach( "smoke_grenade" )
+                entity:attach( "stimpack_small" )
             end
         ]=],
     },

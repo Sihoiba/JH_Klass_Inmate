@@ -885,9 +885,9 @@ register_blueprint "ktrait_dealer"
                         elseif k == enviro and ( type(v) == "boolean" or k.lifetime.time_left >= v ) then
                             k.lifetime.time_left = k.lifetime.time_left + (5000 * increase[self.attributes.level])
                         end
+                        dealer.data.buffs[k] = k.lifetime.time_left
                     end
 
-                    dealer.data.buffs[k] = k.lifetime.time_left
                 end
                 return 0
             end

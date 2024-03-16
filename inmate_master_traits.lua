@@ -8,7 +8,7 @@ register_blueprint "ktrait_master_berserker"
     text = {
         name   = "BERSERK",
         desc   = "MASTER TRAIT - you enter berserk on damage and on gibbing with melee weapons.",
-        full   = "You're a barely controlled ball of rage, and will go berserk on the slightest provocation.\n\n{!LEVEL 1} - If not Berserk, become berserk if you lose {!10%} of your health in a single hit or {!25%} chance to go berserk on gibbing with a melee kill\n{!LEVEL 2} - Taking damage or gibbing will now add to Berserk time if already berserk\n{!LEVEL 3} - {!33%} chance to go or extend Berserk on a melee gib.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You're a barely controlled ball of rage, and will go berserk on the slightest provocation.\n\n{!LEVEL 1} - If not Berserk, become berserk if you lose {!10%} of your health in a single hit or {!25%} chance to go berserk on gibbing with a melee kill\n{!LEVEL 2} - The Berserker can now use grenades while berserk, {!33%} chance to go berserk when gibbing\n{!LEVEL 3} - Taking damage or gibbing will now add to Berserk time if already berserk.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MBK",
         abbr   = "MBK",
 
@@ -21,12 +21,14 @@ register_blueprint "ktrait_master_berserker"
     },
     callbacks = {
         on_activate = [=[
-            function(self,entity)
+            function( self, entity )
                 local tlevel, t = gtk.upgrade_master( entity, "ktrait_master_berserker" )
                 local tattr = t.attributes
-                if tlevel == 3 then
+                if tlevel == 2 then
                     tattr.gib_berserk_chance = 3
                 end
+                local data  = entity.data
+                data.berserk_level = ( data.berserk_level or 0 ) + 1
             end
         ]=],
         on_receive_damage = [=[
@@ -38,7 +40,7 @@ register_blueprint "ktrait_master_berserker"
                 local is_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
 
                 if amount >= ten_percent_max then
-                    if (tlevel == 1 and not is_berserk) or tlevel > 1 then
+                    if (tlevel < 3 and not is_berserk) or tlevel > 2 then
                         if not is_berserk then
                             ui:set_hint( "{R"..self.text.berserk_proc.."}", 2001, 0 )
                         else
@@ -56,7 +58,7 @@ register_blueprint "ktrait_master_berserker"
                 local is_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
 
                 if target.data and target.data.ai and gibbed and gib_berserk == 1 and weapon and weapon.weapon and weapon.weapon.type == world:hash("melee") then
-                    if (tlevel == 1 and not is_berserk) or tlevel > 1 then
+                    if (tlevel < 3 and not is_berserk) or tlevel > 2 then
                         if not is_berserk then
                             ui:set_hint( "{R"..self.text.berserk_proc.."}", 2001, 0 )
                         else
@@ -292,7 +294,9 @@ register_blueprint "buff_ghost_gun"
     },
     attributes = {
         level = 1,
-        shots = 0
+        shots = 0,
+        opt_distance = 0,
+        max_distance = 0,
     },
     callbacks = {
         on_pre_command = [=[
@@ -300,6 +304,8 @@ register_blueprint "buff_ghost_gun"
                 if command == COMMAND_USE then
                     if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") then
                         self.attributes.shots = 0
+                        self.attributes.opt_distance = 0
+                        self.attributes.max_distance = 0
                     end
                 end
                 return 0
@@ -309,6 +315,8 @@ register_blueprint "buff_ghost_gun"
             function ( self, actor, cmt, tgt, time )
                 if time <= 0 then return end
                 self.attributes.shots = 0
+                self.attributes.opt_distance = 0
+                self.attributes.max_distance = 0
             end
         ]=],
         on_aim = [=[
@@ -335,6 +343,35 @@ register_blueprint "buff_ghost_gun"
                         self.attributes.shots = clip_size - shots
                     else
                         self.attributes.shots = math.floor(clip_size/shot_cost) - shots
+                    end
+
+                    if self.attributes.level < 3 then
+                        local opt = weapon.attributes.opt_distance
+                        for c in weapon:children() do
+                            if c.attributes and c.attributes.opt_distance then
+                                opt = opt + c.attributes.opt_distance
+                            end
+                        end
+
+                        local max = weapon.attributes.max_distance
+                        for c in weapon:children() do
+                            if c.attributes and c.attributes.max_distance then
+                                max = max + c.attributes.max_distance
+                            end
+                        end
+
+                        local gg_opt = 3
+                        local gg_max = 5
+                        if self.attributes.level == 2 then
+                            gg_max = 6
+                        end
+
+                        if opt > gg_opt then
+                            self.attributes.opt_distance = gg_opt - opt
+                        end
+                        if max > gg_max then
+                            self.attributes.max_distance = gg_max - max
+                        end
                     end
                 end
             end
@@ -376,7 +413,7 @@ register_blueprint "kskill_ghost_gun_toggle"
     },
     callbacks = {
         on_use = [=[
-            function ( self, entity, level )
+            function ( self, entity )
                  if self.data and self.data.active then
                     self.data.active = false
                     local gg = entity:child( "buff_ghost_gun" )
@@ -387,8 +424,9 @@ register_blueprint "kskill_ghost_gun_toggle"
                     self.data.active = true
                     local buff = world:add_buff( entity, "buff_ghost_gun" )
 
-                    local attr = buff.attributes
-                    attr.level = level
+                    buff.attributes.level = entity.data.gg_level
+
+                    nova.log("buff.attributes.level"..tostring(buff.attributes.level))
 
                     self.text.name = self.text.off
                 end
@@ -412,7 +450,7 @@ register_blueprint "ktrait_master_ghost_gun"
     text = {
         name   = "GHOST GUN",
         desc   = "MASTER TRAIT - PISTOL/SMG ONLY - ACTIVE SKILL Toggle On/Off - empty full clip when firing",
-        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets.\n{!LEVEL 2} - Automatically reload pistol/SMGs when empty at {!halved} ammo consumption.\n{!LEVEL 3} reload ammo consumption is {!20%} for pistol/SMGs.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets, but weapon optimal range is reduced to a maximum of 3 and maximum range reduced to 5.\n{!LEVEL 2} - Automatically reload pistol/SMGs when empty at {!halved} ammo consumption, max range now reduced to 6.\n{!LEVEL 3} reload ammo consumption is {!20%}, optimal and max range penalties removed.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGG",
     },
     attributes = {
@@ -424,7 +462,7 @@ register_blueprint "ktrait_master_ghost_gun"
     },
     callbacks = {
         on_activate = [=[
-            function(self, entity)
+            function( self, entity )
                 local lvl, gg = gtk.upgrade_master( entity, "ktrait_master_ghost_gun" )
                 if lvl == 1 then
                     entity:attach( "kskill_ghost_gun_toggle" )
@@ -435,6 +473,7 @@ register_blueprint "ktrait_master_ghost_gun"
                     gg.attributes["pistols.reload_mod"] = 0.20
                     gg.attributes["smgs.reload_mod"]    = 0.20
                 end
+                entity.data.gg_level = ( entity.data.gg_level or 0 ) + 1
             end
         ]=],
         on_post_command = [=[
