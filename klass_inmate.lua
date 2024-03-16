@@ -112,7 +112,8 @@ register_blueprint "buff_inmate_berserk_base"
             function ( self, entity, command, w, coord )
                 self.attributes.initialized = 1
                 if command == COMMAND_USE then
-                    if w and w.weapon and w.weapon.group == world:hash("grenades") and entity and entity.data and entity.data.berserk_level > 1 then
+				
+                    if w and w.weapon and w.weapon.group == world:hash("grenades") and entity and entity.data and entity.data.berserk_level and entity.data.berserk_level > 1 then
                         return 0
                     elseif w then
                         if ( w.weapon and w.weapon.type ~= world:hash("melee") ) or ( w.skill and ( w.skill.weapon and ( not w.skill.melee ) ) ) then
