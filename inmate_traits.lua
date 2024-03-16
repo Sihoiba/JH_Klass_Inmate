@@ -827,15 +827,11 @@ register_blueprint "ktrait_sucker_punch"
     },
 }
 
-dealer = {
-    data = {
-        buffs = {},
-    }
-}
+dealer = {}
 
 function dealer.record_buff( entity )
     if entity and entity.flags and entity.flags.data[ EF_NOPICKUP ] and not entity.flags.data[ EF_PERMANENT ] and entity.ui_buff then
-        dealer.data.buffs[entity] = true
+        world:get_player().data.buffs[world:get_id(entity)] = true
     end
 end
 
@@ -845,7 +841,7 @@ register_blueprint "ktrait_dealer"
     text = {
         name = "Dealer",
         desc = "Increases duration of postive buffs from items.",
-        full = "When your fellow prisoners want better drugs, you are the person they turn to. When you use items that grant buffs like stim packs the duraction is increased\n\n{!LEVEL 1} - Positive buff duration increased by {!50%} \n{!LEVEL 2} - increase is now {!100%} \n{!LEVEL 3} - increase is now {!200%}s",
+        full = "When your fellow prisoners want better drugs, you are the person they turn to. When you use items that grant buffs like stim packs the duraction is increased\n\n{!LEVEL 1} - Positive buff duration increased by {!50%} \n{!LEVEL 2} - increase is now {!100%} \n{!LEVEL 3} - increase is now {!200%}",
         abbr = "Del",
     },
     attributes = {
@@ -857,6 +853,7 @@ register_blueprint "ktrait_dealer"
                 local tlevel = gtk.upgrade_trait( entity, "ktrait_dealer" )
                 if tlevel == 1 then
                     world.register_on_entity( dealer.record_buff )
+                    entity.data.buffs = {}
                 end
             end
         ]=],
@@ -866,37 +863,37 @@ register_blueprint "ktrait_dealer"
                     return 0
                 end
                 local increase = {0.5, 1.0, 2.0}
-                for k,v in pairs(dealer.data.buffs) do
-                    local parent = k:parent()
-                    if k.lifetime and parent and parent == actor then
-                        local stimmed = parent:child("buff_stimpack")
-                        local juiced = parent:child("buff_combatpack")
-                        local enviro = parent:child("buff_enviro")
+                for k,v in pairs(actor.data.buffs) do
 
-                        if k == stimmed then
-                            if type(v) == "boolean" then
-                                k.lifetime.time_left = k.lifetime.time_left + (k.lifetime.time_left * increase[self.attributes.level])
-                            elseif k.lifetime.time_left >= v then
-                                if (k.lifetime.time_left - v) > 600 then
-                                    k.lifetime.time_left = k.lifetime.time_left + (3000 * increase[self.attributes.level])
-                                else
-                                    k.lifetime.time_left = k.lifetime.time_left + (500 * increase[self.attributes.level])
-                                end
+                    local stimmed = actor:child("buff_stimpack")
+                    local juiced = actor:child("buff_combatpack")
+                    local enviro = actor:child("buff_enviro")
+
+                    if k == "buff_stimpack" then
+                        if type(v) == "boolean" then
+                            stimmed.lifetime.time_left = stimmed.lifetime.time_left + (stimmed.lifetime.time_left * increase[self.attributes.level])
+                        elseif stimmed.lifetime.time_left >= v then
+                            if (stimmed.lifetime.time_left - v) > 600 then
+                                stimmed.lifetime.time_left = stimmed.lifetime.time_left + (3000 * increase[self.attributes.level])
+                            else
+                                stimmed.lifetime.time_left = stimmed.lifetime.time_left + (500 * increase[self.attributes.level])
                             end
-                        elseif k == juiced then
-                            if type(v) == "boolean" then
-                                k.lifetime.time_left = k.lifetime.time_left + (k.lifetime.time_left * increase[self.attributes.level])
-                            elseif k.lifetime.time_left >= v then
-                                if (k.lifetime.time_left - v) > 600 then
-                                    k.lifetime.time_left = k.lifetime.time_left + (1500 * increase[self.attributes.level])
-                                else
-                                    k.lifetime.time_left = k.lifetime.time_left + (500 * increase[self.attributes.level])
-                                end
-                            end
-                        elseif k == enviro and ( type(v) == "boolean" or k.lifetime.time_left >= v ) then
-                            k.lifetime.time_left = k.lifetime.time_left + (5000 * increase[self.attributes.level])
                         end
-                        dealer.data.buffs[k] = k.lifetime.time_left
+                        actor.data.buffs[k] = stimmed.lifetime.time_left
+                    elseif k == "buff_combatpack" then
+                        if type(v) == "boolean" then
+                            juiced.lifetime.time_left = juiced.lifetime.time_left + (juiced.lifetime.time_left * increase[self.attributes.level])
+                        elseif juiced.lifetime.time_left >= v then
+                            if (juiced.lifetime.time_left - v) > 600 then
+                                juiced.lifetime.time_left = juiced.lifetime.time_left + (1500 * increase[self.attributes.level])
+                            else
+                                juiced.lifetime.time_left = juiced.lifetime.time_left + (500 * increase[self.attributes.level])
+                            end
+                        end
+                        actor.data.buffs[k] = juiced.lifetime.time_left
+                    elseif k == "buff_enviro" and ( type(v) == "boolean" or enviro.lifetime.time_left >= v ) then
+                        enviro.lifetime.time_left = enviro.lifetime.time_left + (5000 * increase[self.attributes.level])
+                        actor.data.buffs[k] = enviro.lifetime.time_left
                     end
 
                 end
