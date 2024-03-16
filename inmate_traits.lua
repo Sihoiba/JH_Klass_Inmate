@@ -126,7 +126,13 @@ register_blueprint "ktrait_smuggler"
                 local level = world:get_level()
                 local tlevel = self.attributes.level or 0
                 local wep = entity:get_weapon()
-                if target and wep and wep.weapon and not (target.data and target.data.ai) and not target.hazard and (target.text and target.text.name ~= "door")  then
+                local is_door = false
+                local c = world:get_position(target)
+                local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
+                if d and d == target then
+                    is_door = true
+                end
+                if target and wep and wep.weapon and not (target.data and target.data.ai) and not target.hazard and not is_door then
 
                     local ammos  =
                     {
@@ -516,7 +522,7 @@ register_blueprint "ktrait_first_rule"
                     for e in level:enemies() do
                         local xp = e.attributes.experience_value or 0
                         local danger = e.attributes.health + xp
-                        if tlevel == 2 and e.text and not string.find(e.text.name, "exalted") then
+                        if tlevel == 2 and e.data and not e.data.exalted_traits then
                             table.insert(toughest, {entity = e, danger = danger})
                             track_count = track_count + 1
                         elseif tlevel == 1 then
@@ -542,7 +548,7 @@ register_blueprint "ktrait_first_rule"
                 end
                 if tlevel >= 2 then
                     for e in level:enemies() do
-                        if e.text and string.find(e.text.name, "exalted") then
+                        if e.data and e.data.exalted_traits then
                             local tracker = e:child("tracker")
                             if tracker then
                                 world:mark_destroy( tracker )
@@ -569,7 +575,7 @@ register_blueprint "ktrait_first_rule"
                     for e in level:enemies() do
                         local xp = e.attributes.experience_value or 0
                         local danger = e.attributes.health + xp
-                        if self.attributes.level == 2 and e.text and not string.find(e.text.name, "exalted") then
+                        if self.attributes.level == 2 and e.data and not e.data.exalted_traits then
                             table.insert(toughest, {entity = e, danger = danger})
                             track_count = track_count + 1
                         elseif self.attributes.level == 1 then
@@ -595,7 +601,7 @@ register_blueprint "ktrait_first_rule"
                 end
                 if self.attributes.level >= 2 then
                     for e in level:enemies() do
-                        if e.text and string.find(e.text.name, "exalted") then
+                        if e.data and e.data.exalted_traits then
                             local tracker = e:child("tracker")
                             if tracker then
                                 world:mark_destroy( tracker )
