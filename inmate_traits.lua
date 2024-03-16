@@ -9,7 +9,7 @@ register_blueprint "ktrait_skilled_inmate"
     },
     callbacks = {
         on_activate = [=[
-            function(self,entity)
+            function( self, entity )
                 local attr  = entity.attributes
                 attr.skilled_bonus = ( attr.skilled_bonus or 0 ) + 1
             end
@@ -824,7 +824,7 @@ dealer = {
 
 function dealer.record_buff( entity )
     if entity and entity.flags and entity.flags.data[ EF_NOPICKUP ] and not entity.flags.data[ EF_PERMANENT ] and entity.ui_buff then
-        table.insert(dealer.data.buffs, entity)
+        dealer.data.buffs[entity] = true
     end
 end
 
@@ -854,20 +854,40 @@ register_blueprint "ktrait_dealer"
                 if world:get_player() ~= actor then
                     return 0
                 end
-                local increase = {1.5, 2.0, 3.0}
-                for k,e in pairs(dealer.data.buffs) do
-                    local parent = e:parent()
-                    if e.lifetime and parent and parent == world:get_player() then
+                local increase = {0.5, 1.0, 2.0}
+                for k,v in pairs(dealer.data.buffs) do
+                    local parent = k:parent()
+                    if k.lifetime and parent and parent == actor then
                         local stimmed = parent:child("buff_stimpack")
                         local juiced = parent:child("buff_combatpack")
                         local enviro = parent:child("buff_enviro")
 
-                        if (e == stimmed or e == juiced or e == enviro) then
-                            e.lifetime.time_left = e.lifetime.time_left * increase[self.attributes.level]
+                        if k == stimmed then
+                            if type(v) == "boolean" then
+                                k.lifetime.time_left = k.lifetime.time_left + (k.lifetime.time_left * increase[self.attributes.level])
+                            elseif k.lifetime.time_left >= v then
+                                if (k.lifetime.time_left - v) > 600 then
+                                    k.lifetime.time_left = k.lifetime.time_left + (3000 * increase[self.attributes.level])
+                                else
+                                    k.lifetime.time_left = k.lifetime.time_left + (500 * increase[self.attributes.level])
+                                end
+                            end
+                        elseif k == juiced then
+                            if type(v) == "boolean" then
+                                k.lifetime.time_left = k.lifetime.time_left + (k.lifetime.time_left * increase[self.attributes.level])
+                            elseif k.lifetime.time_left >= v then
+                                if (k.lifetime.time_left - v) > 600 then
+                                    k.lifetime.time_left = k.lifetime.time_left + (1500 * increase[self.attributes.level])
+                                else
+                                    k.lifetime.time_left = k.lifetime.time_left + (500 * increase[self.attributes.level])
+                                end
+                            end
+                        elseif k == enviro and ( type(v) == "boolean" or k.lifetime.time_left >= v ) then
+                            k.lifetime.time_left = k.lifetime.time_left + (5000 * increase[self.attributes.level])
                         end
                     end
 
-                    table.remove(dealer.data.buffs, k)
+                    dealer.data.buffs[k] = k.lifetime.time_left
                 end
                 return 0
             end
