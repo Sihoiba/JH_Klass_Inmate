@@ -112,7 +112,7 @@ register_blueprint "buff_inmate_berserk_base"
             function ( self, entity, command, w, coord )
                 self.attributes.initialized = 1
                 if command == COMMAND_USE then
-				
+
                     if w and w.weapon and w.weapon.group == world:hash("grenades") and entity and entity.data and entity.data.berserk_level and entity.data.berserk_level > 1 then
                         return 0
                     elseif w then
@@ -399,6 +399,40 @@ register_blueprint "runtime_add_xp"
     },
 }
 
+register_blueprint "runtime_fix_challenges"
+{
+    flags = { EF_NOPICKUP },
+    callbacks = {
+        on_enter_level = [[
+            function ( self, player, reenter )
+                nova.log("on enter level called")
+                local level = world:get_level()
+                if player:child( "runtime_reload" ) or player:child( "runtime_shotgunnery" ) then
+                    local pw  = player:child( "pipe_wrench" )
+                    level:drop_item( player, pw )
+                    if pw then world:destroy( pw ) end
+
+                    local fpw = world:create_entity( "fragile_pipe_wrench" )
+                    player:equip( fpw )
+                elseif player:child( "runtime_marksmanship" ) then
+                    local pw  = player:child( "pipe_wrench" )
+                    level:drop_item( player, pw )
+                    if pw then world:destroy( pw ) end
+
+                    local p = world:create_entity( "pistol" )
+                    local a = world:create_entity( "ammo_9mm" )
+                    a.stack.amount = 32
+                    level:pickup( player, p, true )
+                    level:pickup( player, a, true )
+
+                    local fpw = world:create_entity( "fragile_pipe_wrench" )
+                    player:equip( fpw )
+                end
+            end
+        ]],
+    },
+}
+
 register_blueprint "klass_inmate"
 {
     text = {
@@ -414,9 +448,10 @@ register_blueprint "klass_inmate"
                 entity:attach( "ktrait_always_angry" )
                 local adr = entity:attach( "ktrait_berserk" )
                 adr.skill.cost = 30
-                entity:attach( "pipe_wrench" )
                 entity:attach( "smoke_grenade" )
                 entity:attach( "stimpack_small" )
+                entity:attach( "pipe_wrench" )
+                entity:attach( "runtime_fix_challenges" )
             end
         ]=],
     },

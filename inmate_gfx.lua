@@ -272,44 +272,70 @@ register_gfx_blueprint "adv_axe_large"
 
 register_gfx_blueprint "buff_inmate_berserk_base"
 {
-	equip = {},
-	persist = true,
-	point_generator = {
-		type    = "cylinder",
-		extents = vec3(0.2,0.9,0.0),
-	},
-	particle = {
-		material       = "data/texture/particles/shapes_01/blick_01",
-		group_id       = "pgroup_fx",
-		orientation    = PS_ORIENTED,
-		destroy_owner  = true,
-	},
-	particle_emitter = {
-		rate     = 96,
-		size     = vec2(0.05,0.1),
-		velocity = 0.1,
-		lifetime = 0.5,
-		color    = vec4(1.0,0.1,0.1,0.5),
-	},
-	particle_transform = {
-		force = vec3(0,3,0),
-	},
-	particle_fade = {
-		fade_out = 0.5,
-	},
+    equip = {},
+    persist = true,
+    point_generator = {
+        type    = "cylinder",
+        extents = vec3(0.2,0.9,0.0),
+    },
+    particle = {
+        material       = "data/texture/particles/shapes_01/blick_01",
+        group_id       = "pgroup_fx",
+        orientation    = PS_ORIENTED,
+        destroy_owner  = true,
+    },
+    particle_emitter = {
+        rate     = 96,
+        size     = vec2(0.05,0.1),
+        velocity = 0.1,
+        lifetime = 0.5,
+        color    = vec4(1.0,0.1,0.1,0.5),
+    },
+    particle_transform = {
+        force = vec3(0,3,0),
+    },
+    particle_fade = {
+        fade_out = 0.5,
+    },
 }
 
 register_gfx_blueprint "buff_inmate_berserk_skill_1"
 {
-	blueprint = "buff_inmate_berserk_base"
+    blueprint = "buff_inmate_berserk_base"
 }
 
 register_gfx_blueprint "buff_inmate_berserk_skill_2"
 {
-	blueprint = "buff_inmate_berserk_base"
+    blueprint = "buff_inmate_berserk_base"
 }
 
 register_gfx_blueprint "buff_inmate_berserk_skill_3"
 {
-	blueprint = "buff_inmate_berserk_base"
+    blueprint = "buff_inmate_berserk_base"
+}
+
+register_gfx_blueprint "fragile_pipe_wrench"
+{
+    uisprite = {
+        icon = "data/texture/ui/icons/ui_weapon_pipe_wrench",
+        color = vec4( 1.0, 0.15, 0.0, 1.0 ),
+    },
+    weapon_fx = {
+        advance   = 0.5,
+    },
+    equip = {
+        animation  = "to_machete",
+        target     = "RigRHandWeaponMount",
+        alt_target = "RigLHandWeaponMount",
+    },
+    vision = {
+        pure_floor = true,
+    },
+    scene = {},
+    {
+        render = {
+            mesh     = "data/model/pipe_wrench.nmd:pipe_wrench_01",
+            material = "data/texture/weapons/melee/pipe_wrench_01/A/pipe_wrench_01",
+        },
+    },
 }

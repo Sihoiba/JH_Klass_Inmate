@@ -332,10 +332,76 @@ register_blueprint "adv_axe_large"
     },
     callbacks = {
         on_create = [=[
-        function(self,_,tier)
-            nova.log("large axe tier"..tostring(tier))
-            generator.roll_perks( self, tier )
-        end
+            function(self,_,tier)
+                nova.log("large axe tier"..tostring(tier))
+                generator.roll_perks( self, tier )
+            end
+        ]=],
+    },
+}
+
+register_blueprint "perk_fragile"
+{
+    flags      = { EF_NOPICKUP },
+    text = {
+        name  = "Fragile",
+        desc  = "breaks after this many attacks.",
+    },
+    attributes = {
+        level = 1,
+        value = 10,
+    },
+    callbacks = {
+        on_post_command = [=[
+            function ( self, actor, cmt, weapon, time )
+                if self:parent() == weapon then
+                    local sattr = self.attributes
+                    sattr.value = sattr.value - 1
+                    if sattr.value == 0 then
+                        world:get_level():drop_item( actor, weapon )
+                        world:destroy( weapon )
+                    end
+                end
+                return 0
+            end
+        ]=],
+    }
+}
+
+register_blueprint "fragile_pipe_wrench"
+{
+    blueprint = "base_melee",
+    text = {
+        name = "shoddy pipe wrench",
+        desc = "It's seen a lot of use, and won't take more.",
+    },
+    ascii     = {
+        glyph     = "/",
+        color     = DARKGRAY,
+    },
+    attributes = {
+        damage = 30,
+        swap_time    = 0.5,
+        crit_damage  = 50,
+        mod_capacity = 4,
+        gib_factor   = 2,
+    },
+    ui_target = {
+        type = "melee",
+    },
+    weapon = {
+        group = "melee",
+        type  = "melee",
+        damage_type = "impact",
+        fire_sound = "blunt_swing",
+        hit_sound  = "blunt",
+    },
+    callbacks = {
+        on_create = [=[
+            function(self,_,tier)
+                generator.add_perk( self, "perk_wb_mechabane" )
+                generator.add_perk( self, "perk_fragile" )
+            end
         ]=],
     },
 }
