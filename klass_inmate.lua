@@ -405,28 +405,32 @@ register_blueprint "runtime_fix_challenges"
     callbacks = {
         on_enter_level = [[
             function ( self, player, reenter )
-                nova.log("on enter level called")
-                local level = world:get_level()
-                if player:child( "runtime_reload" ) or player:child( "runtime_shotgunnery" ) then
-                    local pw  = player:child( "pipe_wrench" )
-                    level:drop_item( player, pw )
-                    if pw then world:destroy( pw ) end
+                if player.data and not player.data.first_level then
+                    player.data.first_level = true
+                else
+                    nova.log("on enter level called")
+                    local level = world:get_level()
+                    if player:child( "runtime_reload" ) or player:child( "runtime_shotgunnery" ) then
+                        local pw  = player:child( "pipe_wrench" )
+                        level:drop_item( player, pw )
+                        if pw then world:destroy( pw ) end
 
-                    local fpw = world:create_entity( "fragile_pipe_wrench" )
-                    player:equip( fpw )
-                elseif player:child( "runtime_marksmanship" ) then
-                    local pw  = player:child( "pipe_wrench" )
-                    level:drop_item( player, pw )
-                    if pw then world:destroy( pw ) end
+                        local fpw = world:create_entity( "fragile_pipe_wrench" )
+                        player:equip( fpw )
+                    elseif player:child( "runtime_marksmanship" ) then
+                        local pw  = player:child( "pipe_wrench" )
+                        level:drop_item( player, pw )
+                        if pw then world:destroy( pw ) end
 
-                    local p = world:create_entity( "pistol" )
-                    local a = world:create_entity( "ammo_9mm" )
-                    a.stack.amount = 32
-                    level:pickup( player, p, true )
-                    level:pickup( player, a, true )
+                        local p = world:create_entity( "pistol" )
+                        local a = world:create_entity( "ammo_9mm" )
+                        a.stack.amount = 32
+                        level:pickup( player, p, true )
+                        level:pickup( player, a, true )
 
-                    local fpw = world:create_entity( "fragile_pipe_wrench" )
-                    player:equip( fpw )
+                        local fpw = world:create_entity( "fragile_pipe_wrench" )
+                        player:equip( fpw )
+                    end
                 end
             end
         ]],
