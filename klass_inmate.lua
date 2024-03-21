@@ -402,12 +402,15 @@ register_blueprint "runtime_add_xp"
 register_blueprint "runtime_fix_challenges"
 {
     flags = { EF_NOPICKUP },
+    data = {
+        first_level = 0
+    },
     callbacks = {
         on_enter_level = [[
             function ( self, player, reenter )
-                if player.data and not player.data.first_level then
-                    player.data.first_level = true
-                else
+
+                if self.data and self.data.first_level == 0 then
+                    self.data.first_level = 1
                     nova.log("on enter level called")
                     local level = world:get_level()
                     if player:child( "runtime_reload" ) or player:child( "runtime_shotgunnery" ) then
