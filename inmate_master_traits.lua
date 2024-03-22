@@ -468,6 +468,11 @@ register_blueprint "kskill_ghost_gun_toggle"
                 else
                     self.data.active = true
                     local buff = world:add_buff( entity, "buff_ghost_gun" )
+                    local berserk = entity:child("buff_inmate_berserk_base") or entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
+                    if berserk then
+                        world:mark_destroy(berserk)
+                        world:flush_destroy()
+                    end
 
                     buff.attributes.level = entity.data.gg_level
 
@@ -495,7 +500,7 @@ register_blueprint "ktrait_master_ghost_gun"
     text = {
         name   = "GHOST GUN",
         desc   = "MASTER TRAIT - PISTOL/SMG ONLY - ACTIVE SKILL Toggle On/Off - empty full clip when firing",
-        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets, but weapon optimal range is reduced to a maximum of 3 and maximum range reduced to 5.\n{!LEVEL 2} - Automatically reload pistol/SMGs when empty at {!halved} ammo consumption, max range now reduced to 6.\n{!LEVEL 3} reload ammo consumption is {!20%}, optimal and max range penalties removed.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets, but weapon optimal range is reduced to a max of 3 and max range reduced to 5. Activating Ghost Gun cancels berserk.\n{!LEVEL 2} - Automatically reload pistol/SMGs when empty at {!halved} ammo consumption, max range now reduced to 6.\n{!LEVEL 3} reload ammo consumption is {!20%}, optimal and max range penalties removed.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGG",
     },
     attributes = {
