@@ -175,7 +175,7 @@ register_blueprint "ktrait_master_chemist"
     text = {
         name   = "CHEMIST",
         desc   = "MASTER TRAIT - acid resist, and acid spreading on AoE.",
-        full   = "You have set up so many make shift drug labs that you know your acids and bases! You are acid immune, moreover any wielded weapon you use (especially area of effect weapons) spread acid!\n\n{!LEVEL 1} - {!immunity} to acid status effect, {!10 Acid} pool created on hit\n{!LEVEL 2} - double armor damage, grenades leave acid in their AoE\n{!LEVEL 3} - hit enemies gain -100% acid resistance\n\nYou can pick only one MASTER trait per character.",
+        full   = "You have set up so many make shift drug labs that you know your acids and bases! You are acid immune, moreover any wielded weapon you use (especially area of effect weapons) spread acid!\n\n{!LEVEL 1} - {!immunity} to acid status effect, {!10 Acid} pool created on hit, leave acid trail when Berserk\n{!LEVEL 2} - double armor damage, grenades leave acid in their AoE\n{!LEVEL 3} - hit enemies gain -100% acid resistance\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MCH",
     },
     attributes = {
@@ -235,6 +235,27 @@ register_blueprint "ktrait_master_chemist"
                 return 0
             end
         ]=],
+        on_post_command = [[
+            function ( self, actor, cmt, weapon, time )
+                local berserk = actor:child("buff_inmate_berserk_base") or actor:child("buff_inmate_berserk_skill_1") or actor:child("buff_inmate_berserk_skill_2") or actor:child("buff_inmate_berserk_skill_3")
+
+                if berserk then
+                    local level = world:get_level()
+                    local c     = world:get_position( actor )
+                    local place = function( level, c )
+                        if not level:get_cell_flags( c )[ EF_NOMOVE ] then
+                            local acid  = level:get_entity( c, "acid_pool" )
+                            if not acid then
+                                acid = level:place_entity( "acid_pool", c )
+                            end
+                            acid.attributes.acid_amount = 10
+                            acid.lifetime.time_left = math.max( acid.lifetime.time_left, 300 + math.random(100) )
+                        end
+                    end
+                    place( level, c )
+                end
+            end
+        ]],
     },
 }
 
