@@ -267,7 +267,7 @@ register_blueprint "ktrait_master_gbh"
     text = {
         name   = "GBH",
         desc   = "MASTER TRAIT - bleed immunity and afflict bleed on attacks.",
-        full   = "Grevious bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - bleed effects are {!100%} stronger.\n\nYou can pick only one MASTER trait per character.",
+        full   = "Grevious bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit, range {!2} bleed aura when berserk\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - bleed effects are {!100%} stronger.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGB",
     },
     attributes = {
@@ -296,6 +296,30 @@ register_blueprint "ktrait_master_gbh"
                     local slevel = core.get_status_value( 4, "bleed", source )
                     core.apply_damage_status( who, "bleed", "bleed", slevel, source )
                 end
+            end
+        ]=],
+        on_timer = [=[
+            function ( self, first )
+                if first then return 1 end
+                if not self then return 0 end
+                local level    = world:get_level()
+                local parent   = self:parent()
+
+                local berserk = parent:child("buff_inmate_berserk_base") or parent:child("buff_inmate_berserk_skill_1") or parent:child("buff_inmate_berserk_skill_2") or parent:child("buff_inmate_berserk_skill_3")
+
+                if berserk then
+                    local position = world:get_position( parent )
+                    local ar       = area.around( position, 2 )
+                    ar:clamp( level:get_area() )
+
+                    for c in ar:coords() do
+                        for e in level:entities( c ) do
+                            local slevel = core.get_status_value( 3, "bleed", parent )
+                            core.apply_damage_status( e, "bleed", "bleed", slevel, parent )
+                        end
+                    end
+                end
+                return 50
             end
         ]=],
     },
