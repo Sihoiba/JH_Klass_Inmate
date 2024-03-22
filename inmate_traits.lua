@@ -752,7 +752,7 @@ register_blueprint "ktrait_sucker_punch"
     text = {
         name   = "Sucker punch",
         desc   = "They never see the first blow coming",
-        full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non bladed melee weapons you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non bladed one.\n\n{!LEVEL 1} - {!90%} attack time with non bladed melee weapons\n{!LEVEL 2} - {!80%} attack time with non bladed melee weapons, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time with non bladed melee weapons, melee weapon lootboxes contain large axes",
+        full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non bladed melee weapons (crowbars, pipewrenchs, axes, and chainsaws) you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non bladed one.\n\n{!LEVEL 1} - {!90%} attack time with non bladed melee weapons\n{!LEVEL 2} - {!80%} attack time with non bladed melee weapons, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time with non bladed melee weapons, melee weapon lootboxes contain large axes",
         abbr   = "SPu",
     },
     attributes = {
@@ -841,7 +841,7 @@ register_blueprint "ktrait_dealer"
     text = {
         name = "Dealer",
         desc = "Increases duration of postive buffs from items.",
-        full = "When your fellow prisoners want better drugs, you are the person they turn to. When you use items that grant buffs like stim packs the duraction is increased\n\n{!LEVEL 1} - Positive buff duration increased by {!50%} \n{!LEVEL 2} - increase is now {!100%} \n{!LEVEL 3} - increase is now {!200%}",
+        full = "When your fellow prisoners want better drugs, you are the person they turn to. When you use items that grant buffs (stim packs, combat packs and enviro packs) the duraction is increased\n\n{!LEVEL 1} - Positive buff duration increased by {!50%} \n{!LEVEL 2} - increase is now {!100%} \n{!LEVEL 3} - increase is now {!200%}",
         abbr = "Del",
     },
     attributes = {
@@ -908,15 +908,14 @@ register_blueprint "ktrait_hitman"
     blueprint = "trait",
     text = {
         name   = "Hitman",
-        desc   = "Improved accuracy and safe explosive usage",
-        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down the elevator shaft. Each level of this trait improves your ability to fight at close range.\n\n{!LEVEL 1} - {!-3} minimum distance\n{!LEVEL 2} - grenade launchers, rocket launchers and grenades are safe at close distance\n{!LEVEL 3} - enemy cover is only {!20%} effective",
+        desc   = "Improved accuracy against enemies in cover. Increased damage versus enemies with overhealth",
+        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down the elevator shaft. Each level of this trait improves your ability to hurt things.\n\n{!LEVEL 1} - enemy cover is only {!80%} effective. {!10%}-{!50%} bonus damage if enemy is at {!100%}-{!200%} health\n{!LEVEL 2} - enemy cover is only {!60%} effective. {!10%}-{!100%} bonus damage if enemy is at {!100%}-{!200%} health\n{!LEVEL 3} - enemy cover is only {!20%} effective. {!10%}-{!100%} bonus damage if enemy is at {!50%}-{!150+%} health",
         abbr   = "Hit",
     },
     attributes = {
         level   = 1,
-        min_distance = 0,
         cover_mult   = 1.0,
-        player_splash_mod = 1.0
+        damage_mult = 1.0,
     },
     callbacks = {
         on_activate = [=[
@@ -924,7 +923,9 @@ register_blueprint "ktrait_hitman"
                 local hit, t = gtk.upgrade_trait( entity, "ktrait_hitman" )
                 local attr  = t.attributes
                 if hit == 1 then
-                    attr.min_distance = -3
+                    attr.cover_mult   = 0.8
+                elseif hit == 2 then
+                    attr.cover_mult   = 0.6
                 else
                     attr.cover_mult   = 0.2
                 end
@@ -932,29 +933,40 @@ register_blueprint "ktrait_hitman"
         ]=],
         on_aim = [=[
             function ( self, entity, target, weapon )
-                if self.attributes.level < 2 then return end
-                local weapon = entity:get_weapon()
-                if weapon and weapon.weapon and weapon.attributes and weapon.attributes.explosion then
-                    weapon.attributes.splash_mod = 0.0
-                end
-            end
-        ]=],
-        on_pre_command = [=[
-            function ( self, entity, command, weapon )
-                if command == COMMAND_USE then
-                    if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") then
-                        self.attributes.player_splash_mod = entity.attributes.splash_mod
-                        entity.attributes.splash_mod = 0.0
+                if target then
+                    local tlevel = self.attributes.level or 0
+                    local enemy = world:get_level():get_being( target )
+                    if enemy then
+                        local health  = enemy.attributes.health
+                        local current = enemy.health.current
+                        local bonus_cap = 0.4
+                        local health_threshold = enemy.attributes.health
+                        if tlevel > 1 then
+                            bonus_cap = 0.9
+                        end
+                        if tlevel > 2 then
+                            health_threshold = health_threshold/2
+                        end
+                        if current > health_threshold then
+                            local bonus = ((current - health_threshold)/health) * bonus_cap
+                            if bonus > bonus_cap then
+                                bonus = bonus_cap
+                            end
+                            bonus = bonus + 0.1
+                            self.attributes.damage_mult = 1.0 + bonus
+                        elseif current == health_threshold then
+                            self.attributes.damage_mult = 1.1
+                        else
+                            self.attributes.damage_mult = 1.0
+                        end
                     end
                 end
-                return 0
+
             end
         ]=],
         on_post_command = [=[
             function ( self, actor, cmt, tgt, time )
-                if command == COMMAND_USE then
-                    actor.attributes.splash_mod = self.attributes.player_splash_mod
-                end
+                self.attributes.damage_mult = 1.0
             end
         ]=],
     },

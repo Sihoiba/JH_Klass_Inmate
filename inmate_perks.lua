@@ -26,10 +26,10 @@ register_blueprint "perk_cb_tantrum"
     },
     text = {
         name = "Tantrum",
-        desc = "Doubles berserk duration",
+        desc = "Increases berserk duration by 10 turns",
     },
     attributes = {
-        berserk_duration_bonus = 1,
+        berserk_duration_bonus = 1000,
     },
 }
 
@@ -182,7 +182,7 @@ register_blueprint "perk_we_panic"
     callbacks = {
         on_damage = [=[
             function ( unused, weapon, who, amount, source )
-                if who and who.data and ( not who.data.is_mechanical ) then
+                if who and who.data and ( not who.data.is_mechanical ) and who.data.can_bleed then
                     world:add_buff( who, "buff_panicked", 150, true )
                 end
             end
@@ -211,7 +211,7 @@ register_blueprint "perk_we_stun"
     callbacks = {
         on_damage = [=[
             function ( unused, weapon, who, amount, source )
-                if who and who.data and ( not who.data.is_mechanical ) then
+                if who and who.data and ( not who.data.is_mechanical ) and who.data.can_bleed then
                     world:add_buff( who, "buff_stunned", 150, true )
                 end
             end

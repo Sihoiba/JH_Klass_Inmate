@@ -22,10 +22,10 @@ register_blueprint "resource_rage"
 
                 if not entity then return end
                 if not entity.data or not entity.data.is_player then return end
-                if amount < 5 then return end
+                if amount < 3 then return end
 
                 local restore_bonus = entity:attribute( "rage_bonus") or 0
-                local restore = math.floor( amount * 0.2 ) + restore_bonus
+                local restore = math.floor( amount * 0.3 ) + restore_bonus
                 local resource = entity:child( "resource_rage" )
 
                 local rattr = resource.attributes
@@ -296,21 +296,21 @@ register_blueprint "ktrait_berserk"
         on_use = [=[
             function ( self, entity, level, target )
                 local buff
-                local duration_bonus = (entity:attribute( "berserk_duration_bonus") or 0) + 1
-                local duration = 1000 * duration_bonus
+                local duration_bonus = (entity:attribute( "berserk_duration_bonus") or 0)
+                local duration = 1000
                 if entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 1 then
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", duration )
+                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", duration + duration_bonus )
                 elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 2 then
                     duration = duration * 2
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", duration )
+                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", duration + duration_bonus )
                 elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 3 then
                     duration = duration * 2
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", duration )
+                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", duration + duration_bonus )
                 else
-                    buff = world:add_buff( entity, "buff_inmate_berserk_base", duration )
+                    buff = world:add_buff( entity, "buff_inmate_berserk_base", duration + duration_bonus )
                 end
                 if entity:attribute( "berserk_action_bonus" ) then
-                    world:add_buff( entity, "buff_inmate_berserk_speed_boost", duration )
+                    world:add_buff( entity, "buff_inmate_berserk_speed_boost", duration + duration_bonus )
                 end
                 world:lua_callback( entity, "on_inmate_berserk" )
 
