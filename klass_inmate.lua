@@ -164,6 +164,17 @@ register_blueprint "buff_inmate_berserk_base"
                     parent.attributes.grace_period = false
                     buff = world:add_buff( parent, "buff_inmate_berserk_grace_period", 300 )
                 end
+                local f = parent:child("ktrait_master_fraudster")
+                local sf = parent:child("kskill_fraudster_create_decoy")
+                if f and sf then
+                    if f.attributes.level == 3 then
+                        sf.skill.cooldown = 500
+                    elseif f.attributes.level == 2 then
+                        sf.skill.cooldown = 1000
+                    else
+                        sf.skill.cooldown = 2000
+                    end
+                end
             end
         ]],
         on_enter_level = [[
@@ -332,6 +343,12 @@ register_blueprint "ktrait_berserk"
                         world:flush_destroy()
                     end
                     level:swap_weapon( entity, index )
+                end
+
+                local sf = entity:child("kskill_fraudster_create_decoy")
+                if sf then
+                    sf.skill.time_left = 0
+                    sf.skill.cooldown = 200
                 end
 
                 world:lua_callback( entity, "on_berserk" )
