@@ -178,7 +178,7 @@ register_blueprint "buff_inmate_berserk_skill_1"
 {
     blueprint = "buff_inmate_berserk_base",
     attributes = {
-        damage_mult = 10.0,
+        damage_mult = 5.5,
         accuracy    = 10,
         pain_max    = -75,
         dodge_value = 0,
@@ -186,10 +186,10 @@ register_blueprint "buff_inmate_berserk_skill_1"
         move_time   = 0.75,
         splash_mod  = 0.5,
         resist = {
-            slash = 75,
-            impact = 75,
-            pierce = 75,
-            plasma = 75,
+            slash = 65,
+            impact = 65,
+            pierce = 65,
+            plasma = 65,
             ignite = 50,
             cold = 50,
             acid = 50,
@@ -202,7 +202,7 @@ register_blueprint "buff_inmate_berserk_skill_2"
 {
     blueprint = "buff_inmate_berserk_base",
     attributes = {
-        damage_mult = 10.0,
+        damage_mult = 5.5,
         accuracy    = 10,
         pain_max    = -75,
         dodge_value = 10,
@@ -210,10 +210,10 @@ register_blueprint "buff_inmate_berserk_skill_2"
         move_time   = 0.75,
         splash_mod  = 0.5,
         resist = {
-            slash = 75,
-            impact = 75,
-            pierce = 75,
-            plasma = 75,
+            slash = 65,
+            impact = 65,
+            pierce = 65,
+            plasma = 65,
             ignite = 50,
             cold = 50,
             acid = 50,
@@ -226,18 +226,18 @@ register_blueprint "buff_inmate_berserk_skill_3"
 {
     blueprint = "buff_inmate_berserk_base",
     attributes = {
-        damage_mult = 12.0,
+        damage_mult = 6.0,
         accuracy    = 15,
         pain_max    = -75,
         dodge_value = 20,
         dodge_max   = 20,
         move_time   = 0.75,
-        splash_mod  = 0.1,
+        splash_mod  = 0.5,
         resist = {
-            slash = 90,
-            impact = 90,
-            pierce = 90,
-            plasma = 90,
+            slash = 80,
+            impact = 80,
+            pierce = 80,
+            plasma = 80,
             ignite = 75,
             cold = 75,
             acid = 75,
