@@ -8,7 +8,7 @@ register_blueprint "ktrait_master_berserker"
     text = {
         name   = "BERSERK",
         desc   = "MASTER TRAIT - you enter berserk on damage and on gibbing with melee weapons.",
-        full   = "You're a barely controlled ball of rage, and will go berserk on the slightest provocation.\n\n{!LEVEL 1} - If not Berserk, become berserk if you lose {!10%} of your health in a single hit or {!25%} chance to go berserk on gibbing with a melee kill\n{!LEVEL 2} - The Berserker can now use grenades while berserk, {!33%} chance to go berserk when gibbing\n{!LEVEL 3} - Taking damage or gibbing will now add to Berserk time if already berserk.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You're a barely controlled ball of rage, and will go berserk on the slightest provocation.\n\n{!LEVEL 1} - If not Berserk, become berserk if you lose {!15%} of your health in a single hit or {!25%} chance to go berserk on gibbing with a melee kill\n{!LEVEL 2} - The Berserker can now use grenades while berserk, {!33%} chance to go berserk when gibbing\n{!LEVEL 3} - Taking damage or gibbing will now add to Berserk time if already berserk.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MBK",
         abbr   = "MBK",
 
@@ -36,10 +36,10 @@ register_blueprint "ktrait_master_berserker"
                 if not entity then return end
                 local tlevel = self.attributes.level
                 local max_health = entity.attributes.health
-                local ten_percent_max = math.floor( max_health / 10 )
+                local fifteen_percent_max = math.floor( max_health / 15 )
                 local is_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
 
-                if amount >= ten_percent_max then
+                if amount >= fifteen_percent_max then
                     if (tlevel < 3 and not is_berserk) or tlevel > 2 then
                         if not is_berserk then
                             ui:set_hint( "{R"..self.text.berserk_proc.."}", 2001, 0 )
