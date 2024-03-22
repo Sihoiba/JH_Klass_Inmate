@@ -827,14 +827,6 @@ register_blueprint "ktrait_sucker_punch"
     },
 }
 
-dealer = {}
-
-function dealer.record_buff( entity )
-    if entity and entity.flags and entity.flags.data[ EF_NOPICKUP ] and not entity.flags.data[ EF_PERMANENT ] and entity.ui_buff then
-        world:get_player().data.buffs[world:get_id(entity)] = true
-    end
-end
-
 register_blueprint "ktrait_dealer"
 {
     blueprint = "trait",
@@ -850,54 +842,7 @@ register_blueprint "ktrait_dealer"
     callbacks = {
         on_activate = [=[
             function(self, entity)
-                local tlevel = gtk.upgrade_trait( entity, "ktrait_dealer" )
-                if tlevel == 1 then
-                    world.register_on_entity( dealer.record_buff )
-                    entity.data.buffs = {}
-                end
-            end
-        ]=],
-        on_post_command = [=[
-            function ( self, actor, cmt, tgt, time )
-                if world:get_player() ~= actor then
-                    return 0
-                end
-                local increase = {0.5, 1.0, 2.0}
-                for k,v in pairs(actor.data.buffs) do
-
-                    local stimmed = actor:child("buff_stimpack")
-                    local juiced = actor:child("buff_combatpack")
-                    local enviro = actor:child("buff_enviro")
-
-                    if k == "buff_stimpack" then
-                        if type(v) == "boolean" then
-                            stimmed.lifetime.time_left = stimmed.lifetime.time_left + (stimmed.lifetime.time_left * increase[self.attributes.level])
-                        elseif stimmed.lifetime.time_left >= v then
-                            if (stimmed.lifetime.time_left - v) > 600 then
-                                stimmed.lifetime.time_left = stimmed.lifetime.time_left + (3000 * increase[self.attributes.level])
-                            else
-                                stimmed.lifetime.time_left = stimmed.lifetime.time_left + (500 * increase[self.attributes.level])
-                            end
-                        end
-                        actor.data.buffs[k] = stimmed.lifetime.time_left
-                    elseif k == "buff_combatpack" then
-                        if type(v) == "boolean" then
-                            juiced.lifetime.time_left = juiced.lifetime.time_left + (juiced.lifetime.time_left * increase[self.attributes.level])
-                        elseif juiced.lifetime.time_left >= v then
-                            if (juiced.lifetime.time_left - v) > 600 then
-                                juiced.lifetime.time_left = juiced.lifetime.time_left + (1500 * increase[self.attributes.level])
-                            else
-                                juiced.lifetime.time_left = juiced.lifetime.time_left + (500 * increase[self.attributes.level])
-                            end
-                        end
-                        actor.data.buffs[k] = juiced.lifetime.time_left
-                    elseif k == "buff_enviro" and ( type(v) == "boolean" or enviro.lifetime.time_left >= v ) then
-                        enviro.lifetime.time_left = enviro.lifetime.time_left + (5000 * increase[self.attributes.level])
-                        actor.data.buffs[k] = enviro.lifetime.time_left
-                    end
-
-                end
-                return 0
+                gtk.upgrade_trait( entity, "ktrait_dealer" )
             end
         ]=],
     },
