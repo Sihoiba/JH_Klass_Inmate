@@ -36,7 +36,7 @@ register_blueprint "ktrait_master_berserker"
                 if not entity then return end
                 local tlevel = self.attributes.level
                 local max_health = entity.attributes.health
-                local fifteen_percent_max = math.floor( max_health / 15 )
+                local fifteen_percent_max = math.floor( max_health / 100 ) * 15
                 local is_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
 
                 if amount >= fifteen_percent_max then
