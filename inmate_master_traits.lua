@@ -34,9 +34,10 @@ register_blueprint "ktrait_master_berserker"
         on_receive_damage = [=[
             function ( self, entity, source, weapon, amount )
                 if not entity then return end
+                if entity ~= world:get_player() then return 0 end
                 local tlevel = self.attributes.level
                 local max_health = entity.attributes.health
-                local fifteen_percent_max = math.floor( max_health / 100 ) * 15
+                local fifteen_percent_max = math.floor( ( max_health / 100 ) * 15 )
                 local is_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
 
                 if amount >= fifteen_percent_max then
@@ -53,6 +54,7 @@ register_blueprint "ktrait_master_berserker"
         ]=],
         on_kill = [=[
             function ( self, entity, target, weapon, gibbed )
+                if entity ~= world:get_player() then return 0 end
                 local tlevel = self.attributes.level
                 local gib_berserk = math.random(self.attributes.gib_berserk_chance)
                 local is_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
