@@ -149,6 +149,57 @@ register_blueprint "buff_corroded_minor"
     },
 }
 
+register_blueprint "buff_hyped"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name    = "Hyped",
+        desc    = "faster move speed when near acid",
+    },
+    callbacks = {
+        on_die = [[
+            function ( self )
+                world:mark_destroy( self )
+            end
+        ]],
+        on_move = [=[
+            function ( self, actor )
+                local level = world:get_level()
+                local pos = world:get_position( actor )
+                local ar = area.around( pos, 2 )
+                ar:clamp( level:get_area() )
+                local fumes = false
+                for c in ar:coords() do
+                    local acid  = level:get_entity( c, "acid_pool" )
+                    if acid then
+                        fumes = true
+                    end
+                end
+                if not fumes then
+                    world:mark_destroy( self )
+                end
+            end
+        ]=],
+    },
+    attributes = {
+        move_time   = 0.9,
+    },
+    ui_buff = {
+       color     = YELLOW,
+    },
+}
+
+register_blueprint "buff_hyped_improved"
+{
+    blueprint = "buff_hyped",
+    text = {
+        desc    = "even faster move speed when near acid",
+    },
+    attributes = {
+        move_time   = 0.75,
+    },
+}
+
 register_blueprint "kperk_chemist"
 {
     flags = { EF_NOPICKUP },
@@ -185,7 +236,6 @@ register_blueprint "kperk_chemist"
                 end
 
                 if distance < 7 and not world:get_level():get_cell_flags( c )[ EF_NOMOVE ] then
-                    nova.log("adding acid pool")
                     if distance < 1 then distance = 1 end
                     local pool = level:get_entity(c, "acid_pool" )
                     if not pool then
@@ -205,7 +255,7 @@ register_blueprint "ktrait_master_chemist"
     text = {
         name   = "CHEMIST",
         desc   = "MASTER TRAIT - acid resist, and acid spreading on AoE.",
-        full   = "You have set up so many make shift drug labs that you know your acids and bases! You are acid immune, moreover any wielded weapon you use (especially area of effect weapons) spread acid!\n\n{!LEVEL 1} - {!immunity} to acid status effect, {!10 Acid} pool created on hit, leave acid trail when Berserk\n{!LEVEL 2} - double armor damage, hit enemies gain -25% acid resistance, grenades leave acid in their AoE\n{!LEVEL 3} - hit enemies gain -100% acid resistance\n\nYou can pick only one MASTER trait per character.",
+        full   = "You have set up so many make shift drug labs that you know your acids and bases! You are acid immune, moreover any wielded weapon you use (especially area of effect weapons) spread acid!\n\n{!LEVEL 1} - {!immunity} to acid status effect, {!10 Acid} pool created on hit, faster move speed when near acid, leave acid trail when {!Berserk}\n{!LEVEL 2} - double armor damage, hit enemies gain {!-25%} acid resistance, grenades leave acid in their AoE\n{!LEVEL 3} - hit enemies gain {!-100%} acid resistance, even faster move speed when near acid\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MCH",
     },
     attributes = {
@@ -252,19 +302,38 @@ register_blueprint "ktrait_master_chemist"
         ]=],
         on_pre_command = [=[
             function ( self, entity, command, weapon )
+                local tlevel = self.attributes.level
                 if command == COMMAND_USE then
-                    local tlevel = self.attributes.level
                     if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") and tlevel >= 2 then
                         local fp = weapon:child("kperk_chemist")
                         if not fp then
                             weapon:attach("kperk_chemist")
                         end
                     end
+                elseif command >= COMMAND_MOVE and command <= COMMAND_MOVE_F then
+                    local level = world:get_level()
+                    local pos = world:get_position( entity )
+                    local ar = area.around( pos, 2 )
+                    ar:clamp( level:get_area() )
+                    local fumes = false
+                    for c in ar:coords() do
+                        local acid  = level:get_entity( c, "acid_pool" )
+                        if acid then
+                            fumes = true
+                        end
+                    end
+                    if fumes then
+                        if tlevel == 3 then
+                            world:add_buff( entity, "buff_hyped_improved")
+                        elseif tlevel >= 1 then
+                            world:add_buff( entity, "buff_hyped")
+                        end
+                    end
                 end
                 return 0
             end
         ]=],
-        on_post_command = [[
+        on_post_command = [=[
             function ( self, actor, cmt, weapon, time )
                 local berserk = actor:child("buff_inmate_berserk_base") or actor:child("buff_inmate_berserk_skill_1") or actor:child("buff_inmate_berserk_skill_2") or actor:child("buff_inmate_berserk_skill_3")
 
@@ -284,7 +353,7 @@ register_blueprint "ktrait_master_chemist"
                     place( level, c )
                 end
             end
-        ]],
+        ]=],
     },
 }
 
