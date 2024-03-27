@@ -125,6 +125,30 @@ register_blueprint "buff_corroded"
     },
 }
 
+register_blueprint "buff_corroded_minor"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name    = "Corroded",
+        desc    = "{!-25%} acid resistance",
+    },
+    callbacks = {
+        on_die = [[
+            function ( self )
+                world:mark_destroy( self )
+            end
+        ]],
+    },
+    attributes = {
+        resist = {
+            acid = -25,
+        },
+    },
+    ui_buff = {
+       color     = YELLOW,
+    },
+}
+
 register_blueprint "kperk_chemist"
 {
     flags = { EF_NOPICKUP },
@@ -133,7 +157,9 @@ register_blueprint "kperk_chemist"
             function ( self, source, who )
                 if who and who.data and who.data.ai then
                     local clevel = world:get_player():child("ktrait_master_chemist").attributes.level
-                    if clevel == 3 and not who:child("buff_corroded") then
+                    if clevel == 2 and not who:child("buff_corroded_minor") then
+                        world:add_buff( who, "buff_corroded_minor", 1000 )
+                    elseif clevel == 3 and not who:child("buff_corroded") then
                         world:add_buff( who, "buff_corroded", 1000 )
                     end
                 end
@@ -148,7 +174,9 @@ register_blueprint "kperk_chemist"
                     else
                         for e in level:entities( c ) do
                             if e.data and e.data.ai then
-                                if clevel == 3 and not e:child("buff_corroded") then
+                                if clevel == 2 and not e:child("buff_corroded_minor") then
+                                    world:add_buff( e, "buff_corroded_minor", 1000 )
+                                elseif clevel == 3 and not e:child("buff_corroded") then
                                     world:add_buff( e, "buff_corroded", 1000 )
                                 end
                             end
@@ -177,7 +205,7 @@ register_blueprint "ktrait_master_chemist"
     text = {
         name   = "CHEMIST",
         desc   = "MASTER TRAIT - acid resist, and acid spreading on AoE.",
-        full   = "You have set up so many make shift drug labs that you know your acids and bases! You are acid immune, moreover any wielded weapon you use (especially area of effect weapons) spread acid!\n\n{!LEVEL 1} - {!immunity} to acid status effect, {!10 Acid} pool created on hit, leave acid trail when Berserk\n{!LEVEL 2} - double armor damage, grenades leave acid in their AoE\n{!LEVEL 3} - hit enemies gain -100% acid resistance\n\nYou can pick only one MASTER trait per character.",
+        full   = "You have set up so many make shift drug labs that you know your acids and bases! You are acid immune, moreover any wielded weapon you use (especially area of effect weapons) spread acid!\n\n{!LEVEL 1} - {!immunity} to acid status effect, {!10 Acid} pool created on hit, leave acid trail when Berserk\n{!LEVEL 2} - double armor damage, hit enemies gain -25% acid resistance, grenades leave acid in their AoE\n{!LEVEL 3} - hit enemies gain -100% acid resistance\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MCH",
     },
     attributes = {
@@ -193,7 +221,6 @@ register_blueprint "ktrait_master_chemist"
                 local tlevel, t = gtk.upgrade_master( entity, "ktrait_master_chemist" )
                 t.attributes.chemist_level = tlevel
                 if tlevel == 2 then
-                    nova.log("Setting armor damage to 2.0")
                     t.attributes.armor_damage = 2.0
                 end
                 if tlevel >= 1 then
@@ -251,7 +278,7 @@ register_blueprint "ktrait_master_chemist"
                                 acid = level:place_entity( "acid_pool", c )
                             end
                             acid.attributes.acid_amount = 10
-                            acid.lifetime.time_left = math.max( acid.lifetime.time_left, 300 + math.random(100) )
+                            acid.lifetime.time_left = math.max( acid.lifetime.time_left, 2000 )
                         end
                     end
                     place( level, c )
