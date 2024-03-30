@@ -328,14 +328,21 @@ register_blueprint "ktrait_berserk"
 
                 local index = 0
                 local melee = nil
-                repeat
-                    melee = world:get_weapon( entity, index, true )
-                    if not melee then break end
-                    if melee.weapon and melee.weapon.type == world:hash("melee") then
-                        break
-                    end
-                    index = index + 1
-                until false
+                local wep0 = entity:get_slot( "1" )
+                local wep1 = entity:get_slot( "2" )
+                local wep2 = entity:get_slot( "3" )
+
+                if wep0 and wep0.weapon and wep0.weapon.type == world:hash("melee") then
+                    melee = wep0
+                    index = 0
+                elseif wep1 and wep1.weapon and wep1.weapon.type == world:hash("melee") then
+                    melee = wep1
+                    index = 1
+                elseif wep2 and wep2.weapon and wep2.weapon.type == world:hash("melee") then
+                    melee = wep2
+                    index = 2
+                end
+
                 if melee then
                     local bgg = entity:child("buff_ghost_gun")
                     if bgg then
@@ -380,14 +387,21 @@ register_blueprint "ktrait_berserk"
 
                 local index = 0
                 local melee = nil
-                repeat
-                    melee = world:get_weapon( entity, index, true )
-                    if not melee then break end
-                    if melee.weapon and melee.weapon.type == world:hash("melee") then
-                        break
-                    end
-                    index = index + 1
-                until false
+                local wep0 = entity:get_slot( "1" )
+                local wep1 = entity:get_slot( "2" )
+                local wep2 = entity:get_slot( "3" )
+
+                if wep0 and wep0.weapon and wep0.weapon.type == world:hash("melee") then
+                    melee = wep0
+                    index = 0
+                elseif wep1 and wep1.weapon and wep1.weapon.type == world:hash("melee") then
+                    melee = wep1
+                    index = 1
+                elseif wep2 and wep2.weapon and wep2.weapon.type == world:hash("melee") then
+                    melee = wep2
+                    index = 2
+                end
+
                 if melee then
                     world:get_level():swap_weapon( entity, index )
                 end
