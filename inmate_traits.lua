@@ -205,8 +205,8 @@ register_blueprint "ktrait_desperado"
     blueprint = "trait",
     text = {
         name = "Desperado",
-        desc = "Damage bonus based on weapon shot cost versus clip size. No affect on melee.",
-        full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots in the clip, the fewer the better.\n\n{!LEVEL 1} - {!+25%} times shot cost/clip\n{!LEVEL 2} - {!+50%} times shot cost/clip\n{!LEVEL 3} - {!+75%} times shot cost/clip",
+        desc = "Damage bonus based on weapon shot cost versus clip size, proportional bonus based on the amount of clip fired. No affect on melee.",
+        full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots in the clip, the fewer the better. Guns that fire their entire clip per shot get the full damage bonus, guns that don't get proportionally less.\n\n{!LEVEL 1} - {!+25%} times clip/shot cost\n{!LEVEL 2} - {!+50%} times clip/shot cost\n{!LEVEL 3} - {!+75%} times clip/shot cost",
         abbr = "Des",
     },
     attributes = {
@@ -262,8 +262,8 @@ register_blueprint "ktrait_gambler"
     blueprint = "trait",
     text = {
         name = "Gambler",
-        desc = "Chance to refund charges when using a terminal; excluding extract multitools.",
-        full = "You cannot resist a game of chance, hacking them into things when they don't otherwise exist.\n\n{!LEVEL 1} - {!+40%} chance to refund the cost when using a station\n{!LEVEL 2} - {!+10%} chance the station will drop a multitool when using it, and reveal terminals\n{!LEVEL 3} - {!+80%} chance to refund the cost when using a station.",
+        desc = "Chance to refund charges when using a station or ammo terminal; excluding extract multitools.",
+        full = "You cannot resist a game of chance, hacking them into things when they don't otherwise exist.\n\n{!LEVEL 1} - {!+40%} chance to refund the cost when using a station/terminal\n{!LEVEL 2} - {!+10%} chance the station/terminal will drop a multitool when using it, and reveal terminals and stations\n{!LEVEL 3} - {!+80%} chance to refund the cost when using a station/terminal.",
         abbr = "Gmb",
     },
     attributes = {
@@ -623,6 +623,51 @@ register_blueprint "ktrait_first_rule"
     },
 }
 
+register_blueprint "open"
+{
+}
+
+register_blueprint "close"
+{
+}
+
+register_blueprint "unlock_open"
+{
+}
+
+function run_burgler_ui( self, user, level )
+    local list = {}
+    table.insert( list, {
+        name = "Close visible doors",
+        target = self,
+        parameter = world:create_entity("close"),
+        confirm = false,
+    })
+    table.insert( list, {
+        name = "Open visible doors",
+        target = self,
+        parameter = world:create_entity("open"),
+        confirm = false,
+    })
+    if level == 3 then
+        table.insert( list, {
+        name = "Open visible locked doors",
+        target = self,
+        parameter = world:create_entity("unlock_open"),
+        confirm = false,
+    })
+    end
+    table.insert( list, {
+        name = ui:text("ui.lua.common.cancel"),
+        target = self,
+        cancel = true,
+    })
+    list.title = "Open/Close doors"
+    list.size  = coord( 35, 0 )
+    ui:terminal( user, nil, list )
+end
+
+
 register_blueprint "kskill_burglar_open_close"
 {
     blueprint = "trait",
@@ -640,70 +685,96 @@ register_blueprint "kskill_burglar_open_close"
                 local tlevel = self.attributes.level
                 local return_val = 0
 
-                for c in level:coords( {"door_frame","pdoor_frame","door_frame_l","door_frame_r" } ) do
-                    local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
+                if tlevel > 1 then
+                    run_burgler_ui( self, entity, tlevel )
+                    return -1
+                else
+                    for c in level:coords( {"door_frame","pdoor_frame","door_frame_l","door_frame_r" } ) do
+                        local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
 
-                    if d then
-                        local distance = level:distance(entity, d)
-                        local visible = level:is_visible(c)
-                        local closed = d.flags.data[ EF_NOMOVE ]
-                        local broken = d.flags.data[ EF_KILLED ]
-                        local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" )
+                        if d then
+                            local distance = level:distance(entity, d)
+                            local visible = level:is_visible(c)
+                            local closed = d.flags.data[ EF_NOMOVE ]
+                            local broken = d.flags.data[ EF_KILLED ]
+                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" )
 
-                        if tlevel == 1 and distance < 3 and visible and closed and not broken and not locked then
-                            d.flags.data = { EF_ACTION },
-                            world:play_sound( "door_open", d )
-                            world:set_state( d, "open" )
-                            return_val = 1
-                        elseif tlevel > 1 and visible and closed and not broken and not locked then
-                            d.flags.data = { EF_ACTION },
-                            world:play_sound( "door_open", d )
-                            world:set_state( d, "open" )
-                            return_val = 1
-                        elseif tlevel > 1 and visible and not closed and not broken and level:can_close( d ) then
-                            d.flags.data = { EF_NOSIGHT, EF_NOMOVE, EF_NOFLY, EF_NOSHOOT, EF_BUMPACTION, EF_ACTION }
-                            world:play_sound( "door_close", d )
-                            world:set_state( d, "closed" )
-                            return_val = 1
-                        end
-                        if tlevel == 3 and visible and not broken and ecs:child( d, "door_locked" ) then
-                            d.flags.data = { EF_ACTION },
-                            level:change_state( d, {
-                                door_locked = "door_unlocked",
-                            })
-                            world:play_sound( "door_open", d )
-                            world:set_state( d, "open" )
-                            return_val = 1
+                            if distance < 3 and visible and closed and not broken and not locked then
+                                d.flags.data = { EF_ACTION },
+                                world:play_sound( "door_open", d )
+                                world:set_state( d, "open" )
+                                return_val = 1
+                            end
                         end
                     end
-                    if tlevel == 3 then
-                        local elevators = { elevator_01 = true, elevator_01_off = true, elevator_01_branch = true, elevator_01_special = true, elevator_01_mini = true }
-                        for e in level:entities() do
-                            local coord = world:get_position(e)
-                            local visible = level:is_visible(coord)
-                            if visible and elevators[ world:get_id(e) ] then
-                                local locked = e:child( "elevator_inactive" ) or e:child( "elevator_locked" ) or e:child("elevator_secure")
-                                if locked then
-                                    world:set_state( e, "open" )
-                                    world:play_sound( "door_open_03", e )
-                                    world:mark_destroy( locked )
-                                    world:flush_destroy()
-                                    return_val = 1
+                    if return_val == 0 then
+                        ui:set_hint( "No doors can be interacted with or the doors are too far away", 50, 1 )
+                    end
+                    return return_val
+                end
+            end
+        ]=],
+        on_activate = [=[
+            function ( self, who, level, param )
+                local worked = 0
+                local tlevel = self.attributes.level
+                if param then
+                    for c in level:coords( {"door_frame","pdoor_frame","door_frame_l","door_frame_r" } ) do
+                        local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
+
+                        if d then
+                            local distance = level:distance(entity, d)
+                            local visible = level:is_visible(c)
+                            local closed = d.flags.data[ EF_NOMOVE ]
+                            local broken = d.flags.data[ EF_KILLED ]
+                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" )
+
+                            if param and world:get_id(param) == "open" and visible and closed and not broken and not locked then
+                                d.flags.data = { EF_ACTION },
+                                world:play_sound( "door_open", d )
+                                world:set_state( d, "open" )
+                                worked = 1
+                            elseif param and world:get_id(param) == "close" and visible and not closed and not broken and level:can_close( d ) then
+                                d.flags.data = { EF_NOSIGHT, EF_NOMOVE, EF_NOFLY, EF_NOSHOOT, EF_BUMPACTION, EF_ACTION }
+                                world:play_sound( "door_close", d )
+                                world:set_state( d, "closed" )
+                                worked = 1
+                            end
+                            if param and world:get_id(param) == "unlock_open" and visible and not broken and ecs:child( d, "door_locked" ) then
+                                d.flags.data = { EF_ACTION },
+                                level:change_state( d, {
+                                    door_locked = "door_unlocked",
+                                })
+                                world:play_sound( "door_open", d )
+                                world:set_state( d, "open" )
+                                worked = 1
+                            end
+                        end
+                        if tlevel == 3 then
+                            local elevators = { elevator_01 = true, elevator_01_off = true, elevator_01_branch = true, elevator_01_special = true, elevator_01_mini = true }
+                            for e in level:entities() do
+                                local coord = world:get_position(e)
+                                local visible = level:is_visible(coord)
+                                if visible and elevators[ world:get_id(e) ] then
+                                    local locked = e:child( "elevator_inactive" ) or e:child( "elevator_locked" ) or e:child("elevator_secure")
+                                    if locked then
+                                        world:set_state( e, "open" )
+                                        world:play_sound( "door_open_03", e )
+                                        world:mark_destroy( locked )
+                                        world:flush_destroy()
+                                        worked = 1
+                                    end
                                 end
                             end
                         end
                     end
-                end
-                if return_val == 0 then
-                    if tlevel == 1 then
-                        ui:set_hint( "No doors can be interacted with or the doors are too far away", 50, 1 )
-                    else
+                    if worked == 0 then
                         ui:set_hint( "No doors can be interacted with", 50, 1 )
                     end
                 end
-                return return_val
+                return 100
             end
-        ]=]
+        ]=],
     },
     data = {
         is_free_use = true,
@@ -712,7 +783,6 @@ register_blueprint "kskill_burglar_open_close"
         level = 1,
     },
     skill = {
-        cooldown = 1000,
         cost     = 0,
     },
 }
@@ -723,7 +793,7 @@ register_blueprint "ktrait_burglar"
     text = {
         name   = "Burgler",
         desc   = "ACTIVE SKILL - open doors from a distance",
-        full   = "There's no where you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance\n{!LEVEL 2} - open or close all doors in sight\n{!LEVEL 3} - open red key card locked doors and elevators, open locked mini level elevators in sight",
+        full   = "There's nowhere you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance\n{!LEVEL 2} - open or close all doors in sight\n{!LEVEL 3} - open red key card locked doors and elevators, open locked mini level elevators in sight",
         abbr   = "Bur",
     },
     callbacks = {
@@ -853,8 +923,8 @@ register_blueprint "ktrait_hitman"
     blueprint = "trait",
     text = {
         name   = "Hitman",
-        desc   = "Improved accuracy against enemies in cover. Increased damage versus enemies with overhealth",
-        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down the elevator shaft. Each level of this trait improves your ability to hurt things.\n\n{!LEVEL 1} - enemy cover is only {!80%} effective. {!10%}-{!50%} bonus damage if enemy is at {!100%}-{!200%} health\n{!LEVEL 2} - enemy cover is only {!60%} effective. {!10%}-{!100%} bonus damage if enemy is at {!100%}-{!200%} health\n{!LEVEL 3} - enemy cover is only {!20%} effective. {!10%}-{!100%} bonus damage if enemy is at {!50%}-{!150+%} health",
+        desc   = "Improved accuracy against enemies in cover. Increased damage versus enemies at or above max health.",
+        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down the elevator shaft. Each level of this trait improves your ability to hurt things.\n\n{!LEVEL 1} - enemy cover is {!80%} effective. {!10%} bonus damage if enemy is at {!100%} health rising to {!50%} if enemy at {!200%} health\n{!LEVEL 2} - enemy cover is {!60%} effective. Bonus damage rises to {!100%} if enemy at {!200%} health\n{!LEVEL 3} - enemy cover is {!20%} effective. {!10%} bonus damage if enemy is at {!50%} health rising to {!100%} if enemy at {!150+%} health",
         abbr   = "Hit",
     },
     attributes = {
@@ -923,7 +993,7 @@ register_blueprint "ktrait_kneecap"
     text = {
         name   = "Kneecap",
         desc   = "PISTOL/SMG/SEMI/AUTO SKILL - weaken biological enemies on hit",
-        full   = "You know where to shoot someone to give them a bad day!\n\n{!LEVEL 1} - enemies shot are slowed\n{!LEVEL 2} - enemies shot have reduced accuracy\n{!LEVEL 3} - enemies shot do reduced damage\n",
+        full   = "You know where to shoot someone to give them a bad day!\n\n{!LEVEL 1} - non-robotic enemies shot are slowed\n{!LEVEL 2} - non-robotic enemies shot have reduced accuracy\n{!LEVEL 3} - non-robotic enemies shot do reduced damage\n",
         abbr   = "Kne",
     },
     attributes = {

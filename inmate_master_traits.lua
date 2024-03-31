@@ -365,7 +365,7 @@ register_blueprint "ktrait_master_gbh"
     text = {
         name   = "GBH",
         desc   = "MASTER TRAIT - bleed immunity and afflict bleed on attacks.",
-        full   = "Grevious bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit, range {!2} bleed aura when berserk\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - bleed effects are {!100%} stronger.\n\nYou can pick only one MASTER trait per character.",
+        full   = "Grevious bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit (stacks with bleed perks on weapon/relics), range {!2} bleed aura when berserk\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - bleed effects are {!100%} stronger.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGB",
     },
     attributes = {
@@ -412,7 +412,7 @@ register_blueprint "ktrait_master_gbh"
 
                     for c in ar:coords() do
                         for e in level:entities( c ) do
-                            local slevel = core.get_status_value( 3, "bleed", parent )
+                            local slevel = core.get_status_value( 5, "bleed", parent )
                             core.apply_damage_status( e, "bleed", "bleed", slevel, parent )
                         end
                     end
