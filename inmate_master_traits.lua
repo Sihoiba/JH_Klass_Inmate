@@ -821,7 +821,7 @@ register_blueprint "ktrait_master_fraudster"
     text = {
         name   = "FRAUDSTER",
         desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire",
-        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!25}, Berserk resets cooldown, and reduces it to {!2}\n{!LEVEL 2} - cooldown {!10}, decoy health {!50}.\n{!LEVEL 3} cooldown {!5}, decoy explodes on death.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!25}, Berserk resets cooldown, and reduces it to {!2}, reduced range of being detected by scent\n{!LEVEL 2} - cooldown {!10}, decoy health {!50}.\n{!LEVEL 3} cooldown {!5}, decoy explodes on death.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MFr",
     },
     attributes = {
@@ -841,6 +841,12 @@ register_blueprint "ktrait_master_fraudster"
                     local cd = entity:child( "kskill_fraudster_create_decoy" )
                     cd.skill.cooldown = 500
                 end
+            end
+        ]=],
+        on_pre_command = [=[
+            function ( self, actor, cmt, tgt )
+                local p = world:get_position( actor )
+                world:set_scent( p, 1000 )
             end
         ]=],
     },
