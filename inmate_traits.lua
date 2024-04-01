@@ -238,7 +238,7 @@ register_blueprint "ktrait_desperado"
                         end
                     end
                     local clip_size = weapon.attributes.clip_size or shots
-                    local gg = entity:child("ktrait_master_ghost_gun")
+                    local gg = entity:child("buff_ghost_gun")
                     if gg then
                         local e_shots = gg.attributes.shots or 0
                         shots = shots + e_shots
