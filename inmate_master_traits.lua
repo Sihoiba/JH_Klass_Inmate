@@ -656,14 +656,57 @@ register_blueprint "ktrait_master_ghost_gun"
 
 -- FRAUDSTER
 
-register_blueprint "decoy_light" {
+register_blueprint "buff_distracted"
+{
     flags = { EF_NOPICKUP },
+    text = {
+        name = "Distracted",
+        desc = "Vulnerable to criticals while distracted by decoys",
+    },
+    ui_buff = {
+        color = MAGENTA,
+    },
     callbacks = {
-        on_die = [[
+        on_die = [=[
             function ( self )
                 world:mark_destroy( self )
             end
-        ]],
+        ]=],
+    }
+}
+
+register_blueprint "decoy_light" {
+    flags = { EF_NOPICKUP },
+    callbacks = {
+        on_die = [=[
+            function ( self )
+                world:mark_destroy( self )
+            end
+        ]=],
+        on_timer = [=[
+            function ( self, first )
+                if first then return 1 end
+                if not self then return 0 end
+                local level  = world:get_level()
+                local parent = self:parent()
+                if not level:is_alive( parent ) then
+                    world:mark_destroy( self )
+                    return 0
+                end
+                local position = world:get_position( parent )
+                local ar       = area.around( position, 2 )
+                ar:clamp( level:get_area() )
+
+                for c in ar:coords() do
+                    for e in level:entities( c ) do
+                        if e and e.data and e.data.ai and e ~= world:get_player()  then
+                            world:add_buff( e, "buff_distracted", 101, true )
+                        end
+                    end
+                end
+                return 50
+            end
+        ]=],
     }
 }
 
@@ -820,12 +863,14 @@ register_blueprint "ktrait_master_fraudster"
     blueprint = "trait",
     text = {
         name   = "FRAUDSTER",
-        desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire",
-        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!25}, Berserk resets cooldown, and reduces it to {!2}, reduced range of being detected by scent\n{!LEVEL 2} - cooldown {!10}, decoy health {!50}.\n{!LEVEL 3} cooldown {!5}, decoy explodes on death.\n\nYou can pick only one MASTER trait per character.",
+        desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire, gain crit bonus against enemies near decoys",
+        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!25}, {!50%} crit chance on enemies near decoys, reduced scent detection range, Berserk resets cooldown, and reduces it to {!2}\n{!LEVEL 2} - cooldown {!10}, decoy health {!50}, {!100%} crit chance and {!50}% crit damage on enemies near decoys.\n{!LEVEL 3} cooldown {!5}, decoy explodes on death, {!100%} crit damage on enemies near decoys.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MFr",
     },
     attributes = {
-        level    = 1,
+        level = 1,
+        crit_chance = 0,
+        crit_damage = 0,
     },
     callbacks = {
         on_activate = [=[
@@ -847,6 +892,30 @@ register_blueprint "ktrait_master_fraudster"
             function ( self, actor, cmt, tgt )
                 local p = world:get_position( actor )
                 world:set_scent( p, 1000 )
+            end
+        ]=],
+        on_aim = [=[
+            function ( self, entity, target, weapon )
+                local tlevel = self.attributes.level
+                local attr = self.attributes
+                local percent_chance = 0
+                local percent_damage = 0
+                if target then
+                    local enemy = world:get_level():get_being( target )
+                    if enemy and enemy:child("buff_distracted") then
+                        if tlevel == 1 then
+                            percent_chance = 50
+                        elseif tlevel == 2 then
+                            percent_chance = 100
+                            percent_damage = 50
+                        elseif tlevel == 3 then
+                            percent_chance = 100
+                            percent_damage = 100
+                        end
+                    end
+                end
+                attr.crit_chance = percent_chance
+                attr.crit_damage = percent_damage
             end
         ]=],
     },
