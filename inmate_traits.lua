@@ -66,7 +66,7 @@ register_blueprint "ktrait_mule"
     callbacks = {
         on_activate = [=[
             function( self, entity )
-                local attr    = entity.attributes
+                local attr = entity.attributes
                 local mule = ( attr.mule_level or 0 ) + 1
                 attr.mule_level = mule
                 if mule == 1 then
@@ -257,6 +257,34 @@ register_blueprint "ktrait_desperado"
     },
 }
 
+register_blueprint "station_extract_multitool"
+{
+    text = {
+        entry = "Extract multitool",
+        desc  = "Extract a single multitool at the cost of a charge."
+    },
+    data = {
+        terminal = {
+            priority = 100,
+        },
+    },
+    attributes = {
+        charge_cost = 1,
+    },
+    callbacks = {
+        on_activate = [=[
+            function( self, who, level )
+                local parent = self:parent()
+                uitk.station_use_charges( self )
+                who:pickup( "kit_multitool", true )
+                uitk.station_activate( who, parent, true )
+                who.data.extracted_multitool = true
+                return 100
+            end
+        ]=]
+    },
+}
+
 register_blueprint "ktrait_gambler"
 {
     blueprint = "trait",
@@ -275,7 +303,6 @@ register_blueprint "ktrait_gambler"
                 local tlevel = gtk.upgrade_trait( entity, "ktrait_gambler" )
                 if tlevel == 1 then
                     entity.data.stations_and_terminals = {}
-                    entity.data.multitool_count = 0
                 end
                 if tlevel == 2 then
                     leveltk.reveal_terminals_and_stations( world:get_level() )
@@ -293,7 +320,6 @@ register_blueprint "ktrait_gambler"
         ]=],
         on_terminal_activate = [=[
             function( self, who, what )
-                who.data.multitool_count = world:has_item( who, "kit_multitool" )
                 who.data.stations_and_terminals = {}
                 who.data.he_supply_found = what.attributes.perk_he_supply
                 if what.attributes and what.attributes.charges then
@@ -303,7 +329,6 @@ register_blueprint "ktrait_gambler"
         ]=],
         on_station_activate = [=[
             function( self, who, what )
-                who.data.multitool_count = world:has_item( who, "kit_multitool" )
                 who.data.stations_and_terminals = {}
                 who.data.perk_he_supply_found = what.attributes.perk_he_supply
                 if what.attributes and what.attributes.charges then
@@ -329,10 +354,10 @@ register_blueprint "ktrait_gambler"
                                 entity.data.perk_he_supply_found = e.attributes.perk_he_supply
                             end
                             if v > e.attributes.charges then
-                                if entity.data.multitool_count ~= world:has_item( entity, "kit_multitool" ) then
+                                if entity.data.extracted_multitool then
                                     nova.log("Extracted multitools")
-                                    entity.data.multitool_count = world:has_item( entity, "kit_multitool" )
                                     entity.data.stations_and_terminals[e] = e.attributes.charges
+                                    entity.data.extracted_multitool = false
                                 else
                                     local lucky = math.random(5)
                                     local good_luck = 2
@@ -356,7 +381,6 @@ register_blueprint "ktrait_gambler"
                                             nova.log("Won Multitool prize")
                                             world:play_sound( "vending_hit_reward", e )
                                             entity:pickup( "kit_multitool", true )
-                                            entity.data.multitool_count = world:has_item( entity, "kit_multitool" )
                                             uitk.station_activate( entity, e, true )
                                         end
                                     end
