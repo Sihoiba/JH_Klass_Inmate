@@ -211,7 +211,7 @@ register_blueprint "ktrait_desperado"
     },
     attributes = {
         level   = 1,
-        damage_mult = 1.0,
+        damage_add = 0,
     },
     callbacks = {
         on_activate = [=[
@@ -246,11 +246,12 @@ register_blueprint "ktrait_desperado"
                     local shot_cost = weapon.weapon.shot_cost or 1
                     local cost_per_shot = shot_cost * shots
                     local shot_clip_percent = cost_per_shot / clip_size
-                    local damage_bonus = 1 + (shot_clip_percent * bonus)
 
-                    self.attributes.damage_mult = damage_bonus
+                    local damage_bonus = math.ceil(weapon.attributes.damage * shot_clip_percent * bonus)
+
+                    self.attributes.damage_add = damage_bonus
                 else
-                    self.attributes.damage_mult = 1.0
+                    self.attributes.damage_add = 0
                 end
             end
         ]=],
