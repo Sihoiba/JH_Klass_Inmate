@@ -33,7 +33,7 @@ In addition to the new Klass, this mod adds AV versions of the Crowbar, Axe and 
  - Burglar; requires Smuggler 1: Open doors from a distance. Higher levels let you close doors from a distance and unlock locked doors and elevators for free.
  - Dealer; requires Cutter 1: Increased the duration of the Juiced, Stimmed and Enviro buffs from Combat Packs, Stimpacks and Enviropacks.
  - Kneecap; requires Dash 1: PISTOL/SMG/SEMI/AUTO: Debuffs enemies on hit. Level 1 slowed, level 2 accuracy malus, level 3 damage malus
- - Hitman; requires Desperado = 1: Improves close range combat. Level 1 massively reduced minimum range, Level 2 explosive weapons/grenades are Safe, Level 3 ignore enemy cover
+ - Hitman; requires Desperado = 1: Reduces enemy cover affect, and increases damage against enemies at 100% or higher health. Level 1 cover 20% effective, damage bonus 10% at 100% health rising to 50% at 200% health; Level 2 cover 40% effective, damage bonus rises to 100% at 200% health, Level 3 ignore 80% enemy cover, damage bonus rises from 50% health capping at 100% damage at 150+% health.
  - Whizkid; requires Gambler 1: As standard
 
 ### Master Traits
