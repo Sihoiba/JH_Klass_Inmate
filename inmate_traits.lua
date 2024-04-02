@@ -118,81 +118,36 @@ register_blueprint "ktrait_smuggler"
     callbacks = {
         on_activate = [=[
             function( self, entity )
-                gtk.upgrade_trait( entity, "ktrait_smuggler" )
+                local tlevel = gtk.upgrade_trait( entity, "ktrait_smuggler" )
+                local level = world:get_level()
+                for e in level:entities() do
+                    local is_door = false
+                    local c = world:get_position(e)
+                    local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
+                    if d and d == e then
+                        is_door = true
+                    end
+                    if not (e.data and e.data.ai) and not e.hazard and not is_door and e.attributes and e.attributes.health and not e.attributes.is_light and not e:flag( EF_NOCORPSE ) then
+                        local cache = world:add_buff( e, "smuggler_cache" )
+                        cache.attributes.level = tlevel or 0
+                    end
+                end
             end
         ]=],
-        on_kill = [=[
-            function ( self, entity, target, weapon, gibbed, coord )
+        on_enter_level = [=[
+            function ( self, entity, reenter )
+                if reenter then return end
                 local level = world:get_level()
-                local tlevel = self.attributes.level or 0
-                local wep = entity:get_weapon()
-                local is_door = false
-                local c = world:get_position(target)
-                local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
-                if d and d == target then
-                    is_door = true
-                end
-                if target and wep and wep.weapon and not (target.data and target.data.ai) and not target.hazard and not is_door then
-
-                    local ammos  =
-                    {
-                        [world:hash("ammo_9mm")]     = { id = "ammo_9mm", },
-                        [world:hash("ammo_shells")]  = { id = "ammo_shells",},
-                        [world:hash("ammo_762")]     = { id = "ammo_762", },
-                        [world:hash("ammo_44")]      = { id = "ammo_44", },
-                        [world:hash("ammo_40")]      = { id = "ammo_40", },
-                        [world:hash("ammo_cells")]   = { id = "ammo_cells", },
-                        [world:hash("ammo_rockets")] = { id = "ammo_rockets", },
-                    }
-
-                    local grenades = "ammo_40"
-                    local rockets = "ammo_rockets"
-
-                    local ammo = nil
-                    if wep.weapon.type ~= world:hash("melee") and wep.clip and wep.clip.ammo then
-                        ammo = ammos[wep.clip.ammo]
-                    elseif wep.weapon.type == world:hash("melee") then
-                        local slots         = { "1", "2", "3" }
-                        local weapons = {}
-                        for _,slot_id in ipairs( slots ) do
-                            local slot     = entity:get_slot( slot_id )
-                            if slot and slot.weapon and slot.weapon.type ~= world:hash("melee") then
-                                table.insert(weapons, slot)
-                            end
-                        end
-                        if next(weapons) then
-                            local w = table.remove( weapons, math.random( #weapons ) )
-                            nova.log("weapon name "..tostring(w.text.name))
-                            if w and w.clip and w.clip.ammo then
-                                ammo = ammos[w.clip.ammo]
-                            end
-                        end
+                for e in level:entities() do
+                    local is_door = false
+                    local c = world:get_position(e)
+                    local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
+                    if d and d == e then
+                        is_door = true
                     end
-
-                    if tlevel == 1 and ammo and ammo.id ~= grenades and ammo.id ~= rockets then
-                        local e = world:create_entity( ammo.id )
-                        e.stack.amount = 1 + math.random(2)
-                        level:drop_entity( e, coord )
-                    elseif tlevel == 2 and ammo and ammo.id == grenades then
-                        local e = world:create_entity( ammo.id )
-                        e.stack.amount = 1 + math.random(2)
-                        level:drop_entity( e, coord )
-                    elseif tlevel == 2 and ammo and ammo.id ~= grenades and ammo.id ~= rockets then
-                        local e = world:create_entity( ammo.id )
-                        e.stack.amount = 5 + math.random(5)
-                        level:drop_entity( e, coord )
-                    elseif tlevel == 3 and ammo and ammo.id == grenades then
-                        local e = world:create_entity( ammo.id )
-                        e.stack.amount = 3 + math.random(3)
-                        level:drop_entity( e, coord )
-                    elseif tlevel == 3 and ammo and ammo.id == rockets then
-                        local e = world:create_entity( ammo.id )
-                        e.stack.amount = 1 + math.random(2)
-                        level:drop_entity( e, coord )
-                    elseif tlevel == 3 and ammo and ammo.id ~= grenades and ammo.id ~= rockets then
-                        local e = world:create_entity( ammo.id )
-                        e.stack.amount = 10 + math.random(10)
-                        level:drop_entity( e, coord )
+                    if not (e.data and e.data.ai) and not e.hazard and not is_door and e.attributes and e.attributes.health and not e.attributes.is_light and not e:flag( EF_NOCORPSE ) then
+                        local cache = world:add_buff( e, "smuggler_cache" )
+                        cache.attributes.level = self.attributes.level
                     end
                 end
             end

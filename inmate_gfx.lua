@@ -339,3 +339,45 @@ register_gfx_blueprint "fragile_pipe_wrench"
         },
     },
 }
+
+register_gfx_blueprint "smuggler_cache"
+{
+    equip = {},
+    persist = true,
+    point_generator = {
+        type    = "cylinder",
+        extents = vec3(0.2,0.9,0.0),
+    },
+    particle = {
+        material      = "data/texture/particles/shapes_01/blick_01",
+        group_id      = "pgroup_fx",
+        orientation   = PS_ORIENTED,
+        destroy_owner = true,
+    },
+    particle_emitter = {
+        rate     = 32,
+        size     = vec2(0.07,0.2),
+        velocity = 0.1,
+        color    = vec4(0.84,0.84,0.84,0.5),
+        lifetime = 1.5,
+    },
+    particle_transform = {
+        force = vec3(0,1,0),
+    },
+    light = {
+        position = vec3(0,0.3,0),
+        color    = vec4(0.84,0.84,0.84,1),
+        range    = 1.5,
+        vision   = true,
+    },
+    particle_fade = {
+        fade_out = 0.5,
+    },
+    uisprite = {
+        icon       = "data/texture/ui/icons/ui_telegraph_01",
+        animation  = "PULSE",
+        propagate  = true,
+        color      = vec4( 0.84,0.84,0.84, 1.0 ),
+        visibility = "OOV_ONLY",
+    },
+}

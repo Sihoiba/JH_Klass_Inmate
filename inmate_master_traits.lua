@@ -573,9 +573,6 @@ register_blueprint "kskill_ghost_gun_toggle"
                     end
 
                     buff.attributes.level = entity.data.gg_level
-
-                    nova.log("buff.attributes.level"..tostring(buff.attributes.level))
-
                     self.text.name = self.text.off
                 end
                 return 1
