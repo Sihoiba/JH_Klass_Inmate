@@ -22,7 +22,7 @@ In addition to the new Klass, this mod adds AV versions of the Crowbar, Axe and 
  - Juggler: As per the Scout/Technician skill
  - Brute: Grants innate armour, higher levels also give splash damage resistance
  - Mule: Increased inventory space and reveal elevator locations, higher levels give more inventory and reveal lootbox locations
- - Smuggler: Break environment objects like crates, plants and chairs to get ammo for your carried weapons.
+ - Smuggler: Hit special environment objects like crates, plants and chairs to get ammo for your carried weapons.
  - Desperado: 25/50/75% flat damage bonus multiplied by the proportion of the ammo clip a shot costs. Better on single shot weapons. E.g. a single shot 60 damage rocket launcher gets 15/30/45 damage increase, a 6 shot 24 damage revolver, would get 1/2/3 damage increase 
  - Gambler: Random chance on using a station/ammo terminal to refund the charges. Higher levels increase the chance, and provide a chance to receive bonus multitools.
  - Cutter: convert small medkits into combat packs and stimpacks, or break large medkits down into 3 small ones.

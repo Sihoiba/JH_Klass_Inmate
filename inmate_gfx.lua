@@ -371,13 +371,13 @@ register_gfx_blueprint "smuggler_cache"
         vision   = true,
     },
     particle_fade = {
-        fade_out = 0.5,
+        fade_out = 0.25,
     },
     uisprite = {
         icon       = "data/texture/ui/icons/ui_telegraph_01",
         animation  = "PULSE",
         propagate  = true,
-        color      = vec4( 0.84,0.84,0.84, 1.0 ),
+        color      = vec4( 0.84,0.84,0.84, 0.5 ),
         visibility = "OOV_ONLY",
     },
 }

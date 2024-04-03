@@ -103,13 +103,54 @@ register_blueprint "ktrait_mule"
     },
 }
 
+function add_smuggler_cache(self, tlevel)
+    nova.log("tlevel"..tostring(tlevel))
+    local level = world:get_level()
+    local smuggler_entities = {}
+    for e in level:entities() do
+        local is_door = false
+        local c = world:get_position(e)
+        local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r") or
+        level:get_entity(c, "wall_summon")
+        if d and d == e then
+            is_door = true
+        end
+        local id = world:get_id(e)
+        local is_dante_pillar = id == "dante_obelisk_01" or id == "dante_obelisk_02" or id == "dante_obelisk_03" or id == "dante_gap_obelisk_01_A" or id == "dante_gap_obelisk_01_B" or id == "dante_pillar" or id == "dante_pillar_blood"
+        if not (e.data and e.data.ai) and not e.hazard and not is_door and e.attributes and e.attributes.health and not e.armor and not e.attributes.is_light and not e:flag( EF_NOCORPSE ) and not is_dante_pillar then
+            if e.health.current == e.attributes.health then
+                table.insert(smuggler_entities, e)
+            end
+        end
+    end
+    local cache_count = {1, 4, 4}
+    local caches = {}
+    local i = 0
+    local total_available_entities = #smuggler_entities or 0
+    while next(smuggler_entities) and i < cache_count[tlevel] do
+        i = i + 1
+        nova.log("Adding smuggler cache "..tostring(i).." of "..tostring(#smuggler_entities))
+        local e = table.remove( smuggler_entities, math.random( #smuggler_entities ) )
+        local cache = world:add_buff( e, "smuggler_cache" )
+        cache.attributes.level = tlevel or 0
+        if tlevel == 3 and i == 1 then
+            cache.data.special_reward = true
+            if total_available_entities < 4 then
+                nova.log("Insufficient objects for caches, missing "..tostring(4 - total_available_entities))
+                cache.data.cache_missing = 4 - total_available_entities
+            end
+        end
+        table.insert(caches, cache)
+    end
+end
+
 register_blueprint "ktrait_smuggler"
 {
     blueprint = "trait",
     text = {
         name   = "Smuggler",
-        desc   = "Find ammo in destructable environment objects",
-        full   = "You know where the black market stashes items! Break boxes, plants, and chairs to find ammo for the current held weapon, or a random carried weapon if current weapon is melee.\n\n{!LEVEL 1} - small amount of ammo in every object for current weapon, except 40mm grenades and rockets\n{!LEVEL 2} - medium amount of ammo, 40mm grenades can be found \n{!LEVEL 3} - large amount of ammo, rockets can be found",
+        desc   = "Find ammo in special destructable environment objects",
+        full   = "You know where the black market stashes items! Hit boxes, plants, urns and chairs containing a stash to find ammo for all carried weapons. Stashes are highlighted when out of sight.\n\n{!LEVEL 1} - {!1} object will contain a stash.\n{!LEVEL 2} - up to {!4} objects will contain a stash depending on number of available objects\n{!LEVEL 3} - guaranteed {!4} stashes worth of ammo across the available objects (as long as there is at least one object). {!1} stash will contain either an exotic/AV weapon or armor.",
         abbr   = "Sm",
     },
     attributes = {
@@ -119,37 +160,14 @@ register_blueprint "ktrait_smuggler"
         on_activate = [=[
             function( self, entity )
                 local tlevel = gtk.upgrade_trait( entity, "ktrait_smuggler" )
-                local level = world:get_level()
-                for e in level:entities() do
-                    local is_door = false
-                    local c = world:get_position(e)
-                    local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
-                    if d and d == e then
-                        is_door = true
-                    end
-                    if not (e.data and e.data.ai) and not e.hazard and not is_door and e.attributes and e.attributes.health and not e.attributes.is_light and not e:flag( EF_NOCORPSE ) then
-                        local cache = world:add_buff( e, "smuggler_cache" )
-                        cache.attributes.level = tlevel or 0
-                    end
-                end
+                add_smuggler_cache(self, tlevel)
             end
         ]=],
         on_enter_level = [=[
             function ( self, entity, reenter )
                 if reenter then return end
-                local level = world:get_level()
-                for e in level:entities() do
-                    local is_door = false
-                    local c = world:get_position(e)
-                    local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
-                    if d and d == e then
-                        is_door = true
-                    end
-                    if not (e.data and e.data.ai) and not e.hazard and not is_door and e.attributes and e.attributes.health and not e.attributes.is_light and not e:flag( EF_NOCORPSE ) then
-                        local cache = world:add_buff( e, "smuggler_cache" )
-                        cache.attributes.level = self.attributes.level
-                    end
-                end
+                local tlevel = self.attributes.level
+                add_smuggler_cache(self, tlevel)
             end
         ]=],
     },
