@@ -489,7 +489,7 @@ register_blueprint "klass_inmate"
                 adr.skill.cost = 30
                 entity:attach( "smoke_grenade" )
                 entity:attach( "stimpack_small" )
-				entity:attach( "medkit_small" )
+                entity:attach( "medkit_small" )
                 entity:attach( "pipe_wrench" )
                 entity:attach( "runtime_fix_challenges" )
             end
