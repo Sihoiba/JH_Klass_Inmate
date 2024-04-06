@@ -773,13 +773,13 @@ register_blueprint "decoy" {
         health = 25,
     },
     callbacks = {
-        on_pre_command = [[
+        on_pre_command = [=[
             function ( self, actor, cmt )
                 if cmt == COMMAND_WAIT then return 0 end
                 world:command( COMMAND_WAIT, actor )
                 return -1
             end
-        ]],
+        ]=],
         on_die = [=[
             function( self, killer, current, weapon )
                 if self.data.level == 3 then

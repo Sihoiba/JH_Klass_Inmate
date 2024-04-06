@@ -13,6 +13,8 @@ The inmates PASSIVE skill Always Angry, restores half his rage whenever he enter
 
 In addition to the new Klass, this mod adds AV versions of the Crowbar, Axe and Large Axe.
 
+Adds a functionally identical alternate version of Angel Of New York Reloaded, as the standard version will crash if you use the decoy skill of Fraudster with that challenge specifically.
+
 ## Inmate Traits
 
 ### Basic Traits
