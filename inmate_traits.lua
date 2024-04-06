@@ -203,7 +203,7 @@ register_blueprint "ktrait_desperado"
                     bonus = 0.75
                 end
 
-                if target and weapon and weapon.attributes and weapon.weapon and weapon.weapon.type ~= world:hash("melee") and ( not weapon.stack ) then
+                if target and weapon and weapon.attributes and weapon.weapon and weapon.weapon.type ~= world:hash("melee") and not weapon.stack and not weapon.weapon.natural then
                     local shots = weapon.attributes["shots"] or 0
                     for c in weapon:children() do
                         if c.attributes and c.attributes.shots then
@@ -820,7 +820,7 @@ register_blueprint "ktrait_sucker_punch"
     text = {
         name   = "Sucker punch",
         desc   = "They never see the first blow coming",
-        full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non bladed melee weapons (crowbars, pipewrenchs, axes, and chainsaws) you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non bladed one.\n\n{!LEVEL 1} - {!90%} attack time with non bladed melee weapons\n{!LEVEL 2} - {!80%} attack time with non bladed melee weapons, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time with non bladed melee weapons, melee weapon lootboxes contain large axes",
+        full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non bladed melee weapons (crowbars, pipe wrenchs, axes, and chainsaws) you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non bladed one.\n\n{!LEVEL 1} - {!90%} attack time with non bladed melee weapons\n{!LEVEL 2} - {!80%} attack time with non bladed melee weapons, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time with non bladed melee weapons, melee weapon lootboxes contain large axes",
         abbr   = "SPu",
     },
     attributes = {
