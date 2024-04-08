@@ -710,9 +710,9 @@ register_blueprint "decoy_light" {
 register_blueprint "decoy_self_destruct_slash"
 {
     attributes = {
-        damage    = 20,
-        explosion = 2,
-        gib_factor= 2,
+        damage     = 50,
+        explosion  = 2,
+        gib_factor = 2,
     },
     weapon = {
         group = "env",
@@ -728,7 +728,7 @@ register_blueprint "decoy_self_destruct_slash"
 register_blueprint "decoy_self_destruct_emp"
 {
     attributes = {
-        damage     = 20,
+        damage     = 25,
         explosion  = 3,
         gib_factor = 0,
         slevel     = { emp = 5, },
@@ -770,7 +770,7 @@ register_blueprint "decoy" {
     },
     target = {},
     attributes = {
-        health = 25,
+        health = 40,
     },
     callbacks = {
         on_pre_command = [=[
@@ -839,8 +839,8 @@ register_blueprint "kskill_fraudster_create_decoy"
                     local friendly = world:create_entity( "friendly" )
                     world:raw_equip( summon, friendly )
                     if tlevel > 1 then
-                        summon.attributes.health = 50
-                        summon.health.current = 50
+                        summon.attributes.health = 80
+                        summon.health.current = 80
                     end
                     summon.data.level = tlevel
                     world:remove_from_max_kills( summon )
@@ -861,7 +861,7 @@ register_blueprint "ktrait_master_fraudster"
     text = {
         name   = "FRAUDSTER",
         desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire, gain crit bonus against enemies near decoys",
-        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!25}, {!50%} crit chance on enemies near decoys, reduced scent detection range, Berserk resets cooldown, and reduces it to {!2}\n{!LEVEL 2} - cooldown {!10}, decoy health {!50}, {!100%} crit chance and {!50}% crit damage on enemies near decoys.\n{!LEVEL 3} cooldown {!5}, decoy explodes on death, {!100%} crit damage on enemies near decoys.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!40}, {!50%} crit chance on enemies near decoys, reduced scent detection range, Berserk resets cooldown, and reduces it to {!2}\n{!LEVEL 2} - cooldown {!10}, decoy health {!80}, {!100%} crit chance and {!50}% crit damage on enemies near decoys.\n{!LEVEL 3} cooldown {!5}, decoy explodes on death, {!100%} crit damage on enemies near decoys.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MFr",
     },
     attributes = {
