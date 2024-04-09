@@ -1,3 +1,23 @@
+function buff_ranged_melee(self, weapon)
+    for c in weapon:children() do
+        if c.weapon and c.weapon.type == world:hash("melee") and c.flags.data[ EF_NOPICKUP ] then
+            nova.log("weapon melee damage increased "..tostring(weapon.text.name))
+            c.attributes.damage_add = 10
+            break
+        end
+    end
+end
+
+function undo_buff_ranged_melee(self, weapon)
+    for c in weapon:children() do
+        if c.weapon and c.weapon.type == world:hash("melee") and c.flags.data[ EF_NOPICKUP ] then
+            nova.log("weapon melee damage reset "..tostring(weapon.text.name))
+            c.attributes.damage_add = 0
+            break
+        end
+    end
+end
+
 register_blueprint "resource_rage"
 {
     flags = { EF_NOPICKUP },
@@ -176,6 +196,20 @@ register_blueprint "buff_inmate_berserk_base"
                         sf.skill.cooldown = 2000
                     end
                 end
+
+                local wep0 = parent:get_slot( "1" )
+                local wep1 = parent:get_slot( "2" )
+                local wep2 = parent:get_slot( "3" )
+
+                if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
+                    undo_buff_ranged_melee(self, wep0)
+                end
+                if wep1 and wep1.weapon and wep1.weapon.type ~= world:hash("melee") then
+                    undo_buff_ranged_melee(self, wep1)
+                end
+                if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
+                    undo_buff_ranged_melee(self, wep2)
+                end
             end
         ]],
         on_enter_level = [[
@@ -296,7 +330,7 @@ register_blueprint "ktrait_berserk"
     text = {
         name   = "Berserk",
         desc   = "ACTIVE SKILL - spend your rage to go Berserk!",
-        full   = "You're a barely controlled simmering ball of anger. It doesn't take much to send you into a berserker rage that earned you a reputation as someone not to mess with. When berserk you do increased melee damage, have damage and status resistance, but your too mad to waste time using gun when you could hurt people with your hands. Activating berserk will automatically swap to the first carried melee weapon if present",
+        full   = "You're a barely controlled simmering ball of anger. It doesn't take much to send you into a berserker rage that earned you a reputation as someone not to mess with. When berserk you do increased melee damage, have damage and status resistance, but your too mad to waste time using gun when you could hurt people with your hands. Activating berserk will automatically swap to the first carried melee weapon if present and increase ranged weapon melee by {!10}.",
         abbr   = "Ber",
     },
     callbacks = {
@@ -341,6 +375,16 @@ register_blueprint "ktrait_berserk"
                 elseif wep2 and wep2.weapon and wep2.weapon.type == world:hash("melee") then
                     melee = wep2
                     index = 2
+                end
+
+                if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
+                    buff_ranged_melee(self, wep0)
+                end
+                if wep1 and wep1.weapon and wep1.weapon.type ~= world:hash("melee") then
+                    buff_ranged_melee(self, wep1)
+                end
+                if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
+                    buff_ranged_melee(self, wep2)
                 end
 
                 if melee then
@@ -391,15 +435,27 @@ register_blueprint "ktrait_berserk"
                 local wep1 = entity:get_slot( "2" )
                 local wep2 = entity:get_slot( "3" )
 
-                if wep0 and wep0.weapon and wep0.weapon.type == world:hash("melee") then
-                    melee = wep0
-                    index = 0
-                elseif wep1 and wep1.weapon and wep1.weapon.type == world:hash("melee") then
-                    melee = wep1
-                    index = 1
-                elseif wep2 and wep2.weapon and wep2.weapon.type == world:hash("melee") then
-                    melee = wep2
-                    index = 2
+                if wep0 and wep0.weapon then
+                    if wep0.weapon.type == world:hash("melee") then
+                        melee = wep0
+                        index = 0
+                    else
+                        buff_ranged_melee(self, wep0)
+                    end
+                elseif wep1 and wep1.weapon then
+                    if wep1.weapon.type == world:hash("melee") then
+                        melee = wep1
+                        index = 1
+                    else
+                        buff_ranged_melee(self, wep1)
+                    end
+                elseif wep2 and wep2.weapon then
+                    if wep2.weapon.type == world:hash("melee") then
+                        melee = wep2
+                        index = 2
+                    else
+                        buff_ranged_melee(self, wep2)
+                    end
                 end
 
                 if melee then
