@@ -25,7 +25,7 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
  - Brute: Grants innate armour, higher levels also give splash damage resistance
  - Mule: Increased inventory space and reveal elevator locations, higher levels give more inventory and reveal lootbox locations
  - Smuggler: Hit special environment objects like crates, plants and chairs to get ammo for your carried weapons.
- - Desperado: 25/50/75% flat damage bonus multiplied by the proportion of the ammo clip a shot costs. Better on single shot weapons. E.g. a single shot 60 damage rocket launcher gets 15/30/45 damage increase, a 6 shot 24 damage revolver, would get 1/2/3 damage increase 
+ - Hitman; requires Desperado = 1: Reduces enemy cover affect, and increases damage against enemies at 100% or higher health. Level 1 cover 20% effective, damage bonus 10% at 100% health rising to 50% at 200% health; Level 2 cover 40% effective, damage bonus rises to 75% at 200% health, Level 3 ignores 60% enemy cover, damage bonus rises from 20% damage at 100% health to 100% at 200% health.
  - Gambler: Random chance on using a station/ammo terminal to refund the charges. Higher levels increase the chance, and provide a chance to receive bonus multitools.
  - Cutter: convert small medkits into combat packs and stimpacks, or break large medkits down into 3 small ones.
 
@@ -35,7 +35,7 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
  - Burglar; requires Smuggler 1: Open doors from a distance. Higher levels let you close doors from a distance and unlock locked doors and elevators for free.
  - Dealer; requires Cutter 1: Increased the duration of the Juiced, Stimmed and Enviro buffs from Combat Packs, Stimpacks and Enviropacks.
  - Kneecap; requires Dash 1: PISTOL/SMG/SEMI/AUTO: Debuffs enemies on hit. Level 1 slowed, level 2 accuracy malus, level 3 damage malus
- - Hitman; requires Desperado = 1: Reduces enemy cover affect, and increases damage against enemies at 100% or higher health. Level 1 cover 20% effective, damage bonus 10% at 100% health rising to 50% at 200% health; Level 2 cover 40% effective, damage bonus rises to 100% at 200% health, Level 3 ignore 80% enemy cover, damage bonus rises from 50% health capping at 100% damage at 150+% health.
+ - Desperado; requires Hitman = 1: 20/40/60% flat damage bonus multiplied by the proportion of the ammo clip a shot costs. Better on single shot weapons. E.g. a single shot 60 damage rocket launcher gets 12/24/36 damage increase, a 6 shot 24 damage revolver, would get 1/2/3 damage increase 
  - Whizkid; requires Gambler 1: As standard
 
 ### Master Traits
@@ -43,7 +43,7 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
  - Chemist; requires Cutter 1 and Grenadier = 1: Acid immunity, acid pools created on hit and on area attacks including grenades.
  - GBH; requires Kneecap 1: Bleed immunity, attacks cause bleed, higher level increase bleed inflicted.
  - Fraudster; requires Burglar 1: Create decoys that distract enemies on cooldown, distracted enemies take more crits, cooldown is reduced on higher levels. Lvl 2 also increases Decoy health, lvl 3 makes Decoys explode on death
- - Ghost Gun; requires Desperado 1 and Smuggler 1: PISTOL/SMG: Active skill that when enabled causes you to fire your entire weapon clip. Higher levels automatically reload on empty, and reduce reload ammo cost.
+ - Ghost Gun; requires Smuggler 2: PISTOL/SMG: Active skill that when enabled causes you to fire your entire weapon clip. Higher levels automatically reload on empty, and reduce reload ammo cost.
 
 ## Installing
 

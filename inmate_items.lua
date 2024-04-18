@@ -104,7 +104,7 @@ register_blueprint "perk_he_berserk_boost"
     blueprint = "perk",
     text = {
         name = "Berserk Boost",
-        desc = "using Booost clears all negative effects",
+        desc = "using Berserk clears all negative effects",
     },
     attributes = {
         level = 3,

@@ -321,6 +321,16 @@ register_blueprint "buff_inmate_berserk_speed_boost"
     flags = { EF_NOPICKUP },
     attributes = {
         speed = 1.1
+    },
+    callbacks = {
+        on_attach = [=[
+            function( self, parent )
+                nova.log("Speed boost level "..tostring(parent:attribute( "berserk_action_bonus" )))
+                if parent:attribute( "berserk_action_bonus" ) > 1 then
+                    self.attributes.speed = 1.2
+                end
+            end
+        ]=],
     }
 }
 
@@ -562,7 +572,7 @@ register_blueprint "klass_inmate"
             { "ktrait_brute", max = 3, },
             { "ktrait_mule", max = 3, },
             { "ktrait_smuggler", max = 3, },
-            { "ktrait_desperado", max = 3, },
+            { "ktrait_hitman", max = 3, },
             { "ktrait_gambler", max = 3, },
             { "ktrait_cutter", max = 3, },
 
@@ -571,14 +581,14 @@ register_blueprint "klass_inmate"
             { "ktrait_burglar", max = 3, require = { ktrait_smuggler = 1, } },
             { "ktrait_dealer", max = 3, require = { ktrait_cutter = 1, } },
             { "ktrait_kneecap", max = 3, require = { ktrait_dash = 1, } },
-            { "ktrait_hitman", max = 3, require = { ktrait_desperado = 1, } },
+            { "ktrait_desperado", max = 3, require = { ktrait_hitman = 1, } },
             { "trait_whizkid", max = 3, require = { ktrait_gambler = 1, } },
 
             { "ktrait_master_berserker", max = 3, master = true, require = { ktrait_skilled_inmate = 2, level = 6, level_inc = 4, } },
             { "ktrait_master_chemist", max = 3, master = true, require = { ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4, } },
             { "ktrait_master_gbh", max = 3, master = true, require = { ktrait_kneecap = 1, level = 6, level_inc = 4, } },
             { "ktrait_master_fraudster", max = 3, master = true, require = {  ktrait_burglar = 1, level = 6, level_inc = 4, } },
-            { "ktrait_master_ghost_gun", max = 3, master = true, require = { ktrait_desperado = 1, ktrait_smuggler = 1, level = 6, level_inc = 4, } },
+            { "ktrait_master_ghost_gun", max = 3, master = true, require = { ktrait_smuggler = 2, level = 6, level_inc = 4, } },
         },
     },
 }
@@ -590,5 +600,6 @@ register_blueprint "player_inmate"
         name = "you",
         namep = "you",
         killed_by = "suicide",
+
     },
 }

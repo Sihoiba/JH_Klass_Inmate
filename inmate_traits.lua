@@ -173,59 +173,76 @@ register_blueprint "ktrait_smuggler"
     },
 }
 
-register_blueprint "ktrait_desperado"
+register_blueprint "ktrait_hitman"
 {
     blueprint = "trait",
     text = {
-        name = "Desperado",
-        desc = "Damage bonus based on weapon shot cost versus clip size, proportional bonus based on the amount of clip fired. No affect on melee.",
-        full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots in the clip, the fewer the better. Guns that fire their entire clip per shot get the full damage bonus, guns that don't get proportionally less.\n\n{!LEVEL 1} - {!+25%} times clip/shot cost\n{!LEVEL 2} - {!+50%} times clip/shot cost\n{!LEVEL 3} - {!+75%} times clip/shot cost",
-        abbr = "Des",
+        name   = "Hitman",
+        desc   = "Improved accuracy against enemies in cover. Increased damage versus enemies at or above max health.",
+        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down an elevator shaft. Each level of this trait improves your ability to hurt things. Damage bonus applies to enemies at full health and increases based on enemy overhealth up to cap at full overhealth.\n\n{!LEVEL 1} - enemy cover is {!80%} effective. Full health damage bonus {!10%}, damage cap {!50%}.\n{!LEVEL 2} - enemy cover is {!60%} effective. Full health damage bonus {!10%}, damage cap {!75%}\n{!LEVEL 3} - enemy cover is {!40%} effective. Full health damage bonus {!20%}, damage cap {!100%}",
+        abbr   = "Hit",
+    },
+    ui_buff = {
+        color     = LIGHTCYAN,
+        attribute = "damage_add",
+        priority  = 140,
+        style     = 1,
     },
     attributes = {
         level   = 1,
+        cover_mult   = 1.0,
         damage_add = 0,
     },
     callbacks = {
         on_activate = [=[
-            function(self, entity)
-                gtk.upgrade_trait( entity, "ktrait_desperado" )
+            function(self,entity)
+                local hit, t = gtk.upgrade_trait( entity, "ktrait_hitman" )
+                local attr  = t.attributes
+                if hit == 1 then
+                    attr.cover_mult   = 0.8
+                elseif hit == 2 then
+                    attr.cover_mult   = 0.6
+                else
+                    attr.cover_mult   = 0.4
+                end
             end
         ]=],
         on_aim = [=[
             function ( self, entity, target, weapon )
-                local tlevel = self.attributes.level or 0
-                local bonus = 0.25
-
-                if tlevel == 2 then
-                    bonus = 0.5
-                elseif tlevel == 3 then
-                    bonus = 0.75
-                end
-
-                if target and weapon and weapon.attributes and weapon.weapon and weapon.weapon.type ~= world:hash("melee") and not weapon.stack and not weapon.weapon.natural then
-                    local shots = weapon.attributes["shots"] or 0
-                    for c in weapon:children() do
-                        if c.attributes and c.attributes.shots then
-                            shots = shots + c.attributes.shots
+                if target then
+                    local tlevel = self.attributes.level or 0
+                    local enemy = world:get_level():get_being( target )
+                    if enemy then
+                        local health  = enemy.attributes.health
+                        local current = enemy.health.current
+                        local bonus_base = 0.1
+                        local bonus_cap = 0.4
+                        if tlevel == 2 then
+                            bonus_cap = 0.65
+                        elseif tlevel == 3 then
+                            bonus_base = 0.2
+                            bonus_cap = 0.8
+                        end
+                        if current > health then
+                            local bonus = ((current - health)/health) * bonus_cap
+                            if bonus > bonus_cap then
+                                bonus = bonus_cap
+                            end
+                            bonus = bonus + bonus_base
+                            self.attributes.damage_add = math.ceil(weapon.attributes.damage *  bonus)
+                        elseif current == health then
+                            self.attributes.damage_add = math.ceil(weapon.attributes.damage *  bonus_base)
+                        else
+                            self.attributes.damage_add = 0
                         end
                     end
-                    local clip_size = weapon.attributes.clip_size or shots
-                    local gg = entity:child("buff_ghost_gun")
-                    if gg then
-                        local e_shots = gg.attributes.shots or 0
-                        shots = shots + e_shots
-                    end
-                    local shot_cost = weapon.weapon.shot_cost or 1
-                    local cost_per_shot = shot_cost * shots
-                    local shot_clip_percent = cost_per_shot / clip_size
-
-                    local damage_bonus = math.ceil(weapon.attributes.damage * shot_clip_percent * bonus)
-
-                    self.attributes.damage_add = damage_bonus
-                else
-                    self.attributes.damage_add = 0
                 end
+
+            end
+        ]=],
+        on_post_command = [=[
+            function ( self, actor, cmt, tgt, time )
+                self.attributes.damage_add = 0
             end
         ]=],
     },
@@ -916,70 +933,61 @@ register_blueprint "ktrait_dealer"
     },
 }
 
-register_blueprint "ktrait_hitman"
+
+
+register_blueprint "ktrait_desperado"
 {
     blueprint = "trait",
     text = {
-        name   = "Hitman",
-        desc   = "Improved accuracy against enemies in cover. Increased damage versus enemies at or above max health.",
-        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down the elevator shaft. Each level of this trait improves your ability to hurt things.\n\n{!LEVEL 1} - enemy cover is {!80%} effective. {!10%} bonus damage if enemy is at {!100%} health rising to {!50%} if enemy at {!200%} health\n{!LEVEL 2} - enemy cover is {!60%} effective. Bonus damage rises to {!100%} if enemy at {!200%} health\n{!LEVEL 3} - enemy cover is {!20%} effective. {!10%} bonus damage if enemy is at {!50%} health rising to {!100%} if enemy at {!150+%} health",
-        abbr   = "Hit",
+        name = "Desperado",
+        desc = "Damage bonus based on weapon shot cost versus clip size, proportional bonus based on the amount of clip fired. No affect on melee.",
+        full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots in the clip, the fewer the better. Guns that fire their entire clip per shot get the full damage bonus, guns that don't get proportionally less.\n\n{!LEVEL 1} - {!+20%} times clip/shot cost\n{!LEVEL 2} - {!+40%} times clip/shot cost\n{!LEVEL 3} - {!+60%} times clip/shot cost",
+        abbr = "Des",
     },
     attributes = {
         level   = 1,
-        cover_mult   = 1.0,
-        damage_mult = 1.0,
+        damage_add = 0,
     },
     callbacks = {
         on_activate = [=[
-            function(self,entity)
-                local hit, t = gtk.upgrade_trait( entity, "ktrait_hitman" )
-                local attr  = t.attributes
-                if hit == 1 then
-                    attr.cover_mult   = 0.8
-                elseif hit == 2 then
-                    attr.cover_mult   = 0.6
-                else
-                    attr.cover_mult   = 0.2
-                end
+            function(self, entity)
+                gtk.upgrade_trait( entity, "ktrait_desperado" )
             end
         ]=],
         on_aim = [=[
             function ( self, entity, target, weapon )
-                if target then
-                    local tlevel = self.attributes.level or 0
-                    local enemy = world:get_level():get_being( target )
-                    if enemy then
-                        local health  = enemy.attributes.health
-                        local current = enemy.health.current
-                        local bonus_cap = 0.4
-                        local health_threshold = enemy.attributes.health
-                        if tlevel > 1 then
-                            bonus_cap = 0.9
-                        end
-                        if tlevel > 2 then
-                            health_threshold = health_threshold/2
-                        end
-                        if current > health_threshold then
-                            local bonus = ((current - health_threshold)/health) * bonus_cap
-                            if bonus > bonus_cap then
-                                bonus = bonus_cap
-                            end
-                            bonus = bonus + 0.1
-                            self.attributes.damage_mult = 1.0 + bonus
-                        elseif current == health_threshold then
-                            self.attributes.damage_mult = 1.1
-                        else
-                            self.attributes.damage_mult = 1.0
-                        end
-                    end
+                local tlevel = self.attributes.level or 0
+                local bonus = 0.2
+
+                if tlevel == 2 then
+                    bonus = 0.4
+                elseif tlevel == 3 then
+                    bonus = 0.6
                 end
 
-            end
-        ]=],
-        on_post_command = [=[
-            function ( self, actor, cmt, tgt, time )
-                self.attributes.damage_mult = 1.0
+                if target and weapon and weapon.attributes and weapon.weapon and weapon.weapon.type ~= world:hash("melee") and not weapon.stack and not weapon.weapon.natural then
+                    local shots = weapon.attributes["shots"] or 0
+                    for c in weapon:children() do
+                        if c.attributes and c.attributes.shots then
+                            shots = shots + c.attributes.shots
+                        end
+                    end
+                    local clip_size = weapon.attributes.clip_size or shots
+                    local gg = entity:child("buff_ghost_gun")
+                    if gg then
+                        local e_shots = gg.attributes.shots or 0
+                        shots = shots + e_shots
+                    end
+                    local shot_cost = weapon.weapon.shot_cost or 1
+                    local cost_per_shot = shot_cost * shots
+                    local shot_clip_percent = cost_per_shot / clip_size
+
+                    local damage_bonus = math.ceil(weapon.attributes.damage * shot_clip_percent * bonus)
+
+                    self.attributes.damage_add = damage_bonus
+                else
+                    self.attributes.damage_add = 0
+                end
             end
         ]=],
     },

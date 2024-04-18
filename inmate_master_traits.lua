@@ -365,7 +365,7 @@ register_blueprint "ktrait_master_gbh"
     text = {
         name   = "GBH",
         desc   = "MASTER TRAIT - bleed immunity and afflict bleed on attacks.",
-        full   = "Grevious bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit (stacks with bleed perks on weapon/relics), range {!2} bleed aura when berserk\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - bleed effects are {!100%} stronger.\n\nYou can pick only one MASTER trait per character.",
+        full   = "Grevious bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit (stacks with bleed perks on weapon/relics), range {!2} bleed aura when berserk\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - attacks apply bleed on enemies near the target on hit.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGB",
     },
     attributes = {
@@ -381,10 +381,8 @@ register_blueprint "ktrait_master_gbh"
         on_activate = [=[
             function(self, entity)
                 local tlevel, t = gtk.upgrade_master( entity, "ktrait_master_gbh" )
-                if tlevel == 2 then
+                if tlevel >= 2 then
                     t.attributes["bleed.affinity"] = 50
-                elseif tlevel == 3 then
-                    t.attributes["bleed.affinity"] = 100
                 end
             end
         ]=],
@@ -393,6 +391,15 @@ register_blueprint "ktrait_master_gbh"
                 if who and who.data and who.data.can_bleed then
                     local slevel = core.get_status_value( 4, "bleed", source )
                     core.apply_damage_status( who, "bleed", "bleed", slevel, source )
+
+                    if self.attributes.level == 3 then
+                        local l = world:get_level()
+                        for e in l:enemies() do
+                            if e.data and e.data.can_bleed and l:cdistance( world:get_position(e), world:get_position(who) ) < 3 then
+                                core.apply_damage_status( e, "bleed", "bleed", slevel/2, entity )
+                            end
+                        end
+                    end
                 end
             end
         ]=],
