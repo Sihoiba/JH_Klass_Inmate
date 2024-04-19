@@ -65,14 +65,12 @@ register_blueprint "smuggler_cache"
                 for _,slot_id in ipairs( slots ) do
                     local slot = world:get_player():get_slot( slot_id )
                     if slot and slot.weapon and slot.weapon.type ~= world:hash("melee") and slot.clip and slot.clip.ammo and slot.clip.ammo ~= 0 and ammos[slot.clip.ammo] then
-                        local e = world:create_entity( ammos[slot.clip.ammo].id )
-                        entity:attach(e)
+                        entity:attach(ammos[slot.clip.ammo].id)
                         if tlevel == 3 and self.data.cache_missing > 0 then
                             local missing = self.data.cache_missing
                             while missing > 0 do
                                 missing = missing - 1
-                                local e = world:create_entity( ammos[slot.clip.ammo].id )
-                                entity:attach(e)
+                                entity:attach(ammos[slot.clip.ammo].id)
                             end
                         end
                     end
@@ -85,8 +83,7 @@ register_blueprint "smuggler_cache"
                     else
                         id = core.lists.item.special.armor:roll( level.level_info.ilevel, world.data.level[ world.data.current ] )
                     end
-                    local e = world:create_entity( id )
-                    entity:attach(e)
+                    entity:attach(id)
                 end
                 level:drop_all( entity, true )
                 world:mark_destroy( self )
