@@ -393,10 +393,16 @@ register_blueprint "ktrait_master_gbh"
                     core.apply_damage_status( who, "bleed", "bleed", slevel, source )
 
                     if self.attributes.level == 3 then
-                        local l = world:get_level()
-                        for e in l:enemies() do
-                            if e.data and e.data.can_bleed and l:cdistance( world:get_position(e), world:get_position(who) ) < 3 then
-                                core.apply_damage_status( e, "bleed", "bleed", slevel/2, entity )
+                        local level = world:get_level()
+                        local position = world:get_position( who )
+                        local ar       = area.around( position, 3 )
+                        ar:clamp( level:get_area() )
+
+                        for c in ar:coords() do
+                            for e in level:entities( c ) do
+                                if e.data and e.data.can_bleed then
+                                    core.apply_damage_status( e, "bleed", "bleed", slevel/2, source )
+                                end
                             end
                         end
                     end
@@ -419,8 +425,10 @@ register_blueprint "ktrait_master_gbh"
 
                     for c in ar:coords() do
                         for e in level:entities( c ) do
-                            local slevel = core.get_status_value( 5, "bleed", parent )
-                            core.apply_damage_status( e, "bleed", "bleed", slevel, parent )
+                            if e.data and e.data.can_bleed then
+                                local slevel = core.get_status_value( 5, "bleed", parent )
+                                core.apply_damage_status( e, "bleed", "bleed", slevel, parent )
+                            end
                         end
                     end
                 end
