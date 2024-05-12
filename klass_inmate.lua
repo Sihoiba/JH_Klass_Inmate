@@ -354,14 +354,16 @@ register_blueprint "ktrait_berserk"
                 local buff
                 local duration_bonus = (entity:attribute( "berserk_duration_bonus") or 0)
                 local duration = 1000 + duration_bonus
-                if entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 1 then
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", duration )
-                elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 2 then
-                    duration = duration + 1000
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", duration )
-                elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 3 then
-                    duration = duration + 1000
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", duration )
+                if entity.attributes and entity.attributes.skilled_bonus then
+                    if entity.attributes.skilled_bonus == 1 then
+                       buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", duration )
+                    elseif entity.attributes.skilled_bonus == 2 then
+                        duration = duration + 1000
+                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", duration )
+                    elseif entity.attributes.skilled_bonus == 3 then
+                        duration = duration + 1000
+                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", duration )
+                    end
                 else
                     buff = world:add_buff( entity, "buff_inmate_berserk_base", duration )
                 end
@@ -423,14 +425,16 @@ register_blueprint "ktrait_berserk"
                 local buff
                 local duration_bonus = (entity:attribute( "berserk_duration_bonus") or 0)
                 local duration = 1000 + duration_bonus
-                if entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 1 then
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", duration )
-                elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 2 then
-                    duration = duration + 1000
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", duration )
-                elseif entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus == 3 then
-                    duration = duration + 1000
-                    buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", duration )
+                if entity.attributes and entity.attributes.skilled_bonus then
+                    if entity.attributes.skilled_bonus == 1 then
+                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", duration )
+                    elseif entity.attributes.skilled_bonus == 2 then
+                        duration = duration + 1000
+                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", duration )
+                    elseif entity.attributes.skilled_bonus == 3 then
+                        duration = duration + 1000
+                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", duration )
+                    end
                 else
                     buff = world:add_buff( entity, "buff_inmate_berserk_base", duration )
                 end
@@ -445,31 +449,56 @@ register_blueprint "ktrait_berserk"
                 local wep1 = entity:get_slot( "2" )
                 local wep2 = entity:get_slot( "3" )
 
-                if wep0 and wep0.weapon then
-                    if wep0.weapon.type == world:hash("melee") then
-                        melee = wep0
-                        index = 0
-                    else
-                        buff_ranged_melee(self, wep0)
-                    end
-                elseif wep1 and wep1.weapon then
-                    if wep1.weapon.type == world:hash("melee") then
-                        melee = wep1
-                        index = 1
-                    else
-                        buff_ranged_melee(self, wep1)
-                    end
-                elseif wep2 and wep2.weapon then
-                    if wep2.weapon.type == world:hash("melee") then
-                        melee = wep2
-                        index = 2
-                    else
-                        buff_ranged_melee(self, wep2)
-                    end
+                if wep0 and wep0.weapon and wep0.weapon.type == world:hash("melee") then
+                    melee = wep0
+                    index = 0
+                elseif wep1 and wep1.weapon and wep1.weapon.type == world:hash("melee") then
+                    melee = wep1
+                    index = 1
+                elseif wep2 and wep2.weapon and wep2.weapon.type == world:hash("melee") then
+                    melee = wep2
+                    index = 2
+                end
+
+                if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
+                    buff_ranged_melee(self, wep0)
+                end
+                if wep1 and wep1.weapon and wep1.weapon.type ~= world:hash("melee") then
+                    buff_ranged_melee(self, wep1)
+                end
+                if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
+                    buff_ranged_melee(self, wep2)
                 end
 
                 if melee then
                     world:get_level():swap_weapon( entity, index )
+                end
+            end
+        ]=],
+        on_reset_berserk = [=[
+            function ( self, entity )
+                local buff
+                local duration_bonus = (entity:attribute( "berserk_duration_bonus") or 0)
+                local duration = 1000 + duration_bonus
+                local current_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
+
+                if not (current_berserk and current_berserk.lifetime and current_berserk.lifetime.time_left) then return end
+                if entity.attributes and entity.attributes.skilled_bonus then
+                    if entity.attributes.skilled_bonus == 1 then
+                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", duration - current_berserk.lifetime.time_left )
+                    elseif entity.attributes.skilled_bonus == 2 then
+                        duration = duration + 1000
+                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", duration - current_berserk.lifetime.time_left )
+                    elseif entity.attributes.skilled_bonus == 3 then
+                        duration = duration + 1000
+                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", duration - current_berserk.lifetime.time_left )
+                    end
+                else
+                    buff = world:add_buff( entity, "buff_inmate_berserk_base", duration - current_berserk.lifetime.time_left )
+                end
+                if entity:attribute( "berserk_action_bonus" ) and entity:child("buff_inmate_berserk_speed_boost") then
+                    local current_berserk_speed = entity:child("buff_inmate_berserk_speed_boost")
+                    world:add_buff( entity, "buff_inmate_berserk_speed_boost", duration - current_berserk_speed.lifetime.time_left )
                 end
             end
         ]=],

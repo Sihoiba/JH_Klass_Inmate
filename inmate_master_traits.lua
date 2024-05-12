@@ -8,12 +8,12 @@ register_blueprint "ktrait_master_berserker"
     text = {
         name   = "BERSERK",
         desc   = "MASTER TRAIT - you enter berserk on damage and on gibbing with melee weapons.",
-        full   = "You're a barely controlled ball of rage, and will go berserk on the slightest provocation.\n\n{!LEVEL 1} - If not Berserk, become berserk if you lose {!15%} of your health in a single hit or {!25%} chance to go berserk on gibbing with a melee kill\n{!LEVEL 2} - The Berserker can now use grenades while berserk, {!33%} chance to go berserk when gibbing\n{!LEVEL 3} - Taking damage or gibbing will now add to Berserk time if already berserk.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You're a barely controlled ball of rage, and will go berserk on the slightest provocation.\n\n{!LEVEL 1} - If not Berserk, become berserk if you lose {!15%} of your health in a single hit or {!25%} chance to go berserk on gibbing with a melee kill\n{!LEVEL 2} - The Berserker can now use grenades while berserk, {!33%} chance to go berserk when gibbing\n{!LEVEL 3} - Gibbing while Berserk now resets the Berserk duration to max.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MBK",
         abbr   = "MBK",
 
         berserk_proc = "WHO'S A MAN AND A HALF? YOUR A MAN AND A HALF!",
-        berserk_extend = "DYNAMITE!"
+        berserk_reset = "DYNAMITE!"
     },
     attributes = {
         level = 1,
@@ -40,15 +40,9 @@ register_blueprint "ktrait_master_berserker"
                 local fifteen_percent_max = math.floor( ( max_health / 100 ) * 15 )
                 local is_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
 
-                if amount >= fifteen_percent_max then
-                    if (tlevel < 3 and not is_berserk) or tlevel > 2 then
-                        if not is_berserk then
-                            ui:set_hint( "{R"..self.text.berserk_proc.."}", 2001, 0 )
-                        else
-                            ui:set_hint( "{R"..self.text.berserk_extend.."}", 2001, 0 )
-                        end
-                        world:lua_callback( entity, "on_trigger_berserk" )
-                    end
+                if amount >= fifteen_percent_max and not is_berserk then
+                    ui:set_hint( "{R"..self.text.berserk_proc.."}", 2001, 0 )
+                    world:lua_callback( entity, "on_trigger_berserk" )
                 end
             end
         ]=],
@@ -59,13 +53,12 @@ register_blueprint "ktrait_master_berserker"
                 local gib_berserk = math.random(self.attributes.gib_berserk_chance)
                 local is_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
 
-                if target.data and target.data.ai and gibbed and gib_berserk == 1 and weapon and weapon.weapon and weapon.weapon.type == world:hash("melee") then
-                    if (tlevel < 3 and not is_berserk) or tlevel > 2 then
-                        if not is_berserk then
-                            ui:set_hint( "{R"..self.text.berserk_proc.."}", 2001, 0 )
-                        else
-                            ui:set_hint( "{R"..self.text.berserk_extend.."}", 2001, 0 )
-                        end
+                if target.data and target.data.ai and gibbed and weapon and weapon.weapon and weapon.weapon.type == world:hash("melee") then
+                    if is_berserk and tlevel == 3 then
+                        ui:set_hint( "{R"..self.text.berserk_reset.."}", 2001, 0 )
+                        world:lua_callback( entity, "on_reset_berserk" )
+                    elseif gib_berserk == 1 then
+                        ui:set_hint( "{R"..self.text.berserk_proc.."}", 2001, 0 )
                         world:lua_callback( entity, "on_trigger_berserk" )
                     end
                 end
@@ -722,28 +715,10 @@ register_blueprint "decoy_light" {
     }
 }
 
-register_blueprint "decoy_self_destruct_slash"
-{
-    attributes = {
-        damage     = 50,
-        explosion  = 2,
-        gib_factor = 2,
-    },
-    weapon = {
-        group = "env",
-        damage_type = "slash",
-        natural = true,
-        fire_sound = "explosion",
-    },
-    noise = {
-        use = 15,
-    },
-}
-
 register_blueprint "decoy_self_destruct_emp"
 {
     attributes = {
-        damage     = 25,
+        damage     = 50,
         explosion  = 3,
         gib_factor = 0,
         slevel     = { emp = 5, },
@@ -752,6 +727,10 @@ register_blueprint "decoy_self_destruct_emp"
         group = "env",
         damage_type = "emp",
         natural = true,
+        fire_sound = "explosion",
+    },
+    noise = {
+        use = 15,
     },
     callbacks = {
         on_create = [=[
@@ -798,11 +777,8 @@ register_blueprint "decoy" {
         on_die = [=[
             function( self, killer, current, weapon )
                 if self.data.level == 3 then
-                    local w_slash = world:create_entity( "decoy_self_destruct_slash" )
                     local w_emp = world:create_entity( "decoy_self_destruct_emp" )
-                    world:attach( self, w_slash )
                     world:attach( self, w_emp )
-                    world:get_level():fire( self, world:get_position( self ), w_slash, 200 )
                     world:get_level():fire( self, world:get_position( self ), w_emp, 200 )
                 end
             end
@@ -876,7 +852,7 @@ register_blueprint "ktrait_master_fraudster"
     text = {
         name   = "FRAUDSTER",
         desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire, gain crit bonus against enemies near decoys",
-        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!40}, {!50%} crit chance on enemies near decoys, reduced scent detection range, Berserk resets cooldown, and reduces it to {!2}\n{!LEVEL 2} - cooldown {!10}, decoy health {!80}, {!100%} crit chance and {!50}% crit damage on enemies near decoys.\n{!LEVEL 3} cooldown {!5}, decoy explodes on death, {!100%} crit damage on enemies near decoys.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!40}, {!50%} crit chance on enemies near decoys, reduced scent detection range, Berserk resets cooldown, and reduces it to {!2}\n{!LEVEL 2} - cooldown {!10}, decoy health {!80}, {!100%} crit chance and {!50}% crit damage on enemies near decoys.\n{!LEVEL 3} cooldown {!5}, decoy EMP explosion on death, {!100%} crit damage on enemies near decoys.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MFr",
     },
     attributes = {
