@@ -57,7 +57,7 @@ register_blueprint "ktrait_master_berserker"
                     if is_berserk and tlevel == 3 then
                         ui:set_hint( "{R"..self.text.berserk_reset.."}", 2001, 0 )
                         world:lua_callback( entity, "on_reset_berserk" )
-                    elseif gib_berserk == 1 then
+                    elseif not is_berserk and gib_berserk == 1 then
                         ui:set_hint( "{R"..self.text.berserk_proc.."}", 2001, 0 )
                         world:lua_callback( entity, "on_trigger_berserk" )
                     end
