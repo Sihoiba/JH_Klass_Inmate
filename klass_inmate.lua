@@ -477,28 +477,33 @@ register_blueprint "ktrait_berserk"
         ]=],
         on_reset_berserk = [=[
             function ( self, entity )
-                local buff
-                local duration_bonus = (entity:attribute( "berserk_duration_bonus") or 0)
-                local duration = 1000 + duration_bonus
-                local current_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
-
+                local current_berserk = entity:child("buff_inmate_berserk_base") or entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
                 if not (current_berserk and current_berserk.lifetime and current_berserk.lifetime.time_left) then return end
+
+                local duration_bonus = (entity:attribute( "berserk_duration_bonus") or 0)
+                local duration_max = 1000 + duration_bonus
+
+                if entity.attributes and entity.attributes.skilled_bonus and entity.attributes.skilled_bonus >= 2 then
+                    duration_max = duration_max + 1000
+                end
+
+                local buff_extension = math.min(duration_max - current_berserk.lifetime.time_left, 300)
+
+
                 if entity.attributes and entity.attributes.skilled_bonus then
                     if entity.attributes.skilled_bonus == 1 then
-                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_1", duration - current_berserk.lifetime.time_left )
+                        world:add_buff( entity, "buff_inmate_berserk_skill_1", buff_extension )
                     elseif entity.attributes.skilled_bonus == 2 then
-                        duration = duration + 1000
-                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_2", duration - current_berserk.lifetime.time_left )
+                        world:add_buff( entity, "buff_inmate_berserk_skill_2", buff_extension )
                     elseif entity.attributes.skilled_bonus == 3 then
-                        duration = duration + 1000
-                        buff = world:add_buff( entity, "buff_inmate_berserk_skill_3", duration - current_berserk.lifetime.time_left )
+                        world:add_buff( entity, "buff_inmate_berserk_skill_3", buff_extension )
                     end
                 else
-                    buff = world:add_buff( entity, "buff_inmate_berserk_base", duration - current_berserk.lifetime.time_left )
+                    world:add_buff( entity, "buff_inmate_berserk_base", buff_extension )
                 end
                 if entity:attribute( "berserk_action_bonus" ) and entity:child("buff_inmate_berserk_speed_boost") then
                     local current_berserk_speed = entity:child("buff_inmate_berserk_speed_boost")
-                    world:add_buff( entity, "buff_inmate_berserk_speed_boost", duration - current_berserk_speed.lifetime.time_left )
+                    world:add_buff( entity, "buff_inmate_berserk_speed_boost", math.min(duration_max - current_berserk_speed.lifetime.time_left, 300) )
                 end
             end
         ]=],
