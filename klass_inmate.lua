@@ -406,7 +406,10 @@ register_blueprint "ktrait_berserk"
                         world:mark_destroy( bgg )
                         world:flush_destroy()
                     end
-                    level:swap_weapon( entity, index )
+                    local eq_weapon = entity:get_weapon()
+                    if eq_weapon and eq_weapon.weapon and eq_weapon.weapon.type ~= world:hash("melee") then
+                        level:swap_weapon( entity, index )
+                    end
                 end
 
                 local sf = entity:child("kskill_fraudster_create_decoy")
@@ -470,8 +473,9 @@ register_blueprint "ktrait_berserk"
                     buff_ranged_melee(self, wep2)
                 end
 
-                if melee then
-                    world:get_level():swap_weapon( entity, index )
+                local eq_weapon = entity:get_weapon()
+                if melee and eq_weapon.weapon and eq_weapon.weapon.type ~= world:hash("melee") then
+                    level:swap_weapon( entity, index )
                 end
             end
         ]=],
