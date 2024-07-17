@@ -16,6 +16,22 @@ register_blueprint "exalted_tracker"
     },
 }
 
+register_blueprint "toughest_tracker"
+{
+    flags = { EF_NOPICKUP, },
+    minimap = {
+        color    = tcolor( BROWN, 255, 151, 17 ),
+        priority = 110,
+    },
+    callbacks = {
+        on_die = [=[
+            function ( self )
+                world:mark_destroy( self )
+            end
+        ]=],
+    },
+}
+
 register_blueprint "smuggler_cache"
 {
     flags = { EF_NOPICKUP },

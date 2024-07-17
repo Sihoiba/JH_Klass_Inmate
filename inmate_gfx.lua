@@ -243,6 +243,19 @@ register_gfx_blueprint "exalted_tracker"
     },
 }
 
+register_gfx_blueprint "toughest_tracker"
+{
+    equip = {},
+    scene = {},
+    uisprite = {
+        icon       = "data/texture/ui/icons/ui_telegraph_01",
+        animation  = "PULSE",
+        propagate  = true,
+        color      = vec4( 1.0, 0.2, 0.0, 1.0 ),
+        visibility = "OOV_ONLY",
+    },
+}
+
 register_gfx_blueprint "adv_crowbar"
 {
     blueprint = "crowbar",

@@ -3,8 +3,8 @@ register_blueprint "ktrait_skilled_inmate"
     blueprint = "trait",
     text = {
         name   = "Skilled",
-        desc   = "PASSIVE SKILL - improve your class traits",
-        full   = "You were locked up for a reason. Each level of this skill improves your berserk active skill.\n\n{!LEVEL 1} - bigger melee damage bonus, better resistances, faster move speed\n{!LEVEL 2} - double Berserk duration, dodge bonus while berserk\n{!LEVEL 3} - even more melee damage, damage resistance and dodge",
+        desc   = "PASSIVE SKILL - improve your class traits. ",
+        full   = "You were locked up for a reason. Each level of this skill improves your berserk active skill.\n\nBase BERSERK: {!x5} melee damage, {!+10%} accuracy, pain immunity, {!50%} damage resistance, {!25%} status resistance, {!50%} splash resistance, {!+10%} move speed.\n\n{!LEVEL 1} - Berserk improved to {!x5.5} melee damage, {!65%} damage resistance, {!50%} status resistance, {!+25%} move speed\n{!LEVEL 2} - double Berserk duration, and berserk also grants {!+10%} dodge/max dodge\n{!LEVEL 3} - Berserk improved to {!x6} melee damage, {!80%} damage resistance, {!75%} status resistance and {!+20%} dodge/max dodge",
         abbr   = "Skl",
     },
     callbacks = {
@@ -179,7 +179,7 @@ register_blueprint "ktrait_hitman"
     text = {
         name   = "Hitman",
         desc   = "Improved accuracy against enemies in cover. Increased damage versus enemies at or above max health.",
-        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down an elevator shaft. Each level of this trait improves your ability to hurt things. Damage bonus applies to enemies at full health and increases based on enemy overhealth up to cap at full overhealth.\n\n{!LEVEL 1} - enemy cover is {!80%} effective. Full health damage bonus {!10%}, damage cap {!50%}.\n{!LEVEL 2} - enemy cover is {!60%} effective. Full health damage bonus {!10%}, damage cap {!75%}\n{!LEVEL 3} - enemy cover is {!40%} effective. Full health damage bonus {!20%}, damage cap {!100%}",
+        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down an elevator shaft. Each level of this trait improves your ability to hurt things. Damage bonus applies to enemies at full health and increases based on enemy overhealth up to maximum at full overhealth.\n\n{!LEVEL 1} - enemy cover is {!80%} effective. Full health damage bonus +{!10%}, max damage bonus +{!50%}.\n{!LEVEL 2} - enemy cover is {!60%} effective. Full health damage bonus +{!10%}, max damage bonus +{!75%}\n{!LEVEL 3} - enemy cover is {!40%} effective. Full health damage bonus +{!20%}, max damage bonus +{!100%}",
         abbr   = "Hit",
     },
     ui_buff = {
@@ -531,54 +531,43 @@ register_blueprint "ktrait_first_rule"
         on_activate = [=[
             function(self, entity)
                 local tlevel = gtk.upgrade_trait( entity, "ktrait_first_rule" )
-
                 local level = world:get_level()
-                if tlevel == 3 then
-                    leveltk.reveal_enemies( world:get_level() )
-                elseif tlevel >= 1 then
-                    local toughest = {}
-                    local toughest3 = {}
-                    local track_count = 0
-                    for e in level:enemies() do
-                        local xp = e.attributes.experience_value or 0
-                        local danger = e.attributes.health + xp
-                        if tlevel == 2 and e.data and not e.data.exalted_traits then
-                            table.insert(toughest, {entity = e, danger = danger})
-                            track_count = track_count + 1
-                        elseif tlevel == 1 then
-                            table.insert(toughest, {entity = e, danger = danger})
-                            track_count = track_count + 1
-                        end
-                    end
 
-                    table.sort( toughest, function ( a, b ) return a.danger > b.danger end )
-
-                    for i = 1,3 do
-                        if toughest[i] then
-                            toughest3[toughest[i].entity] = toughest[i].danger
-                        end
-                    end
-
-                    for e in level:enemies() do
-                        if toughest3[e] then
-                            e:equip("tracker")
-                            e.minimap.always = true
-                        end
+                local toughest = {}
+                local toughest3 = {}
+                for e in level:enemies() do
+                    local xp = e.attributes.experience_value or 0
+                    local danger = e.attributes.health + xp
+                    if tlevel >= 2 and e.data and not e.data.exalted_traits then
+                        table.insert(toughest, {entity = e, danger = danger})
+                    elseif tlevel == 1 then
+                        table.insert(toughest, {entity = e, danger = danger})
                     end
                 end
-                if tlevel >= 2 then
-                    for e in level:enemies() do
-                        if e.data and e.data.exalted_traits then
-                            local tracker = e:child("tracker")
-                            if tracker then
-                                world:mark_destroy( tracker )
-                            end
-                            local etracker = e:equip("exalted_tracker")
-                            e.minimap.color = etracker.minimap.color
+
+                table.sort( toughest, function ( a, b ) return a.danger > b.danger end )
+
+                for i = 1,3 do
+                    if toughest[i] then
+                        toughest3[toughest[i].entity] = toughest[i].danger
+                    end
+                end
+
+                for e in level:enemies() do
+                    if toughest3[e] then
+                        if tlevel == 1 then
+                            local ttracker = e:equip("toughest_tracker")
+                            e.minimap.color = ttracker.minimap.color
                             e.minimap.always = true
                         end
+                    elseif tlevel == 2 and e.data and e.data.exalted_traits then
+                        local etracker = e:equip("exalted_tracker")
+                        e.minimap.color = etracker.minimap.color
+                        e.minimap.always = true
+                    elseif tlevel == 3 then
+                        local etracker = e:equip("tracker")
+                        e.minimap.always = true
                     end
-                    world:flush_destroy()
                 end
             end
         ]=],
@@ -586,52 +575,41 @@ register_blueprint "ktrait_first_rule"
             function ( self, entity, reenter )
                 if reenter then return end
                 local level = world:get_level()
-                if self.attributes.level == 3 then
-                    leveltk.reveal_enemies( world:get_level() )
-                elseif self.attributes.level >= 1 then
-                    local toughest = {}
-                    local toughest3 = {}
-                    local track_count = 0
-                    for e in level:enemies() do
-                        local xp = e.attributes.experience_value or 0
-                        local danger = e.attributes.health + xp
-                        if self.attributes.level == 2 and e.data and not e.data.exalted_traits then
-                            table.insert(toughest, {entity = e, danger = danger})
-                            track_count = track_count + 1
-                        elseif self.attributes.level == 1 then
-                            table.insert(toughest, {entity = e, danger = danger})
-                            track_count = track_count + 1
-                        end
-                    end
+                local tlevel = self.attributes.level
 
-                    table.sort( toughest, function ( a, b ) return a.danger > b.danger end )
-
-                    for i = 1,3 do
-                        if toughest[i] then
-                            toughest3[toughest[i].entity] = toughest[i].danger
-                        end
-                    end
-
-                    for e in level:enemies() do
-                        if toughest3[e] then
-                            e:equip("tracker")
-                            e.minimap.always = true
-                        end
+                local toughest = {}
+                local toughest3 = {}
+                for e in level:enemies() do
+                    local xp = e.attributes.experience_value or 0
+                    local danger = e.attributes.health + xp
+                    if tlevel >= 2 and e.data and not e.data.exalted_traits then
+                        table.insert(toughest, {entity = e, danger = danger})
+                    elseif tlevel == 1 then
+                        table.insert(toughest, {entity = e, danger = danger})
                     end
                 end
-                if self.attributes.level >= 2 then
-                    for e in level:enemies() do
-                        if e.data and e.data.exalted_traits then
-                            local tracker = e:child("tracker")
-                            if tracker then
-                                world:mark_destroy( tracker )
-                            end
-                            local etracker = e:equip("exalted_tracker")
-                            e.minimap.color = etracker.minimap.color
-                            e.minimap.always = true
-                        end
+
+                table.sort( toughest, function ( a, b ) return a.danger > b.danger end )
+
+                for i = 1,3 do
+                    if toughest[i] then
+                        toughest3[toughest[i].entity] = toughest[i].danger
                     end
-                    world:flush_destroy()
+                end
+
+                for e in level:enemies() do
+                    if toughest3[e] then
+                        local ttracker = e:equip("toughest_tracker")
+                        e.minimap.color = ttracker.minimap.color
+                        e.minimap.always = true
+                    elseif tlevel >= 2 and e.data and e.data.exalted_traits then
+                        local etracker = e:equip("exalted_tracker")
+                        e.minimap.color = etracker.minimap.color
+                        e.minimap.always = true
+                    elseif tlevel == 3 then
+                        local etracker = e:equip("tracker")
+                        e.minimap.always = true
+                    end
                 end
             end
         ]=],
@@ -998,8 +976,8 @@ register_blueprint "ktrait_kneecap"
     blueprint = "trait",
     text = {
         name   = "Kneecap",
-        desc   = "PISTOL/SMG/SEMI/AUTO SKILL - weaken biological enemies on hit",
-        full   = "You know where to shoot someone to give them a bad day!\n\n{!LEVEL 1} - non-robotic enemies shot are slowed\n{!LEVEL 2} - non-robotic enemies shot have reduced accuracy\n{!LEVEL 3} - non-robotic enemies shot do reduced damage\n",
+        desc   = "PISTOL/SMG/SEMI/AUTO SKILL - weaken biological and semi-mechanical enemies on hit",
+        full   = "You know where to shoot someone to give them a bad day!\n\n{!LEVEL 1} - biological and semi-mechanical enemies shot are slowed by {!25%}\n{!LEVEL 2} - biological and semi-mechanical enemies shot have {!-25%} accuracy\n{!LEVEL 3} - biological and semi-mechanical enemies shot do {!-25%} damage\n",
         abbr   = "Kne",
     },
     attributes = {

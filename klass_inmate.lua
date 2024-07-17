@@ -101,7 +101,10 @@ register_blueprint "buff_inmate_berserk_base"
         environmental_object_kill_text = "CHOO CHOO CHA'BOOGIE!",
     },
     data = {
-        resource_before = 0
+        resource_before = 0,
+        trigger_kill_text = true,
+        trigger_door_kill_text = true,
+        trigger_environmental_kill_text = true,
     },
     ui_buff = {
         color     = RED,
@@ -171,10 +174,17 @@ register_blueprint "buff_inmate_berserk_base"
                     is_door = true
                 end
                 if is_door then
-                    ui:set_hint( "{R"..self.text.door_kill_text.."}", 2001, 0 )
+                    if self.data.trigger_door_kill_text then
+                        self.data.trigger_door_kill_text = false
+                        ui:set_hint( "{R"..self.text.door_kill_text.."}", 2001, 0 )
+                    end
                 elseif not (target.data and target.data.ai) then
-                    ui:set_hint( "{R"..self.text.environmental_object_kill_text.."}", 2001, 0 )
-                else
+                    if self.data.trigger_environmental_kill_text then
+                        self.data.trigger_environmental_kill_text = false
+                        ui:set_hint( "{R"..self.text.environmental_object_kill_text.."}", 2001, 0 )
+                    end
+                elseif self.data.trigger_kill_text then
+                    self.data.trigger_kill_text = false
                     ui:set_hint( "{R"..self.text.kill_text.."}", 2001, 0 )
                 end
             end
@@ -340,7 +350,7 @@ register_blueprint "ktrait_berserk"
     text = {
         name   = "Berserk",
         desc   = "ACTIVE SKILL - spend your rage to go Berserk!",
-        full   = "You're a barely controlled simmering ball of anger. It doesn't take much to send you into a berserker rage that earned you a reputation as someone not to mess with. When berserk you do increased melee damage, have damage and status resistance, but your too mad to waste time using gun when you could hurt people with your hands. Activating berserk will automatically swap to the first carried melee weapon if present and increase ranged weapon melee by {!10}.",
+        full   = "You're a barely controlled simmering ball of anger. It doesn't take much to send you into a berserker rage that earned you a reputation as someone not to mess with. When berserk you do {5x} melee damage; have {50%} damage and splash resistances; {25%} status resistances and move {10%} faster, but your too angry to fire guns when you could hurt people with your hands. Activating berserk will automatically swap to the first carried melee weapon if present and increase ranged weapon melee by {!10}.",
         abbr   = "Ber",
     },
     callbacks = {
