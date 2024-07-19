@@ -4,7 +4,7 @@ register_blueprint "ktrait_skilled_inmate"
     text = {
         name   = "Skilled",
         desc   = "PASSIVE SKILL - improve your class traits. ",
-        full   = "You were locked up for a reason. Each level of this skill improves your berserk active skill.\n\nBase BERSERK: {!x5} melee damage, {!+10%} accuracy, pain immunity, {!50%} damage resistance, {!25%} status resistance, {!50%} splash resistance, {!+10%} move speed.\n\n{!LEVEL 1} - Berserk improved to {!x5.5} melee damage, {!65%} damage resistance, {!50%} status resistance, {!+25%} move speed\n{!LEVEL 2} - double Berserk duration, and berserk also grants {!+10%} dodge/max dodge\n{!LEVEL 3} - Berserk improved to {!x6} melee damage, {!80%} damage resistance, {!75%} status resistance and {!+20%} dodge/max dodge",
+        full   = "You were locked up for a reason. Each level of this skill improves your berserk active skill.\n\nBase BERSERK: {!x5} melee damage, {!+10%} accuracy, pain immunity, {!50%} damage resistance, {!25%} status resistance, {!50%} splash resistance, {!+10%} move speed.\n\n{!LEVEL 1} - Berserk improved to {!x5.5} melee damage, {!65%} damage resistance, {!50%} status resistance, {!+25%} move speed\n{!LEVEL 2} - Double Berserk duration, and berserk also grants {!+10%} dodge/max dodge\n{!LEVEL 3} - Berserk improved to {!x6} melee damage, {!80%} damage resistance, {!75%} status resistance and {!+20%} dodge/max dodge",
         abbr   = "Skl",
     },
     callbacks = {
@@ -22,7 +22,7 @@ register_blueprint "ktrait_brute"
     blueprint = "trait",
     text = {
         name = "Brute",
-        desc = "Increases armour and splash damage resistance",
+        desc = "Increases armour and splash damage resistance.",
         full = "You're the guy everyone avoided in the yard. You'll shrug off hits that would stagger others.\n\n{!LEVEL 1} - {!2} points of armour versus all damage\n{!LEVEL 2} - {!3} points of armour, {!-25%} splash damage \n{!LEVEL 3} - {!4} points of armour, {!-50%} splash damage",
         abbr = "Bru",
     },
@@ -56,7 +56,7 @@ register_blueprint "ktrait_mule"
     blueprint = "trait",
     text = {
         name   = "Mule",
-        desc   = "Gain extra inventory slots, locate exits and lootboxes",
+        desc   = "Gain extra inventory slots, locate exits and lootboxes.",
         full   = "You are the go to guy to move contraband around Callisto!\n\n{!LEVEL 1} - {!+1} inventory slot, reveal elevators\n{!LEVEL 2} - {!+3} inventory slots\n{!LEVEL 3} - {!+5} inventory slots, reveal lootboxes",
         abbr   = "Mul",
     },
@@ -149,8 +149,8 @@ register_blueprint "ktrait_smuggler"
     blueprint = "trait",
     text = {
         name   = "Smuggler",
-        desc   = "Find ammo in special destructable environment objects",
-        full   = "You know where the black market stashes items! Hit boxes, plants, urns and chairs containing a stash to find ammo for all carried weapons. Stashes are highlighted when out of sight.\n\n{!LEVEL 1} - {!1} object will contain a stash.\n{!LEVEL 2} - up to {!4} objects will contain a stash depending on number of available objects\n{!LEVEL 3} - guaranteed {!4} stashes worth of ammo across the available objects (as long as there is at least one object). {!1} stash will contain either an exotic/AV weapon or armor.",
+        desc   = "Find ammo in special destructable environment objects.",
+        full   = "You know where the black market stashes items! Hit boxes, plants, urns and chairs containing a stash to find ammo for all carried weapons. Stashes are highlighted when out of sight.\n\n{!LEVEL 1} - {!1} object will contain a stash.\n{!LEVEL 2} - Up to {!4} objects will contain a stash depending on number of available objects\n{!LEVEL 3} - Guaranteed {!4} stashes worth of ammo across the available objects (as long as there is at least one object). {!1} stash will contain either an exotic/AV weapon or armor.",
         abbr   = "Sm",
     },
     attributes = {
@@ -179,7 +179,7 @@ register_blueprint "ktrait_hitman"
     text = {
         name   = "Hitman",
         desc   = "Improved accuracy against enemies in cover. Increased damage versus enemies at or above max health.",
-        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down an elevator shaft. Each level of this trait improves your ability to hurt things. Damage bonus applies to enemies at full health and increases based on enemy overhealth up to maximum at full overhealth.\n\n{!LEVEL 1} - enemy cover is {!80%} effective. Full health damage bonus +{!10%}, max damage bonus +{!50%}.\n{!LEVEL 2} - enemy cover is {!60%} effective. Full health damage bonus +{!10%}, max damage bonus +{!75%}\n{!LEVEL 3} - enemy cover is {!40%} effective. Full health damage bonus +{!20%}, max damage bonus +{!100%}",
+        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down an elevator shaft. Each level of this trait improves your ability to hurt things. Damage bonus applies to enemies at full health or higher. The damage bonus increases up to maximum at full enemy overhealth.\n\n{!LEVEL 1} - Enemy cover is {!80%} effective. Full health damage bonus +{!10%}, max max damage bonus at full overhealth +{!50%}.\n{!LEVEL 2} - Enemy cover is {!60%} effective. Max max damage bonus at full overhealth +{!75%}\n{!LEVEL 3} - Enemy cover is {!40%} effective. Full health damage bonus increased to +{!20%}, max damage bonus at full overhealth +{!100%}",
         abbr   = "Hit",
     },
     ui_buff = {
@@ -435,7 +435,7 @@ register_blueprint "kskill_cutter"
     blueprint = "trait",
     text = {
         name  = "Cut Medkits",
-        desc  = "ACTIVE SKILL - convert medkits into other item",
+        desc  = "ACTIVE SKILL - convert medkits into other item.",
         abbr  = "Cut skill",
     },
     callbacks = {
@@ -498,8 +498,8 @@ register_blueprint "ktrait_cutter"
     blueprint = "trait",
     text = {
         name  = "Cutter",
-        desc  = "You can convert medkits into better drugs",
-        full  = "You know how to convert standard civilian medkits into something much more potent\n\n{!LEVEL 1} - convert small medkits into combat packs\n{!LEVEL 2} - convert small medkits into stimpacks\n{!LEVEL 3} - convert large medkits into three small medkits",
+        desc  = "You can convert medkits into better drugs.",
+        full  = "You know how to convert standard civilian medkits into something much more potent\n\n{!LEVEL 1} - Convert small medkits into combat packs\n{!LEVEL 2} - Convert small medkits into stimpacks\n{!LEVEL 3} - Convert large medkits into three small medkits",
         abbr  = "Cut",
     },
     callbacks = {
@@ -520,8 +520,8 @@ register_blueprint "ktrait_first_rule"
     blueprint = "trait",
     text = {
         name   = "First Rule",
-        desc   = "Highlight most dangerous enemies on the minimap",
-        full   = "First rule as an inmate, find the biggest guy in prison and make him your bitch.\n\n{!LEVEL 1} - the three toughest enemies will be visible on the mini map\n{!LEVEL 2} - exalted enemies are visible on the mini map and highlighted out of view in a different colour\n{!LEVEL 3} - always know where {!all} enemies are",
+        desc   = "Highlight most dangerous enemies on the minimap.",
+        full   = "First rule as an inmate, find the biggest guy in prison and make him your bitch.\n\n{!LEVEL 1} - The three toughest enemies will be visible on the mini map and highlighted out of view in brown.\n{!LEVEL 2} - Exalted enemies are visible on the mini map and highlighted out of view in purple\n{!LEVEL 3} - Always know where {!all} enemies are, exalted and the three toughest non-exalted enemies will still be shown in different colours.",
         abbr   = "FRu",
     },
     attributes = {
@@ -784,9 +784,9 @@ register_blueprint "ktrait_burglar"
 {
     blueprint = "trait",
     text = {
-        name   = "Burgler",
-        desc   = "ACTIVE SKILL - open doors from a distance",
-        full   = "There's nowhere you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance\n{!LEVEL 2} - open or close all doors in sight\n{!LEVEL 3} - open red key card locked doors and elevators, open locked mini level elevators in sight",
+        name   = "Burglar",
+        desc   = "ACTIVE SKILL - open doors from a distance.",
+        full   = "There's almost nowhere you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance\n{!LEVEL 2} - Open or close all doors in sight\n{!LEVEL 3} - Open red key card locked doors and elevators, open locked mini level elevators in sight",
         abbr   = "Bur",
     },
     callbacks = {
@@ -813,9 +813,9 @@ register_blueprint "ktrait_sucker_punch"
 {
     blueprint = "trait",
     text = {
-        name   = "Sucker punch",
-        desc   = "They never see the first blow coming",
-        full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non bladed melee weapons (crowbars, pipe wrenchs, axes, and chainsaws) you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non bladed one.\n\n{!LEVEL 1} - {!90%} attack time with non bladed melee weapons\n{!LEVEL 2} - {!80%} attack time with non bladed melee weapons, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time with non bladed melee weapons, melee weapon lootboxes contain large axes",
+        name   = "Sucker Punch",
+        desc   = "They never see the first blow coming.",
+        full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non-bladed melee weapons (crowbars, pipe wrenchs, axes, and chainsaws) you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non-bladed one.\n\n{!LEVEL 1} - {!90%} attack time with non-bladed melee weapons\n{!LEVEL 2} - {!80%} attack time, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time, melee weapon lootboxes contain large axes",
         abbr   = "SPu",
     },
     attributes = {
@@ -896,7 +896,7 @@ register_blueprint "ktrait_dealer"
     text = {
         name = "Dealer",
         desc = "Increases duration of postive buffs from items.",
-        full = "When your fellow prisoners want better drugs, you are the person they turn to. When you use items that grant buffs (stim packs, combat packs and enviro packs) the duraction is increased\n\n{!LEVEL 1} - Positive buff duration increased by {!50%} \n{!LEVEL 2} - increase is now {!100%} \n{!LEVEL 3} - increase is now {!200%}",
+        full = "When your fellow prisoners want better drugs, you are the person they turn to. When you use items that grant buffs (stim packs, combat packs and enviro packs) the duraction is increased\n\n{!LEVEL 1} - Positive buff {!+50%} duration.\n{!LEVEL 2} - {!+100%} duration\n{!LEVEL 3} - {!+200%} duration",
         abbr = "Del",
     },
     attributes = {
@@ -918,7 +918,7 @@ register_blueprint "ktrait_desperado"
     blueprint = "trait",
     text = {
         name = "Desperado",
-        desc = "Damage bonus based on weapon shot cost versus clip size, proportional bonus based on the amount of clip fired. No affect on melee.",
+        desc = "Damage bonus based on shot cost versus clip size, proportional bonus based on the amount of clip fired. No affect on melee.",
         full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots in the clip, the fewer the better. Guns that fire their entire clip per shot get the full damage bonus, guns that don't get proportionally less.\n\n{!LEVEL 1} - {!+20%} times clip/shot cost\n{!LEVEL 2} - {!+40%} times clip/shot cost\n{!LEVEL 3} - {!+60%} times clip/shot cost",
         abbr = "Des",
     },
@@ -976,7 +976,7 @@ register_blueprint "ktrait_kneecap"
     blueprint = "trait",
     text = {
         name   = "Kneecap",
-        desc   = "PISTOL/SMG/SEMI/AUTO SKILL - weaken biological and semi-mechanical enemies on hit",
+        desc   = "PISTOL/SMG/SEMI/AUTO SKILL - weaken biological and semi-mechanical enemies on hit.",
         full   = "You know where to shoot someone to give them a bad day!\n\n{!LEVEL 1} - biological and semi-mechanical enemies shot are slowed by {!25%}\n{!LEVEL 2} - biological and semi-mechanical enemies shot have {!-25%} accuracy\n{!LEVEL 3} - biological and semi-mechanical enemies shot do {!-25%} damage\n",
         abbr   = "Kne",
     },

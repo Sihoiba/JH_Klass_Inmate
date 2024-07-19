@@ -7,8 +7,8 @@ register_blueprint "ktrait_master_berserker"
     blueprint = "trait",
     text = {
         name   = "BERSERK",
-        desc   = "MASTER TRAIT - you enter berserk on damage and on gibbing with melee weapons.",
-        full   = "You're a barely controlled ball of rage, and will go berserk on the slightest provocation.\n\n{!LEVEL 1} - If not Berserk, become berserk if you lose {!15%} of your health in a single hit or {!25%} chance to go berserk on gibbing with a melee kill\n{!LEVEL 2} - The Berserker can now use grenades while berserk, {!33%} chance to go berserk when gibbing\n{!LEVEL 3} - Gibbing while Berserk now extends the Berserk duration by {!3} turns up to max duration.\n\nYou can pick only one MASTER trait per character.",
+        desc   = "MASTER TRAIT - you enter Berserk on damage and on gibbing with melee weapons.",
+        full   = "You're a barely controlled ball of rage, and will go Berserk on the slightest provocation.\n\n{!LEVEL 1} - If not Berserk, become Berserk if you lose {!15%} of your health in a single hit or {!25%} chance to go Berserk on gibbing with a melee kill\n{!LEVEL 2} - The Berserker can now use grenades while Berserk, {!33%} chance to go Berserk when gibbing\n{!LEVEL 3} - Gibbing while Berserk now extends the Berserk duration by {!3} turns up to max duration.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MBK",
         abbr   = "MBK",
 
@@ -358,7 +358,7 @@ register_blueprint "ktrait_master_gbh"
     text = {
         name   = "GBH",
         desc   = "MASTER TRAIT - bleed immunity and afflict bleed on attacks.",
-        full   = "Grevious bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit (stacks with bleed perks on weapon/relics), range {!2} bleed aura when berserk\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - attacks apply bleed on enemies near the target on hit.\n\nYou can pick only one MASTER trait per character.",
+        full   = "Grievous bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit (stacks with bleed perks on weapon/relics), range {!2} bleed aura when {!Berserk}\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - attacks apply bleed on enemies near the target on hit.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGB",
     },
     attributes = {
@@ -602,8 +602,8 @@ register_blueprint "ktrait_master_ghost_gun"
     blueprint = "trait",
     text = {
         name   = "GHOST GUN",
-        desc   = "MASTER TRAIT - PISTOL/SMG ONLY - ACTIVE SKILL Toggle On/Off - empty full clip when firing",
-        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets, but weapon optimal range is reduced to a max of 3 and max range reduced to 5. Activating Ghost Gun cancels berserk.\n{!LEVEL 2} - Automatically reload pistol/SMGs when empty at {!halved} ammo consumption, max range now reduced to 6.\n{!LEVEL 3} - reload ammo consumption is {!20%}, optimal and max range penalties removed.\n\nYou can pick only one MASTER trait per character.",
+        desc   = "MASTER TRAIT - PISTOL/SMG ONLY - ACTIVE SKILL Toggle On/Off - empty full clip when firing.",
+        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets, but weapon optimal range is reduced to a max of {!3} and max range reduced to {!5}. Activating {!Ghost Gun} cancels {!Berserk}.\n{!LEVEL 2} - Automatically reload pistol/SMGs when empty at {!halved} ammo consumption, max range now reduced to {!6}.\n{!LEVEL 3} - reload ammo consumption is {!20%}, optimal and max range penalties removed.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGG",
     },
     attributes = {
@@ -851,8 +851,8 @@ register_blueprint "ktrait_master_fraudster"
     blueprint = "trait",
     text = {
         name   = "FRAUDSTER",
-        desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire, gain crit bonus against enemies near decoys",
-        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!40}, {!50%} crit chance on enemies near decoys, reduced scent detection range, Berserk resets cooldown, and reduces it to {!2}\n{!LEVEL 2} - cooldown {!10}, decoy health {!80}, {!100%} crit chance and {!50}% crit damage on enemies near decoys.\n{!LEVEL 3} - cooldown {!5}, decoy EMP explosion on death, {!100%} crit damage on enemies near decoys.\n\nYou can pick only one MASTER trait per character.",
+        desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire, gain crit bonus against enemies near decoys.",
+        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!40}, {!50%} crit chance on enemies near decoys, reduced scent detection range, {!Berserk} resets cooldown, and reduces it to {!2}\n{!LEVEL 2} - cooldown {!10}, decoy health {!80}, {!100%} crit chance and {!50}% crit damage on enemies near decoys.\n{!LEVEL 3} - cooldown {!5}, decoy EMP explosion on death, {!100%} crit damage on enemies near decoys.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MFr",
     },
     attributes = {
