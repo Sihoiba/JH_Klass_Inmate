@@ -485,7 +485,7 @@ register_blueprint "ktrait_berserk"
 
                 local eq_weapon = entity:get_weapon()
                 if melee and eq_weapon.weapon and eq_weapon.weapon.type ~= world:hash("melee") then
-                    level:swap_weapon( entity, index )
+                    world:get_level():swap_weapon( entity, index )
                 end
             end
         ]=],
