@@ -102,6 +102,10 @@ register_blueprint "stimpack_large"
         name = "military stimpack",
         desc = "Standard military stimpack. Fully heals you, resets all skill cooldowns, regenerates class resource, and removes pain and grants resistances for a longer time. We'd suggest you not overuse it, but we know you better. You monster.",
     },
+    stack = {
+        max    = 1,
+        amount = 1,
+    },
     ascii     = {
         glyph     = "+",
         color     = GREEN,
