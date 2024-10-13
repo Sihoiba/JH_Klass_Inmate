@@ -23,7 +23,7 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
  - Grenadier: As per the Technician skill
  - Juggler: As per the Scout/Technician skill
  - Brute: Grants innate armour, higher levels also give splash damage resistance
- - Mule: Increased inventory space and reveal elevator locations, higher levels give more inventory and reveal lootbox locations
+ - Mule: Increased inventory space and reveal elevator locations, higher levels give more inventory, more weapon slots and reveal lootbox locations
  - Smuggler: Hit special environment objects like crates, plants and chairs to get ammo for your carried weapons.
  - Hitman; requires Desperado = 1: Reduces enemy cover affect, and increases damage against enemies at 100% or higher health. Level 1 cover 20% effective, damage bonus 10% at 100% health rising to 50% at 200% health; Level 2 cover 40% effective, damage bonus rises to 75% at 200% health, Level 3 ignores 60% enemy cover, damage bonus rises from 20% damage at 100% health to 100% at 200% health.
  - Gambler: Random chance on using a station/ammo terminal to refund the charges. Higher levels increase the chance, and provide a chance to receive bonus multitools.

@@ -57,7 +57,7 @@ register_blueprint "ktrait_mule"
     text = {
         name   = "Mule",
         desc   = "Gain extra inventory slots, locate exits and lootboxes.",
-        full   = "You are the go to guy to move contraband around Callisto!\n\n{!LEVEL 1} - {!+1} inventory slot, reveal elevators\n{!LEVEL 2} - {!+3} inventory slots\n{!LEVEL 3} - {!+5} inventory slots, reveal lootboxes",
+        full   = "You are the go to guy to move contraband around Callisto!\n\n{!LEVEL 1} - {!+1} inventory slot, reveal elevators\n{!LEVEL 2} - {!+2} inventory slots, extra weapon slot\n{!LEVEL 3} - {!+4} inventory slots, reveal lootboxes",
         abbr   = "Mul",
     },
     attributes = {
@@ -75,7 +75,8 @@ register_blueprint "ktrait_mule"
                         world:get_level():set_explored( c, true )
                     end
                 elseif mule == 2 then
-                    attr.inv_capacity = attr.inv_capacity + 2
+                    attr.inv_capacity = attr.inv_capacity + 1
+                    entity.equipment.count = entity.equipment.count + 1
                 elseif mule == 3 then
                     attr.inv_capacity = attr.inv_capacity + 2
                     leveltk.reveal_lootboxes( world:get_level() )
@@ -853,34 +854,31 @@ register_blueprint "ktrait_sucker_punch"
                 local tlevel  = self.attributes.level
                 local melee_box = false
                 local melee_adv = false
-                local melee_adv_prefix = ""
+                local melee_adv_tier = 0
                 for c in ecs:children( what ) do
-                        if c.weapon and c.weapon.type == world:hash("melee") then
+                    if c.weapon and c.weapon.type == world:hash("melee") then
                         melee_box = true
                         if c.data and not melee_adv then
                             melee_adv = c.data.adv
-                            melee_adv_prefix = c.text.prefix
+                            if melee_adv then
+                                for p in ecs:children( c ) do
+                                    if p.attributes and p.attributes.perk_reroll then
+                                        melee_adv_tier = melee_adv_tier + p.attributes.perk_reroll
+                                    end
+                                end
+                            end
                         end
                     end
                 end
-                nova.log(melee_adv_prefix)
-                local tier = 0
-                if melee_adv_prefix == "AV1" then
-                    tier = 1
-                elseif melee_adv_prefix == "AV2" then
-                    tier = 2
-                elseif melee_adv_prefix == "AV3" then
-                    tier = 3
-                end
                 if tlevel == 2 and melee_box then
                     if melee_adv then
-                        what:attach("adv_axe", nil, tier)
+                        what:attach("adv_axe", nil, melee_adv_tier)
                     else
                         what:attach("axe")
                     end
                 elseif tlevel == 3 and melee_box then
                     if melee_adv then
-                        what:attach("adv_axe_large", nil, tier)
+                        what:attach("adv_axe_large", nil, melee_adv_tier)
                     else
                         what:attach("axe_large")
                     end
