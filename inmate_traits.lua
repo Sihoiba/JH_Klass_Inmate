@@ -870,6 +870,9 @@ register_blueprint "ktrait_sucker_punch"
                         end
                     end
                 end
+                if melee_adv_tier > 3 then
+                    melee_adv_tier = 3
+                end
                 if tlevel == 2 and melee_box then
                     if melee_adv then
                         what:attach("adv_axe", nil, melee_adv_tier)
