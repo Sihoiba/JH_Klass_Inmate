@@ -283,11 +283,11 @@ register_blueprint "ktrait_gambler"
     text = {
         name = "Gambler",
         desc = "Chance to refund charges when using a station or ammo terminal; excluding extract multitools.",
-        full = "You cannot resist a game of chance, hacking them into things when they don't otherwise exist.\n\n{!LEVEL 1} - {!+40%} chance to refund the cost when using a station/terminal\n{!LEVEL 2} - {!+10%} chance the station/terminal will drop a multitool when using it, and reveal terminals and stations\n{!LEVEL 3} - {!+80%} chance to refund the cost when using a station/terminal.",
+        full = "You cannot resist a game of chance, hacking them into things when they don't otherwise exist.\n\n{!LEVEL 1} - {!+40%} chance to refund the cost when using a station/terminal\n{!LEVEL 2} - {!+10%} chance the station/terminal will drop a multitool when using it, and reveal terminals and stations\n{!LEVEL 3} - an additional {!+40%} chance to refund the cost which decays {10%} with every attempt and resets on entering a new level.",
         abbr = "Gmb",
     },
     attributes = {
-        level   = 1,
+        level   = 1
     },
     callbacks = {
         on_activate = [=[
@@ -299,6 +299,9 @@ register_blueprint "ktrait_gambler"
                 if tlevel == 2 then
                     leveltk.reveal_terminals_and_stations( world:get_level() )
                 end
+                if tlevel == 3 then
+                    entity.data.bonus_luck = 4
+                end
             end
         ]=],
         on_enter_level = [=[
@@ -307,6 +310,9 @@ register_blueprint "ktrait_gambler"
                 local tlevel = self.attributes.level
                 if tlevel > 1 then
                     leveltk.reveal_terminals_and_stations( world:get_level() )
+                end
+                if tlevel == 3 then
+                    entity.data.bonus_luck = 4
                 end
             end
         ]=],
@@ -351,20 +357,22 @@ register_blueprint "ktrait_gambler"
                                     entity.data.stations_and_terminals[e] = e.attributes.charges
                                     entity.data.extracted_multitool = false
                                 else
-                                    local lucky = math.random(5)
-                                    local good_luck = 2
-                                    if tlevel == 3 then
-                                        good_luck = 4
-                                    end
+                                    local lucky = math.random(10)
+                                    local bonus_luck = entity.data.bonus_luck or 0
+                                    local good_luck = 4 + bonus_luck
 
                                     if lucky > good_luck then
-                                        nova.log("Didn't win recharge")
+                                        nova.log("Didn't win recharge, rolled "..tostring(lucky).." had "..tostring(good_luck).." luck")
                                         entity.data.stations_and_terminals[e] = e.attributes.charges
                                     elseif lucky <= good_luck then
-                                        nova.log("Won the recharge jackpot")
+                                        nova.log("Won the recharge jackpot, rolled "..tostring(lucky).." had "..tostring(good_luck).." luck")
                                         world:play_sound( "vending_hit_reward", e )
                                         e.attributes.charges = v
                                         uitk.station_activate( entity, e, true )
+                                    end
+
+                                    if bonus_luck > 0 then
+                                        entity.data.bonus_luck = bonus_luck - 1
                                     end
 
                                     if tlevel > 1 then
