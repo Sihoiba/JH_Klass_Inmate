@@ -180,7 +180,7 @@ register_blueprint "ktrait_hitman"
     text = {
         name   = "Hitman",
         desc   = "Improved accuracy against enemies in cover. Increased damage versus enemies at or above max health.",
-        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down an elevator shaft. Each level of this trait improves your ability to hurt things. Damage bonus applies to enemies at full health or higher. The damage bonus increases up to maximum at full enemy overhealth.\n\n{!LEVEL 1} - Enemy cover is {!80%} effective. Full health damage bonus +{!10%}, max max damage bonus at full overhealth +{!50%}.\n{!LEVEL 2} - Enemy cover is {!60%} effective. Max max damage bonus at full overhealth +{!75%}\n{!LEVEL 3} - Enemy cover is {!40%} effective. Full health damage bonus increased to +{!20%}, max damage bonus at full overhealth +{!100%}",
+        full   = "When it came time for someone to have an accident they came to you; you then threw that someone down an elevator shaft. Each level of this trait improves your ability to hurt things. Damage bonus applies to enemies at full health or higher. The damage bonus increases up to maximum at full enemy overhealth.\n\n{!LEVEL 1} - Enemy cover is {!80%} effective. Full health damage bonus +{!10%}, max max damage bonus at full overhealth +{!50%}.\n{!LEVEL 2} - Enemy cover is {!60%} effective. Max damage bonus at full overhealth +{!75%}\n{!LEVEL 3} - Enemy cover is {!40%} effective. Full health damage bonus increased to +{!20%}, max damage bonus at full overhealth +{!100%}",
         abbr   = "Hit",
     },
     ui_buff = {
