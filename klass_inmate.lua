@@ -210,6 +210,7 @@ register_blueprint "buff_inmate_berserk_base"
                 local wep0 = parent:get_slot( "1" )
                 local wep1 = parent:get_slot( "2" )
                 local wep2 = parent:get_slot( "3" )
+                local wep3 = parent:get_slot( "4" )
 
                 if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
                     undo_buff_ranged_melee(self, wep0)
@@ -219,6 +220,9 @@ register_blueprint "buff_inmate_berserk_base"
                 end
                 if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
                     undo_buff_ranged_melee(self, wep2)
+                end
+                if wep3 and wep3.weapon and wep3.weapon.type ~= world:hash("melee") then
+                    undo_buff_ranged_melee(self, wep3)
                 end
             end
         ]],
@@ -387,6 +391,7 @@ register_blueprint "ktrait_berserk"
                 local wep0 = entity:get_slot( "1" )
                 local wep1 = entity:get_slot( "2" )
                 local wep2 = entity:get_slot( "3" )
+                local wep3 = entity:get_slot( "4" )
 
                 if wep0 and wep0.weapon and wep0.weapon.type == world:hash("melee") then
                     melee = wep0
@@ -397,6 +402,9 @@ register_blueprint "ktrait_berserk"
                 elseif wep2 and wep2.weapon and wep2.weapon.type == world:hash("melee") then
                     melee = wep2
                     index = 2
+                elseif wep3 and wep3.weapon and wep3.weapon.type == world:hash("melee") then
+                    melee = wep3
+                    index = 3
                 end
 
                 if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
@@ -407,6 +415,9 @@ register_blueprint "ktrait_berserk"
                 end
                 if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
                     buff_ranged_melee(self, wep2)
+                end
+                if wep3 and wep3.weapon and wep3.weapon.type ~= world:hash("melee") then
+                    buff_ranged_melee(self, wep3)
                 end
 
                 if melee then
@@ -461,6 +472,7 @@ register_blueprint "ktrait_berserk"
                 local wep0 = entity:get_slot( "1" )
                 local wep1 = entity:get_slot( "2" )
                 local wep2 = entity:get_slot( "3" )
+                local wep3 = entity:get_slot( "4" )
 
                 if wep0 and wep0.weapon and wep0.weapon.type == world:hash("melee") then
                     melee = wep0
@@ -471,6 +483,9 @@ register_blueprint "ktrait_berserk"
                 elseif wep2 and wep2.weapon and wep2.weapon.type == world:hash("melee") then
                     melee = wep2
                     index = 2
+                elseif wep3 and wep3.weapon and wep3.weapon.type == world:hash("melee") then
+                    melee = wep3
+                    index = 3
                 end
 
                 if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
@@ -481,6 +496,9 @@ register_blueprint "ktrait_berserk"
                 end
                 if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
                     buff_ranged_melee(self, wep2)
+                end
+                if wep3 and wep3.weapon and wep3.weapon.type ~= world:hash("melee") then
+                    buff_ranged_melee(self, wep3)
                 end
 
                 local eq_weapon = entity:get_weapon()
