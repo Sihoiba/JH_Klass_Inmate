@@ -3,17 +3,6 @@ nova.require "data/lua/core/common"
 register_blueprint "exo_axe"
 {
     blueprint = "base_melee",
-    text = {
-        name = "axe",
-        desc = "Pretty sure it's not used to chop down trees.",
-    },
-    lists = {
-        group    = "item",
-        keywords = { "general", "melee", "special", "exotic" },
-        weight   = 10,
-        dmin     = 12,
-        dmed     = 19,
-    },
     ascii     = {
         glyph     = "/",
         color     = MAGENTA,
@@ -46,20 +35,19 @@ register_blueprint "perk_we_axe_inmate"
     },
     attributes = {
         level    = 3,
-        speed = 1.0,
     },
     callbacks = {
         on_aim = [=[
             function ( self, entity, target, weapon )
-                local speed = 1.0
+                local fire_time = 1.0
                 local berserk = entity:child("buff_inmate_berserk_base") or
                 entity:child("buff_inmate_berserk_skill_1") or
                 entity:child("buff_inmate_berserk_skill_2") or
                 entity:child("buff_inmate_berserk_skill_3")
                 if berserk then
-                    speed = 1.1
+                    fire_time = 0.9
                 end
-                entity.attributes.speed = speed
+                self:parent().attributes.fire_time = fire_time
             end
         ]=],
     },
