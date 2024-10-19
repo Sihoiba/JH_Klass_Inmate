@@ -603,7 +603,7 @@ register_blueprint "ktrait_master_ghost_gun"
     text = {
         name   = "GHOST GUN",
         desc   = "MASTER TRAIT - PISTOL/SMG ONLY - ACTIVE SKILL Toggle On/Off - empty full clip when firing.",
-        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets, but weapon optimal range is reduced to a max of {!3} and max range reduced to {!5}. Activating {!Ghost Gun} cancels {!Berserk}.\n{!LEVEL 2} - Automatically reload pistol/SMGs when empty at {!halved} ammo consumption, max range now reduced to {!6}.\n{!LEVEL 3} - reload ammo consumption is {!20%}, optimal and max range penalties removed.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets, but weapon optimal range is reduced to a max of {!3} and max range reduced to {!5}. Activating {!Ghost Gun} cancels {!Berserk}.\n{!LEVEL 2} - {!50%} reload time for pistol/SMGs when empty at {!50%} ammo consumption, max range now reduced to {!6}.\n{!LEVEL 3} - {!20%} pistol/SMG reload time when empty at {!20%} ammo consumption, optimal and max range penalties removed.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGG",
     },
     attributes = {
@@ -633,24 +633,21 @@ register_blueprint "ktrait_master_ghost_gun"
             function ( self, actor, cmt, tgt, time )
                 if time <= 0 then return end
                 local tlevel = self.attributes.level
-                if tlevel > 1 and cmt == COMMAND_USE then
+                if tlevel > 1 then
                     local weapon = actor:get_weapon()
                     if weapon and gtk.is_weapon_group( weapon, {"pistols", "smgs"} ) then
                         local wd = weapon.weapon
                         if not wd then return 0 end
                         local cd = weapon.clip
-                        local clipsize = weapon.attributes.clip_size or 0
-                        for c in weapon:children() do
-                            if c.attributes and c.attributes.clip_size then
-                                clipsize = clipsize + c.attributes.clip_size
-                            end
-                        end
+
                         if cd and cd.count == 0 then
-                            local reload_attempts = 0
-                            while cd.count < clipsize and reload_attempts < 10 do
-                                world:get_level():reload( actor, weapon, true )
-                                reload_attempts = reload_attempts + 1
+                            if tlevel == 2 then
+                                self.attributes.reload_time = 0.5
+                            elseif tlevel == 3 then
+                                self.attributes.reload_time = 0.2
                             end
+                        else
+                            self.attributes.reload_time = 1.0
                         end
                     end
                 end
