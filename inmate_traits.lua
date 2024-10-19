@@ -795,7 +795,7 @@ register_blueprint "ktrait_burglar"
     text = {
         name   = "Burglar",
         desc   = "ACTIVE SKILL - open doors from a distance.",
-        full   = "There's almost nowhere you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance\n{!LEVEL 2} - Open or close all doors in sight\n{!LEVEL 3} - Open red key card locked doors and elevators, open locked mini level elevators in sight",
+        full   = "There's almost nowhere you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance instantly.\n{!LEVEL 2} - Open or close all doors in sight instantly\n{!LEVEL 3} - Open red key card locked doors and elevators, open locked mini level elevators in sight instantly",
         abbr   = "Bur",
     },
     callbacks = {
