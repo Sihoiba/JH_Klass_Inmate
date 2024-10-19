@@ -66,7 +66,7 @@ register_blueprint "smuggler_cache"
                 local level = world:get_level()
                 local coord = world:get_position(entity)
                 local tlevel = self.attributes.level or 0
-                local slots = { "1", "2", "3" }
+                local slots = { "1", "2", "3", "4" }
                 local ammos  =
                     {
                         [world:hash("ammo_9mm")]     = { id = "ammo_9mm", },
