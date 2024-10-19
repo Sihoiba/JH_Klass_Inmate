@@ -43,7 +43,7 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
  - Chemist; requires Cutter 1 and Grenadier = 1: Acid immunity, acid pools created on hit and on area attacks including grenades.
  - GBH; requires Kneecap 1: Bleed immunity, attacks cause bleed, higher level increase bleed inflicted.
  - Fraudster; requires Burglar 1: Create decoys that distract enemies on cooldown, distracted enemies take more crits, cooldown is reduced on higher levels. Lvl 2 also increases Decoy health, lvl 3 makes Decoys explode on death
- - Ghost Gun; requires Smuggler 2: PISTOL/SMG: Active skill that when enabled causes you to fire your entire weapon clip. Higher levels automatically reload on empty, and reduce reload ammo cost.
+ - Ghost Gun; requires Smuggler 2: PISTOL/SMG: Active skill that when enabled causes you to fire your entire weapon clip. Higher levels reduce reload time on empty, and reduce reload ammo cost.
 
 ## Installing
 
