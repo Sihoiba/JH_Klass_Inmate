@@ -679,6 +679,9 @@ register_blueprint "buff_distracted"
 
 register_blueprint "decoy_light" {
     flags = { EF_NOPICKUP },
+    data = {
+        lifespan = 4000
+    },
     callbacks = {
         on_die = [=[
             function ( self )
@@ -705,6 +708,10 @@ register_blueprint "decoy_light" {
                             world:add_buff( e, "buff_distracted", 101, true )
                         end
                     end
+                end
+                self.data.lifespan = self.data.lifespan - 50
+                if self.data.lifespan <= 0 then
+                    world:mark_destroy( self:parent() )
                 end
                 return 50
             end
