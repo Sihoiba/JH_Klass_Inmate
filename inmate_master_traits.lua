@@ -756,7 +756,7 @@ register_blueprint "decoy" {
         ai = {
             aware = false,
             group = "player",
-            state = "idle",
+            state = "turret_idle",
         },
     },
     target = {},
