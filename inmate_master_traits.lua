@@ -388,7 +388,7 @@ register_blueprint "ktrait_master_gbh"
                     if self.attributes.level == 3 then
                         local level = world:get_level()
                         local position = world:get_position( who )
-                        local ar       = area.around( position, 3 )
+                        local ar       = area.around( position, 2 )
                         ar:clamp( level:get_area() )
 
                         for c in ar:coords() do
