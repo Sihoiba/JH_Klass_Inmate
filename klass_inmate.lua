@@ -654,7 +654,7 @@ register_blueprint "klass_inmate"
             { "ktrait_master_chemist", max = 3, master = true, require = { ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4, } },
             { "ktrait_master_gbh", max = 3, master = true, require = { ktrait_kneecap = 1, level = 6, level_inc = 4, } },
             { "ktrait_master_fraudster", max = 3, master = true, require = {  ktrait_burglar = 1, level = 6, level_inc = 4, } },
-            { "ktrait_master_ghost_gun", max = 3, master = true, require = { ktrait_smuggler = 2, level = 6, level_inc = 4, } },
+            { "ktrait_master_ghost_gun", max = 3, master = true, require = { ktrait_brute = 1, trait_juggler = 1, level = 6, level_inc = 4, } },
         },
     },
 }
