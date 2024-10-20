@@ -25,7 +25,7 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
  - Brute: Grants innate armour, higher levels also give splash damage resistance
  - Mule: Increased inventory space and reveal elevator locations, higher levels give more inventory, more weapon slots and reveal lootbox locations
  - Smuggler: Hit special environment objects like crates, plants and chairs to get ammo for your carried weapons.
- - Hitman; requires Desperado = 1: Reduces enemy cover affect, and increases damage against enemies at 100% or higher health. Level 1 cover 20% effective, damage bonus 10% at 100% health rising to 50% at 200% health; Level 2 cover 40% effective, damage bonus rises to 75% at 200% health, Level 3 ignores 60% enemy cover, damage bonus rises from 20% damage at 100% health to 100% at 200% health.
+ - Hitman; requires Desperado 1: Reduces enemy cover affect, and increases damage against enemies at 100% or higher health. Level 1 cover 20% effective, damage bonus 10% at 100% health rising to 50% at 200% health; Level 2 cover 40% effective, damage bonus rises to 75% at 200% health, Level 3 ignores 60% enemy cover, damage bonus rises from 20% damage at 100% health to 100% at 200% health.
  - Gambler: Random chance on using a station/ammo terminal to refund the charges. Higher levels increase the chance, and provide a chance to receive bonus multitools.
  - Cutter: convert small medkits into combat packs and stimpacks, or break large medkits down into 3 small ones.
 
@@ -40,10 +40,10 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
 
 ### Master Traits
  - Berserker; requires Skilled 2: Automatically enter Berserk status on taking damage or on gibbing enemies. Higher levels can extend active berserk duration too.
- - Chemist; requires Cutter 1 and Grenadier = 1: Acid immunity, acid pools created on hit and on area attacks including grenades.
+ - Chemist; requires Cutter 1 and Grenadier 1: Acid immunity, acid pools created on hit and on area attacks including grenades.
  - GBH; requires Kneecap 1: Bleed immunity, attacks cause bleed, higher level increase bleed inflicted.
  - Fraudster; requires Burglar 1: Create decoys that distract enemies on cooldown, distracted enemies take more crits, cooldown is reduced on higher levels. Lvl 2 also increases Decoy health, lvl 3 makes Decoys explode on death
- - Ghost Gun; requires Smuggler 2: PISTOL/SMG: Active skill that when enabled causes you to fire your entire weapon clip. Higher levels reduce reload time on empty, and reduce reload ammo cost.
+ - Ghost Gun; requires Juggler 1 and Brute 1: PISTOL/SMG: Active skill that when enabled causes you to fire your entire weapon clip. Higher levels reduce reload time on empty, and reduce reload ammo cost.
 
 ## Installing
 
