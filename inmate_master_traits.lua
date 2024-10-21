@@ -447,7 +447,7 @@ register_blueprint "buff_ghost_gun"
         level = 1,
         opt_distance = 0,
         max_distance = 0,
-        damage_add = 0,
+        damage_mult = 1.0,
         shots = 0,
         shot_cost_mod = 1.0,
     },
@@ -458,7 +458,7 @@ register_blueprint "buff_ghost_gun"
                     if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") then
                         self.attributes.opt_distance = 0
                         self.attributes.max_distance = 0
-                        self.attributes.damage_add = 0
+                        self.attributes.damage_mult = 1.0
                         self.attributes.shots = 0
                         self.attributes.shot_cost_mod = 1.0
                     end
@@ -471,15 +471,14 @@ register_blueprint "buff_ghost_gun"
                 if time <= 0 then return end
                 self.attributes.opt_distance = 0
                 self.attributes.max_distance = 0
-                self.attributes.damage_add = 0
+                self.attributes.damage_mult = 1.0
                 self.attributes.shots = 0
                 self.attributes.shot_cost_mod = 1.0
             end
         ]=],
         on_aim = [=[
             function ( self, entity, target, weapon )
-                if target and weapon and gtk.is_weapon_group( weapon, {"pistols", "smgs"} ) and weapon.weapon and weapon.attributes and weapon.attributes.shots and weapon.clip then
-                    if weapon.clip.count == 0 then return end
+                if target and weapon and gtk.is_weapon_group( weapon, {"pistols", "smgs"} ) and weapon.weapon and weapon.attributes and weapon.attributes.shots then
 
                     local shots = weapon.attributes.shots
                     for c in weapon:children() do
@@ -488,18 +487,16 @@ register_blueprint "buff_ghost_gun"
                         end
                     end
                     if weapon:child( "perk_wu_void" ) then
-                        self.attributes.shots = shots * self.attributes.level
-                    else
+                        self.attributes.damage_mult = self.attributes.level + 1
+                    elseif weapon.clip and weapon.clip.count > 0 then
                         local clip_count = weapon.clip.count
                         local shot_cost = weapon.weapon.shot_cost or 0
                         if shot_cost == 0 then shot_cost = 1 end
 
-                        local remaining_shots_after_this = clip_count - shot_cost
-                        if remaining_shots_after_this < 0 then remaining_shots_after_this = 0 end
-                        remaining_shots_after_this = math.floor(remaining_shots_after_this/shots)
+                        local remaining_shots_in_clip = math.floor(clip_count/(shot_cost * shots))
 
-                        self.attributes.damage_add = remaining_shots_after_this * weapon.attributes.damage
-                        self.attributes.shot_cost_mod = remaining_shots_after_this + 1
+                        self.attributes.damage_mult = remaining_shots_in_clip
+                        self.attributes.shot_cost_mod = remaining_shots_in_clip
                     end
 
                     if self.attributes.level < 3 then
@@ -531,7 +528,7 @@ register_blueprint "buff_ghost_gun"
                         end
                     end
                 else
-                    self.attributes.damage_add = 0
+                    self.attributes.damage_mult = 1.0
                     self.attributes.shots = 0
                     self.attributes.shot_cost_mod = 1.0
                 end

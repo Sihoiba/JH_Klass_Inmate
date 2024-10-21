@@ -960,14 +960,14 @@ register_blueprint "ktrait_desperado"
                         end
                     end
                     local clip_size = weapon.attributes.clip_size or shots
-                    local gg = entity:child("buff_ghost_gun")
-                    if gg then
-                        local e_shots = gg.attributes.shots or 0
-                        shots = shots + e_shots
-                    end
-                    local shot_cost = weapon.weapon.shot_cost or 1
+                    local shot_cost = (weapon.weapon.shot_cost or 1)
                     local cost_per_shot = shot_cost * shots
                     local shot_clip_percent = cost_per_shot / clip_size
+
+                    local gg = entity:child("buff_ghost_gun")
+                    if gg then
+                        shot_clip_percent = 1.0
+                    end
 
                     local damage_bonus = math.ceil(weapon.attributes.damage * shot_clip_percent * bonus)
 
