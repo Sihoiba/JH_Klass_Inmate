@@ -178,7 +178,7 @@ register_blueprint "buff_inmate_berserk_base"
                         self.data.trigger_door_kill_text = false
                         ui:set_hint( "{R"..self.text.door_kill_text.."}", 2001, 0 )
                     end
-                elseif not (target.data and target.data.ai) then
+                elseif target and not (target.data and target.data.ai) then
                     if self.data.trigger_environmental_kill_text then
                         self.data.trigger_environmental_kill_text = false
                         ui:set_hint( "{R"..self.text.environmental_object_kill_text.."}", 2001, 0 )
