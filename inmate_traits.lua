@@ -699,7 +699,7 @@ register_blueprint "kskill_burglar_open_close"
                             local visible = level:is_visible(c)
                             local closed = d.flags.data[ EF_NOMOVE ]
                             local broken = d.flags.data[ EF_KILLED ]
-                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" )
+                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" ) or ecs:child( d, "asterius_locked" ) or ecs:child( d, "valhalla_red_locked" ) or ecs:child( d, "dig_zone_tyre_locked" )
 
                             if distance < 3 and visible and closed and not broken and not locked then
                                 d.flags.data = { EF_ACTION },
@@ -729,10 +729,10 @@ register_blueprint "kskill_burglar_open_close"
                             local visible = level:is_visible(c)
                             local closed = d.flags.data[ EF_NOMOVE ]
                             local broken = d.flags.data[ EF_KILLED ]
-                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" )
+                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" ) or ecs:child( d, "asterius_locked" ) or ecs:child( d, "valhalla_red_locked" ) or ecs:child( d, "dig_zone_tyre_locked" )
 
                             if param and world:get_id(param) == "open" and visible and closed and not broken and not locked then
-                                d.flags.data = { EF_ACTION },
+                                d.flags.data = { EF_ACTION }
                                 world:play_sound( "door_open", d )
                                 world:set_state( d, "open" )
                                 worked = 1
@@ -742,11 +742,8 @@ register_blueprint "kskill_burglar_open_close"
                                 world:set_state( d, "closed" )
                                 worked = 1
                             end
-                            if param and world:get_id(param) == "unlock_open" and visible and not broken and ecs:child( d, "door_locked" ) then
-                                d.flags.data = { EF_ACTION },
-                                level:change_state( d, {
-                                    door_locked = "door_unlocked",
-                                })
+                            if param and world:get_id(param) == "unlock_open" and visible and not broken and locked then
+                                d.flags.data = { EF_ACTION }
                                 world:play_sound( "door_open", d )
                                 world:set_state( d, "open" )
                                 worked = 1
@@ -795,7 +792,7 @@ register_blueprint "ktrait_burglar"
     text = {
         name   = "Burglar",
         desc   = "ACTIVE SKILL - open doors from a distance.",
-        full   = "There's almost nowhere you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance instantly.\n{!LEVEL 2} - Open or close all doors in sight instantly\n{!LEVEL 3} - Open red key card locked doors and elevators, open locked mini level elevators in sight instantly",
+        full   = "There's almost nowhere you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance instantly.\n{!LEVEL 2} - Open or close all doors in sight instantly\n{!LEVEL 3} - Open any locked doors, red key card locked elevators and open locked mini level elevators in sight instantly",
         abbr   = "Bur",
     },
     callbacks = {
