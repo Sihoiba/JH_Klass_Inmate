@@ -699,7 +699,7 @@ register_blueprint "kskill_burglar_open_close"
                             local visible = level:is_visible(c)
                             local closed = d.flags.data[ EF_NOMOVE ]
                             local broken = d.flags.data[ EF_KILLED ]
-                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" ) or ecs:child( d, "asterius_locked" ) or ecs:child( d, "valhalla_red_locked" ) or ecs:child( d, "dig_zone_tyre_locked" )
+                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" ) or ecs:child( d, "valhalla_red_locked" ) or ecs:child( d, "valhalla_valsec_locked" ) or ecs:child( d, "asterius_locked" ) or ecs:child( d, "dig_zone_tyre_locked" )
 
                             if distance < 3 and visible and closed and not broken and not locked then
                                 d.flags.data = { EF_ACTION },
@@ -729,7 +729,7 @@ register_blueprint "kskill_burglar_open_close"
                             local visible = level:is_visible(c)
                             local closed = d.flags.data[ EF_NOMOVE ]
                             local broken = d.flags.data[ EF_KILLED ]
-                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" ) or ecs:child( d, "asterius_locked" ) or ecs:child( d, "valhalla_red_locked" ) or ecs:child( d, "dig_zone_tyre_locked" )
+                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" ) or ecs:child( d, "valhalla_red_locked" ) or ecs:child( d, "valhalla_valsec_locked" ) or ecs:child( d, "asterius_locked" ) or ecs:child( d, "dig_zone_tyre_locked" )
 
                             if param and world:get_id(param) == "open" and visible and closed and not broken and not locked then
                                 d.flags.data = { EF_ACTION }
