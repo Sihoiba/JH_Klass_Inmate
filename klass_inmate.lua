@@ -440,7 +440,7 @@ register_blueprint "ktrait_berserk"
                 end
 
                 world:lua_callback( entity, "on_berserk" )
-
+                world:lua_callback( entity, "on_klass_skill" )
                 return 1
             end
         ]=],

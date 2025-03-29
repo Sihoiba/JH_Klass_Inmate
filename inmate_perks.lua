@@ -73,65 +73,6 @@ register_blueprint "perk_cb_healing_rage"
     },
 }
 
-register_blueprint "perk_ta_capacitor"
-{
-    blueprint = "perk",
-    lists = {
-        group    = "perk_ca",
-        keywords = { "armor", },
-    },
-    text = {
-        name = "Capacitor matrix",
-        desc = "receiving damage recharges class skill (up to 100%)",
-    },
-    attributes = {
-        level = 2,
-    },
-    callbacks = {
-        on_receive_damage = [[
-            function ( self, entity, source, weapon, amount )
-                nova.log("on_recieve_damage")
-                if not entity then return end
-                if not entity.data or not entity.data.is_player then return end
-                if amount < 5 then return end
-                nova.log("on_recieve_damage past guard")
-                local restore = math.floor( amount * 0.2 )
-                local klass = gtk.get_klass_id( entity )
-                local resource
-
-                if klass == "marine" then
-                    nova.log("is marine")
-                    resource = entity:child( "resource_fury" )
-                elseif klass == "scout" then
-                    resource = entity:child( "resource_energy" )
-                elseif klass == "tech" then
-                    resource = entity:child( "resource_power" )
-                else
-                    local klass_hash = entity.progression.klass
-                    nova.log(klass_hash)
-                    local klass_id   = world:resolve_hash( klass_hash )
-                    nova.log(klass_id)
-                    local k = blueprints[ klass_id ]
-                    if not k or not k.klass or not k.klass.res then
-                        return
-                    end
-                    resource = entity:child( k.klass.res )
-                end
-
-                if not resource then
-                    return
-                end
-
-                local rattr = resource.attributes
-                if rattr.value < rattr.max then
-                    nova.log("restoring")
-                    rattr.value = math.min( rattr.value + restore, rattr.max )
-                end
-            end
-        ]],
-    }
-}
-
 register_blueprint "buff_kneecapped"
 {
     flags = { EF_NOPICKUP },
@@ -214,64 +155,6 @@ register_blueprint "perk_we_stun"
                 if who and who.data and ( not who.data.is_mechanical ) and who.data.can_bleed then
                     world:add_buff( who, "buff_stunned", 150, true )
                 end
-            end
-        ]=],
-    },
-}
-
-register_blueprint "perk_wb_specialist"
-{
-    blueprint = "perk",
-    lists = {
-        group    = "perk_wb",
-        keywords = { "pistols", "smgs", "auto", "shotguns", "rotary", "explosives", "semi", "weak" },
-    },
-    data = {},
-    text = {
-        name = "Specialist",
-        desc = "{!+100%} damage after class skill use",
-    },
-    attributes = {
-        apply       = 0,
-        damage_mult = 1.0,
-    },
-    callbacks = {
-        on_adrenaline = [=[
-            function(self,entity)
-                self.attributes.apply = 1
-            end
-        ]=],
-        on_stealth = [=[
-            function(self,entity)
-                self.attributes.apply = 1
-            end
-        ]=],
-        on_smoke_screen = [=[
-            function(self,entity)
-                self.attributes.apply = 1
-            end
-        ]=],
-        on_berserk = [=[
-            function(self,entity)
-                self.attributes.apply = 1
-            end
-        ]=],
-        on_post_command = [=[
-            function ( self, actor, cmt, weapon, time )
-                if cmt == COMMAND_USE then
-                    if weapon == self:parent() then
-                        self.attributes.apply = 0
-                    end
-                end
-            end
-        ]=],
-        on_aim = [=[
-            function ( self, entity, target, weapon )
-                local bonus = 1.0
-                if target and self:parent() == weapon and self.attributes.apply == 1 then
-                    bonus = 2.0
-                end
-                self.attributes.damage_mult = bonus
             end
         ]=],
     },
