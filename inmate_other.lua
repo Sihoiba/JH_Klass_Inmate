@@ -80,7 +80,7 @@ register_blueprint "smuggler_cache"
 
                 for _,slot_id in ipairs( slots ) do
                     local slot = world:get_player():get_slot( slot_id )
-                    if slot and slot.weapon and slot.weapon.type ~= world:hash("melee") and slot.clip and slot.clip.ammo and slot.clip.ammo ~= 0 and ammos[slot.clip.ammo] then
+                    if (slot and slot.weapon and not gtk.is_melee( slot )) and slot.clip and slot.clip.ammo and slot.clip.ammo ~= 0 and ammos[slot.clip.ammo] then
                         entity:attach(ammos[slot.clip.ammo].id)
                         if tlevel == 3 and self.data.cache_missing > 0 then
                             local missing = self.data.cache_missing

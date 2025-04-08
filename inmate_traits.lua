@@ -845,8 +845,7 @@ register_blueprint "ktrait_sucker_punch"
                 if time <= 0 then return end
                 if cmt == COMMAND_USE then
                     local weapon = actor:get_weapon()
-                    if weapon and weapon.weapon and weapon.weapon.type == world:hash("melee")
-                    and not gtk.is_blade( weapon ) then
+                    if gtk.is_melee_non_blade( weapon ) then
                         self.attributes.speed = self.attributes.melee_speed
                     end
                 else
@@ -861,7 +860,7 @@ register_blueprint "ktrait_sucker_punch"
                 local melee_adv = false
                 local melee_adv_tier = 0
                 for c in ecs:children( what ) do
-                    if c.weapon and c.weapon.type == world:hash("melee") then
+                    if gtk.is_blade( c ) then
                         melee_box = true
                         if c.data and not melee_adv then
                             melee_adv = c.data.adv
@@ -949,7 +948,7 @@ register_blueprint "ktrait_desperado"
                     bonus = 0.6
                 end
 
-                if target and weapon and weapon.attributes and weapon.weapon and weapon.weapon.type ~= world:hash("melee") and not weapon.stack and not weapon.weapon.natural then
+                if target and weapon and weapon.attributes and weapon.weapon and not gtk.is_melee( weapon ) and not weapon.stack and not weapon.weapon.natural then
                     local shots = weapon.attributes["shots"] or 0
                     for c in weapon:children() do
                         if c.attributes and c.attributes.shots then

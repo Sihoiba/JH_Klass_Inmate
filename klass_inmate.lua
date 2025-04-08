@@ -1,4 +1,7 @@
 function buff_ranged_melee(self, weapon)
+	if not weapon then
+		return
+	end	
     for c in weapon:children() do
         if c.weapon and c.weapon.type == world:hash("melee") and c.flags.data[ EF_NOPICKUP ] then
             nova.log("weapon melee damage increased "..tostring(weapon.text.name))
@@ -9,6 +12,9 @@ function buff_ranged_melee(self, weapon)
 end
 
 function undo_buff_ranged_melee(self, weapon)
+	if not weapon then
+		return
+	end
     for c in weapon:children() do
         if c.weapon and c.weapon.type == world:hash("melee") and c.flags.data[ EF_NOPICKUP ] then
             nova.log("weapon melee damage reset "..tostring(weapon.text.name))
@@ -139,7 +145,7 @@ register_blueprint "buff_inmate_berserk_base"
                     if w and w.weapon and w.weapon.group == world:hash("grenades") and entity and entity.data and entity.data.berserk_level and entity.data.berserk_level > 1 then
                         return 0
                     elseif w then
-                        if ( w.weapon and w.weapon.type ~= world:hash("melee") ) or ( w.skill and ( w.skill.weapon and ( not w.skill.melee ) ) ) then
+                        if (w.weapon and not gtk.is_melee( w )) or ( w.skill and ( w.skill.weapon and ( not w.skill.melee ) ) ) then
                             ui:set_hint( "{R"..self.text.weapon_fail.."}", 2001, 0 )
                             return -1
                         end
@@ -157,7 +163,7 @@ register_blueprint "buff_inmate_berserk_base"
                     if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") and entity and entity.data and entity.data.berserk_level and entity.data.berserk_level > 1 then
                         return 0
                     end
-                    if ( weapon.weapon and weapon.weapon.type ~= world:hash("melee") ) or ( weapon.skill and weapon.skill.weapon and not weapon.skill.melee ) then
+                    if (w.weapon and not gtk.is_melee( w )) or ( weapon.skill and weapon.skill.weapon and not weapon.skill.melee ) then
                         return -1
                     end
                 end
@@ -212,16 +218,16 @@ register_blueprint "buff_inmate_berserk_base"
                 local wep2 = parent:get_slot( "3" )
                 local wep3 = parent:get_slot( "4" )
 
-                if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep0 ) then
                     undo_buff_ranged_melee(self, wep0)
                 end
-                if wep1 and wep1.weapon and wep1.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep1 ) then
                     undo_buff_ranged_melee(self, wep1)
                 end
-                if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep2 ) then
                     undo_buff_ranged_melee(self, wep2)
                 end
-                if wep3 and wep3.weapon and wep3.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep3 ) then
                     undo_buff_ranged_melee(self, wep3)
                 end
             end
@@ -393,30 +399,30 @@ register_blueprint "ktrait_berserk"
                 local wep2 = entity:get_slot( "3" )
                 local wep3 = entity:get_slot( "4" )
 
-                if wep0 and wep0.weapon and wep0.weapon.type == world:hash("melee") then
+                if gtk.is_melee( wep0 ) then
                     melee = wep0
                     index = 0
-                elseif wep1 and wep1.weapon and wep1.weapon.type == world:hash("melee") then
+                elseif gtk.is_melee( wep1 ) then
                     melee = wep1
                     index = 1
-                elseif wep2 and wep2.weapon and wep2.weapon.type == world:hash("melee") then
+                elseif gtk.is_melee( wep2 ) then
                     melee = wep2
                     index = 2
-                elseif wep3 and wep3.weapon and wep3.weapon.type == world:hash("melee") then
+                elseif gtk.is_melee( wep3 ) then
                     melee = wep3
                     index = 3
                 end
 
-                if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep0 ) then
                     buff_ranged_melee(self, wep0)
                 end
-                if wep1 and wep1.weapon and wep1.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep1 ) then
                     buff_ranged_melee(self, wep1)
                 end
-                if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep2 ) then
                     buff_ranged_melee(self, wep2)
                 end
-                if wep3 and wep3.weapon and wep3.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep3 ) then
                     buff_ranged_melee(self, wep3)
                 end
 
@@ -428,7 +434,7 @@ register_blueprint "ktrait_berserk"
                         world:flush_destroy()
                     end
                     local eq_weapon = entity:get_weapon()
-                    if eq_weapon and eq_weapon.weapon and eq_weapon.weapon.type ~= world:hash("melee") then
+                    if not gtk.is_melee( eq_weapon ) then
                         level:swap_weapon( entity, index )
                     end
                 end
@@ -474,35 +480,35 @@ register_blueprint "ktrait_berserk"
                 local wep2 = entity:get_slot( "3" )
                 local wep3 = entity:get_slot( "4" )
 
-                if wep0 and wep0.weapon and wep0.weapon.type == world:hash("melee") then
+                if gtk.is_melee( wep0 ) then
                     melee = wep0
                     index = 0
-                elseif wep1 and wep1.weapon and wep1.weapon.type == world:hash("melee") then
+                elseif gtk.is_melee( wep1 ) then
                     melee = wep1
                     index = 1
-                elseif wep2 and wep2.weapon and wep2.weapon.type == world:hash("melee") then
+                elseif gtk.is_melee( wep2 ) then
                     melee = wep2
                     index = 2
-                elseif wep3 and wep3.weapon and wep3.weapon.type == world:hash("melee") then
+                elseif gtk.is_melee( wep3 )  then
                     melee = wep3
                     index = 3
                 end
 
-                if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep0)
+                if not gtk.is_melee( wep0 ) then
+                   buff_ranged_melee(self, wep0)
                 end
-                if wep1 and wep1.weapon and wep1.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep1)
+                if not gtk.is_melee( wep1 ) then
+                   buff_ranged_melee(self, wep1)
                 end
-                if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep2 ) then
                     buff_ranged_melee(self, wep2)
                 end
-                if wep3 and wep3.weapon and wep3.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( wep3 ) then
                     buff_ranged_melee(self, wep3)
                 end
 
                 local eq_weapon = entity:get_weapon()
-                if melee and eq_weapon.weapon and eq_weapon.weapon.type ~= world:hash("melee") then
+                if not gtk.is_melee( eq_weapon ) then
                     world:get_level():swap_weapon( entity, index )
                 end
             end
