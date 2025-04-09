@@ -331,7 +331,7 @@ register_gfx_blueprint "fragile_pipe_wrench"
 {
     uisprite = {
         icon = "data/texture/ui/icons/ui_weapon_pipe_wrench",
-        color = vec4( 1.0, 0.15, 0.0, 1.0 ),
+        color = vec4( 0.4, 0.4, 0.4, 0.8 ),
     },
     weapon_fx = {
         advance   = 0.5,
@@ -350,6 +350,15 @@ register_gfx_blueprint "fragile_pipe_wrench"
             mesh     = "data/model/pipe_wrench.nmd:pipe_wrench_01",
             material = "data/texture/weapons/melee/pipe_wrench_01/A/pipe_wrench_01",
         },
+    },
+}
+
+register_gfx_blueprint "damaged_pistol"
+{
+    blueprint = "pistol_base",
+    uisprite = {
+        icon = "data/texture/ui/icons/ui_weapon_pistol",
+        color = vec4( 0.4, 0.4, 0.4, 0.8 ),
     },
 }
 

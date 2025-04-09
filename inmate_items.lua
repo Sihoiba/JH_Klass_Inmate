@@ -361,7 +361,7 @@ register_blueprint "fragile_pipe_wrench"
     blueprint = "base_melee",
     text = {
         name = "shoddy pipe wrench",
-        desc = "It's seen a lot of use, and won't take more.",
+        desc = "It's seen a lot of use, and won't take much more.",
     },
     ascii     = {
         glyph     = "/",
@@ -389,6 +389,60 @@ register_blueprint "fragile_pipe_wrench"
             function(self,_,tier)
                 generator.add_perk( self, "perk_wb_mechabane" )
                 generator.add_perk( self, "perk_fragile" )
+            end
+        ]=],
+    },
+}
+
+register_blueprint "damaged_pistol"
+{
+	blueprint = "base_pistol",
+	lists = {
+		group    = "item",
+		keywords = { "base_weapon", },
+		weight   = 20,
+		dmed     = 12,
+		dmax     = 18,
+	},
+	text = {
+		name = "damaged 9mm pistol",
+		desc = "Standard military sidearm, damaged but in better shape than the {?curse|poor sod|fucker} you stole it and the landing craft from in your escape attempt. Better find something before it breaks.",
+	},
+	ascii     = {
+		glyph     = "/",
+		color     = DARKGRAY,
+	},
+	clip = {
+		ammo  = "ammo_9mm",
+		count = 8,
+		reload_sound = "pistol_reload",
+	},
+	attributes = {
+		swap_time = 0.5,
+		damage = 16,
+		shots = 1,
+		clip_size  = 8,
+		crit_damage = 50,
+		mod_capacity = 0,
+		opt_distance = 3,
+		max_distance = 6,
+	},
+	ui_target = {
+		type = "path",
+	},
+	noise = {
+		use = 10,
+	},
+	weapon = {
+		group = "pistols",
+		damage_type = "impact",
+		fire_sound = "pistol_shot",
+		hit_sound  = "bullet",
+	},
+    callbacks = {
+        on_create = [=[
+            function(self,_,tier)
+                generator.add_perk( self, "perk_fragile", 8 )
             end
         ]=],
     },
