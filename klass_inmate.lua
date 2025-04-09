@@ -163,7 +163,7 @@ register_blueprint "buff_inmate_berserk_base"
                     if weapon and weapon.weapon and weapon.weapon.group == world:hash("grenades") and entity and entity.data and entity.data.berserk_level and entity.data.berserk_level > 1 then
                         return 0
                     end
-                    if (w.weapon and not gtk.is_melee( w )) or ( weapon.skill and weapon.skill.weapon and not weapon.skill.melee ) then
+                    if (weapon.weapon and not gtk.is_melee( weapon )) or ( weapon.skill and weapon.skill.weapon and not weapon.skill.melee ) then
                         return -1
                     end
                 end
