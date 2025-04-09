@@ -33,7 +33,7 @@ register_blueprint "resource_rage"
         amount = 1
     },
     resource = {
-        color = LIGHTRED,
+        color = MAGENTA,
         block_size = 5,
     },
     callbacks = {
@@ -107,7 +107,7 @@ register_blueprint "buff_inmate_berserk_base"
         trigger_environmental_kill_text = true,
     },
     ui_buff = {
-        color     = RED,
+        color     = MAGENTA,
         priority  = 200,
         style     = 3,
     },
@@ -572,23 +572,14 @@ register_blueprint "runtime_fix_challenges"
     callbacks = {
         on_enter_level = [[
             function ( self, player, reenter )
-
                 if self.data and self.data.first_level == 0 then
                     self.data.first_level = 1
                     nova.log("on enter level called")
                     local level = world:get_level()
-                    if player:child( "runtime_reload" ) or player:child( "runtime_shotgunnery" ) then
-                        local pw  = player:child( "pipe_wrench" )
-                        level:drop_item( player, pw )
-                        if pw then world:destroy( pw ) end
-
+                    if player:child( "runtime_reload" ) or player:child( "runtime_shotgunnery" ) or player:child( "runtime_rocket" ) then
                         local fpw = world:create_entity( "fragile_pipe_wrench" )
                         player:equip( fpw )
                     elseif player:child( "runtime_marksmanship" ) then
-                        local pw  = player:child( "pipe_wrench" )
-                        level:drop_item( player, pw )
-                        if pw then world:destroy( pw ) end
-
                         local p = world:create_entity( "pistol" )
                         local a = world:create_entity( "ammo_9mm" )
                         a.stack.amount = 32
@@ -597,6 +588,11 @@ register_blueprint "runtime_fix_challenges"
 
                         local fpw = world:create_entity( "fragile_pipe_wrench" )
                         player:equip( fpw )
+                    else
+                        local pw = world:create_entity( "pipe_wrench" )
+                        player:equip( pw )
+                        local dp = world:create_entity( "damaged_pistol" )
+                        player:equip( dp )
                     end
                 end
             end
@@ -609,7 +605,7 @@ register_blueprint "klass_inmate"
     text = {
         name  = "Inmate",
         short = "Inmate",
-        desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore 50% {!Rage}.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost; however you can only perform melee attacks.\n\n{!GEAR} - Inmates start with a pipe wrench, smoke grenade and stimpack but no guns.",
+        desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore 50% {!Rage}.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost; however you can only perform melee attacks.\n\n{!GEAR} - Inmates start with a pipe wrench, a stimpack and a broken pistol.",
         abbr = "M",
     },
     callbacks = {
@@ -619,10 +615,7 @@ register_blueprint "klass_inmate"
                 entity:attach( "ktrait_always_angry" )
                 local adr = entity:attach( "ktrait_berserk" )
                 adr.skill.cost = 30
-                entity:attach( "smoke_grenade" )
                 entity:attach( "stimpack_small" )
-                entity:attach( "medkit_small" )
-                entity:attach( "pipe_wrench" )
                 entity:attach( "runtime_fix_challenges" )
             end
         ]=],

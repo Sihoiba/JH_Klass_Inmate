@@ -610,7 +610,7 @@ register_blueprint "ktrait_master_ghost_gun"
     text = {
         name   = "GHOST GUN",
         desc   = "MASTER TRAIT - PISTOL/SMG ONLY - ACTIVE SKILL Toggle On/Off - empty full clip when firing.",
-        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets, but weapon optimal range is reduced to a max of {!3} and max range reduced to {!5}. Activating {!Ghost Gun} cancels {!Berserk}.\n{!LEVEL 2} - {!50%} reload time for pistol/SMGs when empty at {!50%} ammo consumption, max range now reduced to {!6}.\n{!LEVEL 3} - {!20%} pistol/SMG reload time when empty at {!20%} ammo consumption, optimal and max range penalties removed.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You've got a record for using illegal modified firearms. Activate skill to empty your entire clip when you fire a pistol or SMG.\n\n{!LEVEL 1} - While the skill is active fire all your bullets, but weapon optimal range is reduced to a max of {!3} and max range reduced to {!5}. Activating {!Ghost Gun} cancels {!Berserk}.\n{!LEVEL 2} - {!50%} reload time for pistol/SMGs when empty at {!50%} ammo consumption, max range now reduced to {!6}.\n{!LEVEL 3} - {!20%} pistol/SMG reload time when empty at {!25%} ammo consumption, optimal and max range penalties removed.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MGG",
     },
     attributes = {
@@ -630,8 +630,8 @@ register_blueprint "ktrait_master_ghost_gun"
                     gg.attributes["pistols.reload_mod"] = 0.50
                     gg.attributes["smgs.reload_mod"]    = 0.50
                 elseif lvl == 3 then
-                    gg.attributes["pistols.reload_mod"] = 0.20
-                    gg.attributes["smgs.reload_mod"]    = 0.20
+                    gg.attributes["pistols.reload_mod"] = 0.25
+                    gg.attributes["smgs.reload_mod"]    = 0.25
                 end
                 entity.data.gg_level = ( entity.data.gg_level or 0 ) + 1
             end
