@@ -298,10 +298,10 @@ register_blueprint "enviropack"
                 -- Inmate mod difference ends --
 
                 world:play_sound( "medkit_small", entity )
-                world:destroy( self:child("poisoned") )
-                world:destroy( self:child("acided") )
-                world:destroy( self:child("burning") )
-                world:destroy( self:child("freeze") )
+                world:destroy( entity:child("poisoned") )
+                world:destroy( entity:child("acided") )
+                world:destroy( entity:child("burning") )
+                world:destroy( entity:child("freeze") )
                 gtk.remove_fire( entity:get_position() )
                 return 100
             end
