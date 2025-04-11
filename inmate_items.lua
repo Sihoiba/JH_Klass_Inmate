@@ -406,7 +406,7 @@ register_blueprint "damaged_pistol"
 	},
 	text = {
 		name = "damaged 9mm pistol",
-		desc = "Standard military sidearm, damaged but in better shape than the {?curse|poor sod|fucker} you stole it and the landing craft from in your escape attempt. Better find something before it breaks.",
+		desc = "Standard military sidearm, damaged but in better shape than the {?curse|poor sod|fucker} you stole it and the landing craft from in your escape attempt. The magazine is jammed so it can't be reloaded.",
 	},
 	ascii     = {
 		glyph     = "/",
@@ -416,6 +416,7 @@ register_blueprint "damaged_pistol"
 		ammo  = "ammo_9mm",
 		count = 8,
 		reload_sound = "pistol_reload",
+		reload_count = -1,
 	},
 	attributes = {
 		swap_time = 0.5,
@@ -439,11 +440,4 @@ register_blueprint "damaged_pistol"
 		fire_sound = "pistol_shot",
 		hit_sound  = "bullet",
 	},
-    callbacks = {
-        on_create = [=[
-            function(self,_,tier)
-                generator.add_perk( self, "perk_fragile", 8 )
-            end
-        ]=],
-    },
 }
