@@ -53,7 +53,7 @@ register_blueprint "ktrait_master_berserker"
                 local gib_berserk = math.random(self.attributes.gib_berserk_chance)
                 local is_berserk = entity:child("buff_inmate_berserk_skill_1") or entity:child("buff_inmate_berserk_skill_2") or entity:child("buff_inmate_berserk_skill_3")
 
-                if target.data and target.data.ai and gibbed and gtk.is_melee( weapon ) then
+                if target and target.data and target.data.ai and gibbed and gtk.is_melee( weapon ) then
                     if is_berserk and tlevel == 3 then
                         ui:set_hint( "{R"..self.text.berserk_reset.."}", 2001, 0 )
                         world:lua_callback( entity, "on_reset_berserk" )
