@@ -32,6 +32,25 @@ register_blueprint "toughest_tracker"
     },
 }
 
+register_blueprint "smuggler_cache_outline"
+{
+    flags = { EF_NOPICKUP },
+    callbacks = {
+        on_die = [=[
+            function ( self )
+                world:mark_destroy( self )
+                world:flush_destroy()
+            end
+        ]=],
+        on_receive_damage = [=[
+            function ( self, entity, source, weapon, amount )
+                if not self then return end
+                world:mark_destroy( self )
+            end
+        ]=],
+    }
+}
+
 register_blueprint "smuggler_cache"
 {
     flags = { EF_NOPICKUP },

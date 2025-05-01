@@ -99,7 +99,7 @@ register_blueprint "buff_corroded"
     flags = { EF_NOPICKUP },
     text = {
         name    = "Corroded",
-        desc    = "{!-100%} acid resistance",
+        desc    = "{!-50%} slash, impact, pierce, plasma and acid resistance",
     },
     callbacks = {
         on_die = [[
@@ -110,7 +110,11 @@ register_blueprint "buff_corroded"
     },
     attributes = {
         resist = {
-            acid = -100,
+            impact   = -50,
+            slash    = -50,
+            pierce   = -50,
+            plasma   = -50,
+            acid     = -50,
         },
     },
     ui_buff = {
@@ -123,7 +127,7 @@ register_blueprint "buff_corroded_minor"
     flags = { EF_NOPICKUP },
     text = {
         name    = "Corroded",
-        desc    = "{!-25%} acid resistance",
+        desc    = "{!-25%} slash, impact, pierce, plasma and acid resistance",
     },
     callbacks = {
         on_die = [[
@@ -134,7 +138,11 @@ register_blueprint "buff_corroded_minor"
     },
     attributes = {
         resist = {
-            acid = -25,
+            impact   = -25,
+            slash    = -25,
+            pierce   = -25,
+            plasma   = -25,
+            acid     = -25,
         },
     },
     ui_buff = {
@@ -248,12 +256,11 @@ register_blueprint "ktrait_master_chemist"
     text = {
         name   = "CHEMIST",
         desc   = "MASTER TRAIT - acid resist, and acid spreading on AoE.",
-        full   = "You have set up so many make shift drug labs that you know your acids and bases! You are acid immune, moreover any wielded weapon you use (especially area of effect weapons) spread acid!\n\n{!LEVEL 1} - {!immunity} to acid status effect, {!10 Acid} pool created on hit, faster move speed when near acid, leave acid trail when {!Berserk}\n{!LEVEL 2} - double armor damage, hit enemies gain {!-25%} acid resistance, grenades leave acid in their AoE\n{!LEVEL 3} - hit enemies gain {!-100%} acid resistance, even faster move speed when near acid\n\nYou can pick only one MASTER trait per character.",
+        full   = "You have set up so many make shift drug labs that you know your acids and bases! You are acid immune, any wielded weapon you use spread acid!\n\n{!LEVEL 1} - {!immunity} to acid status effect, {!10 Acid} pool created on hit, {!+10%} move speed when near acid, leave acid trail when {!Berserk}\n{!LEVEL 2} - hit enemies suffer {!-25%} resistance to impact, slash, piece, plasma and acid, grenades leave acid in their AoE\n{!LEVEL 3} - hit enemies suffer {!-50%} resistance, {!+25%} move speed when near acid\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MCH",
     },
     attributes = {
         level    = 1,
-        armor_damage = 1.0,
         resist = {
             acid = 100,
         },
@@ -263,9 +270,6 @@ register_blueprint "ktrait_master_chemist"
             function(self, entity)
                 local tlevel, t = gtk.upgrade_master( entity, "ktrait_master_chemist" )
                 t.attributes.chemist_level = tlevel
-                if tlevel == 2 then
-                    t.attributes.armor_damage = 2.0
-                end
                 if tlevel >= 1 then
                     local index = 0
                     repeat

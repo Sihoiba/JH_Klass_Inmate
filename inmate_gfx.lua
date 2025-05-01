@@ -403,3 +403,14 @@ register_gfx_blueprint "smuggler_cache"
         visibility = "OOV_ONLY",
     },
 }
+
+register_gfx_blueprint "smuggler_cache_outline"
+{
+    equip = {},
+    uisprite = {
+            icon = "data/texture/ui/icons/ui_frame_01",
+            color = vec4( 0.84,0.84,0.84, 0.5 ),
+            propagate = true,
+            visibility = "REVEAL",
+    },
+}
