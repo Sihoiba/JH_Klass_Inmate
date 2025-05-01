@@ -141,6 +141,7 @@ function add_smuggler_cache(self, tlevel)
                 cache.data.cache_missing = 4 - total_available_entities
             end
         end
+        world:add_buff( e, "smuggler_cache_outline" )
         table.insert(caches, cache)
     end
 end
@@ -283,7 +284,7 @@ register_blueprint "ktrait_gambler"
     text = {
         name = "Gambler",
         desc = "Chance to refund charges when using a station or ammo terminal; excluding extract multitools.",
-        full = "You cannot resist a game of chance, hacking them into things when they don't otherwise exist.\n\n{!LEVEL 1} - {!+40%} chance to refund the cost when using a station/terminal\n{!LEVEL 2} - {!+10%} chance the station/terminal will drop a multitool when using it, and reveal terminals and stations\n{!LEVEL 3} - an additional {!+40%} chance to refund the cost which decays {10%} with every attempt and resets on entering a new level.",
+        full = "You cannot resist a game of chance, hacking them into things when they don't otherwise exist.\n\n{!LEVEL 1} - {!+40%} chance to refund the cost when using a station/terminal\n{!LEVEL 2} - {!+10%} chance the station/terminal will drop a multitool when using it, and reveal terminals and stations\n{!LEVEL 3} - an additional {!+40%} chance to refund the cost which decays {!10%} with every attempt and resets on entering a new level.",
         abbr = "Gmb",
     },
     attributes = {
@@ -379,7 +380,7 @@ register_blueprint "ktrait_gambler"
                                         local mtlucky = math.random(10)
                                         if mtlucky == 10 then
                                             nova.log("Won Multitool prize")
-                                            world:play_sound( "vending_hit_reward", e )
+                                            world:play_sound( "vending_hit", e )
                                             entity:pickup( "kit_multitool", true )
                                             uitk.station_activate( entity, e, true )
                                         end
@@ -771,7 +772,7 @@ register_blueprint "kskill_burglar_open_close"
                         ui:set_hint( "No doors can be interacted with", 50, 1 )
                     end
                 end
-                return 100
+                return 0
             end
         ]=],
     },
