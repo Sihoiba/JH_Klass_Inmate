@@ -9,7 +9,7 @@ The inmates ACTION skill is Berserk. At the cost of Rage. This gives him a short
 
 The inmates class resources is Rage, and this is restored as the Inmate takes damage.
 
-The inmates PASSIVE skill Always Angry, restores half his rage whenever he enters a new level.
+The inmates PASSIVE skill Always Angry, restores half his rage whenever he enters a new level and increases gun melee damage by 12.
 
 In addition to the new Klass, this mod adds AV versions of the Crowbar, Axe and Large Axe.
 
@@ -43,7 +43,7 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
  - Chemist; requires Cutter 1 and Grenadier 1: Acid immunity, acid pools created on hit and on area attacks including grenades.
  - GBH; requires Kneecap 1: Bleed immunity, attacks cause bleed, higher level increase bleed inflicted.
  - Fraudster; requires Burglar 1: Create decoys that distract enemies on cooldown, distracted enemies take more crits, cooldown is reduced on higher levels. Lvl 2 also increases Decoy health, lvl 3 makes Decoys explode on death
- - Ghost Gun; requires Juggler 1 and Brute 1: PISTOL/SMG: Active skill that when enabled causes you to fire your entire weapon clip. Higher levels reduce reload time on empty, and reduce reload ammo cost.
+ - Ghost Gun; requires Juggler 1 and Mule 1: PISTOL/SMG: Active skill that when enabled causes you to fire your entire weapon clip. Higher levels reduce reload time on empty, and reduce reload ammo cost.
 
 ## Installing
 
