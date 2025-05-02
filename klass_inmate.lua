@@ -570,7 +570,7 @@ register_blueprint "klass_inmate"
                 adr.skill.cost = 30
                 entity:attach( "stimpack_small" )
                 entity:attach( "runtime_fix_challenges" )
-				entity:attach( "runtime_add_xp" )
+                -- entity:attach( "runtime_add_xp" )
             end
         ]=],
     },
