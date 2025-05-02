@@ -562,9 +562,9 @@ register_blueprint "kskill_ghost_gun_toggle"
 {
     flags = { EF_NOPICKUP },
     text = {
-        name = "Ghost Gun On",
-        on   = "Ghost Gun On",
-        off  = "Ghost Gun Off",
+        name = "Start Ghost Gunning",
+        on   = "Start Ghost Gunning",
+        off  = "Stop Ghost Gunning",
     },
     data = {
         is_free_use = true,
@@ -727,7 +727,7 @@ register_blueprint "decoy_light" {
                 if self.data.lifespan <= 0 then
                     world:mark_destroy( self:parent() )
                 end
-                return 50
+                return 25
             end
         ]=],
     }
@@ -811,6 +811,7 @@ register_blueprint "decoy" {
                         e.target.entity = self
                     end
                 end
+                return 10
             end
         ]=],
     }
@@ -826,7 +827,10 @@ register_blueprint "kskill_fraudster_create_decoy"
         is_free_use = true
     },
     skill = {
+        resource = "resource_rage",
+        fail_vo  = "vo_no_rage",
         cooldown = 2000,
+        cost     = 2,
     },
     ui_target = {
         type = "mortar",
@@ -870,7 +874,7 @@ register_blueprint "ktrait_master_fraudster"
     text = {
         name   = "FRAUDSTER",
         desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire, gain crit bonus against enemies near decoys.",
-        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!40}, {!50%} crit chance on enemies near decoys, reduced scent detection range, {!Berserk} resets cooldown, and reduces it to {!2}\n{!LEVEL 2} - cooldown {!10}, decoy health {!80}, {!100%} crit chance and {!50}% crit damage on enemies near decoys.\n{!LEVEL 3} - cooldown {!5}, decoy EMP explosion on death, {!100%} crit damage on enemies near decoys.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!40}, {!50%} crit chance on enemies near decoys, reduced scent detection range, costs {!2} rage.\n{!LEVEL 2} - cooldown {!10}, decoy health {!80}, {!100%} crit chance and {!50}% crit damage on enemies near decoys, {+10} max rage.\n{!LEVEL 3} - cooldown {!5}, decoy EMP explosion on death, {!100%} crit damage on enemies near decoys, {+20} max rage.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MFr",
     },
     attributes = {
@@ -888,9 +892,13 @@ register_blueprint "ktrait_master_fraudster"
                 if lvl == 2 then
                     local cd = entity:child( "kskill_fraudster_create_decoy" )
                     cd.skill.cooldown = 1000
+                    local rage = entity:child( "resource_rage" )
+                    rage.attributes.max = rage.attributes.max + 10
                 elseif lvl == 3 then
                     local cd = entity:child( "kskill_fraudster_create_decoy" )
                     cd.skill.cooldown = 500
+                    local rage = entity:child( "resource_rage" )
+                    rage.attributes.max = rage.attributes.max + 10
                 end
             end
         ]=],
