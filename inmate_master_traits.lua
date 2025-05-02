@@ -6,7 +6,7 @@ register_blueprint "ktrait_master_berserker"
 {
     blueprint = "trait",
     text = {
-        name   = "BERSERK",
+        name   = "BERSERKER",
         desc   = "MASTER TRAIT - you enter Berserk on damage and on gibbing with melee weapons.",
         full   = "You're a barely controlled ball of rage, and will go Berserk on the slightest provocation.\n\n{!LEVEL 1} - If not Berserk, become Berserk if you lose {!15%} of your health in a single hit or {!25%} chance to go Berserk on gibbing with a melee kill\n{!LEVEL 2} - The Berserker can now use grenades while Berserk, {!33%} chance to go Berserk when gibbing\n{!LEVEL 3} - Gibbing while Berserk now extends the Berserk duration by {!3} turns up to max duration.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MBK",
