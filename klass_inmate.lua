@@ -1,14 +1,20 @@
 function buff_ranged_melee(self, weapon)
+    if not weapon then
+        return
+    end
     for c in weapon:children() do
         if c.weapon and c.weapon.type == world:hash("melee") and c.flags.data[ EF_NOPICKUP ] then
             nova.log("weapon melee damage increased "..tostring(weapon.text.name))
-            c.attributes.damage_add = 10
+            c.attributes.damage_add = 15
             break
         end
     end
 end
 
 function undo_buff_ranged_melee(self, weapon)
+    if not weapon then
+        return
+    end
     for c in weapon:children() do
         if c.weapon and c.weapon.type == world:hash("melee") and c.flags.data[ EF_NOPICKUP ] then
             nova.log("weapon melee damage reset "..tostring(weapon.text.name))
@@ -83,6 +89,13 @@ register_blueprint "ktrait_always_angry"
                     if rattr.value > rattr.max then
                         rattr.value = rattr.max
                     end
+                end
+            end
+        ]=],
+        on_pickup = [=[
+            function ( self, user, w )
+                if w and w.weapon and w.weapon.type ~= world:hash("melee") then
+                    buff_ranged_melee(self, w)
                 end
             end
         ]=],
@@ -194,35 +207,6 @@ register_blueprint "buff_inmate_berserk_base"
                 if parent and parent.attributes and parent.attributes.grace_period then
                     parent.attributes.grace_period = false
                     buff = world:add_buff( parent, "buff_inmate_berserk_grace_period", 300 )
-                end
-                local f = parent:child("ktrait_master_fraudster")
-                local sf = parent:child("kskill_fraudster_create_decoy")
-                if f and sf then
-                    if f.attributes.level == 3 then
-                        sf.skill.cooldown = 500
-                    elseif f.attributes.level == 2 then
-                        sf.skill.cooldown = 1000
-                    else
-                        sf.skill.cooldown = 2000
-                    end
-                end
-
-                local wep0 = parent:get_slot( "1" )
-                local wep1 = parent:get_slot( "2" )
-                local wep2 = parent:get_slot( "3" )
-                local wep3 = parent:get_slot( "4" )
-
-                if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
-                    undo_buff_ranged_melee(self, wep0)
-                end
-                if wep1 and wep1.weapon and wep1.weapon.type ~= world:hash("melee") then
-                    undo_buff_ranged_melee(self, wep1)
-                end
-                if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
-                    undo_buff_ranged_melee(self, wep2)
-                end
-                if wep3 and wep3.weapon and wep3.weapon.type ~= world:hash("melee") then
-                    undo_buff_ranged_melee(self, wep3)
                 end
             end
         ]],
@@ -407,19 +391,6 @@ register_blueprint "ktrait_berserk"
                     index = 3
                 end
 
-                if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep0)
-                end
-                if wep1 and wep1.weapon and wep1.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep1)
-                end
-                if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep2)
-                end
-                if wep3 and wep3.weapon and wep3.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep3)
-                end
-
                 if melee then
                     local bgg = entity:child("buff_ghost_gun")
                     if bgg then
@@ -431,12 +402,6 @@ register_blueprint "ktrait_berserk"
                     if eq_weapon and eq_weapon.weapon and eq_weapon.weapon.type ~= world:hash("melee") then
                         level:swap_weapon( entity, index )
                     end
-                end
-
-                local sf = entity:child("kskill_fraudster_create_decoy")
-                if sf then
-                    sf.skill.time_left = 0
-                    sf.skill.cooldown = 200
                 end
 
                 world:lua_callback( entity, "on_berserk" )
@@ -486,19 +451,6 @@ register_blueprint "ktrait_berserk"
                 elseif wep3 and wep3.weapon and wep3.weapon.type == world:hash("melee") then
                     melee = wep3
                     index = 3
-                end
-
-                if wep0 and wep0.weapon and wep0.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep0)
-                end
-                if wep1 and wep1.weapon and wep1.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep1)
-                end
-                if wep2 and wep2.weapon and wep2.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep2)
-                end
-                if wep3 and wep3.weapon and wep3.weapon.type ~= world:hash("melee") then
-                    buff_ranged_melee(self, wep3)
                 end
 
                 local eq_weapon = entity:get_weapon()
@@ -592,6 +544,7 @@ register_blueprint "runtime_fix_challenges"
                         local pw = world:create_entity( "pipe_wrench" )
                         player:equip( pw )
                         local dp = world:create_entity( "damaged_pistol" )
+                        buff_ranged_melee(self, dp)
                         player:equip( dp )
                     end
                 end
@@ -605,7 +558,7 @@ register_blueprint "klass_inmate"
     text = {
         name  = "Inmate",
         short = "Inmate",
-        desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore 50% {!Rage}.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost; however you can only perform melee attacks.\n\n{!GEAR} - Inmates start with a pipe wrench, a stimpack and a broken pistol.",
+        desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore {!50% Rage}. Deal {!+15} damage when meleeing with guns.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost; however you can only perform melee attacks.\n\n{!GEAR} - Inmates start with a pipe wrench, a stimpack and a broken pistol.",
         abbr = "M",
     },
     callbacks = {

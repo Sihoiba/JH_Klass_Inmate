@@ -772,7 +772,7 @@ register_blueprint "kskill_burglar_open_close"
                         ui:set_hint( "No doors can be interacted with", 50, 1 )
                     end
                 end
-                return 0
+                return 1
             end
         ]=],
     },
