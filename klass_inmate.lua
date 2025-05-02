@@ -5,7 +5,7 @@ function buff_ranged_melee(self, weapon)
     for c in weapon:children() do
         if c.weapon and c.weapon.type == world:hash("melee") and c.flags.data[ EF_NOPICKUP ] then
             nova.log("weapon melee damage increased "..tostring(weapon.text.name))
-            c.attributes.damage_add = 15
+            c.attributes.damage_add = 12
             break
         end
     end
@@ -558,7 +558,7 @@ register_blueprint "klass_inmate"
     text = {
         name  = "Inmate",
         short = "Inmate",
-        desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore {!50% Rage}. Deal {!+15} damage when meleeing with guns.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost; however you can only perform melee attacks.\n\n{!GEAR} - Inmates start with a pipe wrench, a stimpack and a broken pistol.",
+        desc = "Inmates are mean and tough enough to need to be imprisoned all the way out here.\n\n{!RESOURCE} - {!Rage} is the Inmate's class resource, it regenerates as the inmate takes damage.\n\n{!PASSIVE} - each time you enter a new level you restore {!50% Rage}. Deal {!+12} damage when meleeing with guns.\n\n{!ACTIVE} - for {!30} points of Rage you go Berserk gaining movement speed, damage resistance and a massive melee damage boost; however you can only perform melee attacks.\n\n{!GEAR} - Inmates start with a pipe wrench, a stimpack and a broken pistol.",
         abbr = "M",
     },
     callbacks = {
@@ -570,6 +570,7 @@ register_blueprint "klass_inmate"
                 adr.skill.cost = 30
                 entity:attach( "stimpack_small" )
                 entity:attach( "runtime_fix_challenges" )
+				entity:attach( "runtime_add_xp" )
             end
         ]=],
     },
@@ -600,7 +601,7 @@ register_blueprint "klass_inmate"
             { "ktrait_master_chemist", max = 3, master = true, require = { ktrait_cutter = 1, ktrait_grenadier = 1, level = 6, level_inc = 4, } },
             { "ktrait_master_gbh", max = 3, master = true, require = { ktrait_kneecap = 1, level = 6, level_inc = 4, } },
             { "ktrait_master_fraudster", max = 3, master = true, require = {  ktrait_burglar = 1, level = 6, level_inc = 4, } },
-            { "ktrait_master_ghost_gun", max = 3, master = true, require = { ktrait_brute = 1, trait_juggler = 1, level = 6, level_inc = 4, } },
+            { "ktrait_master_ghost_gun", max = 3, master = true, require = { ktrait_mule = 1, trait_juggler = 1, level = 6, level_inc = 4, } },
         },
     },
 }
