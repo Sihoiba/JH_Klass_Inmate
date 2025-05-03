@@ -838,7 +838,7 @@ register_blueprint "kskill_fraudster_create_decoy"
     attributes = {
         opt_distance = 8,
         max_distance = 8,
-        range = 0,
+		explosion    = 4,
     },
     callbacks = {
         on_use = [=[
