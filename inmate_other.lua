@@ -97,15 +97,30 @@ register_blueprint "smuggler_cache"
                         [world:hash("ammo_rockets")] = { id = "ammo_rockets", },
                     }
 
+                local caches_needed = {}
                 for _,slot_id in ipairs( slots ) do
                     local slot = world:get_player():get_slot( slot_id )
-                    if slot and slot.weapon and slot.weapon.type ~= world:hash("melee") and slot.clip and slot.clip.ammo and slot.clip.ammo ~= 0 and ammos[slot.clip.ammo] then
-                        entity:attach(ammos[slot.clip.ammo].id)
-                        if tlevel == 3 and self.data.cache_missing > 0 then
-                            local missing = self.data.cache_missing
-                            while missing > 0 do
-                                missing = missing - 1
-                                entity:attach(ammos[slot.clip.ammo].id)
+                    if (slot and slot.weapon and slot.weapon.type ~= world:hash("melee") and slot.clip and slot.clip.ammo and slot.clip.ammo ~= 0 and ammos[slot.clip.ammo] then
+                        if not caches_needed[ammos[slot.clip.ammo].id] then
+                            caches_needed[ammos[slot.clip.ammo].id] = 1
+                        elseif caches_needed[ammos[slot.clip.ammo].id] then
+                            caches_needed[ammos[slot.clip.ammo].id] = 2
+                        end
+                    end
+                end
+
+                for id, count in pairs(caches_needed) do
+                    entity:attach(id)
+                    if count == 2 then
+                        entity:attach(id)
+                    end
+                    if tlevel == 3 and self.data.cache_missing > 0 then
+                        local missing = self.data.cache_missing
+                        while missing > 0 do
+                            missing = missing - 1
+                            entity:attach(id)
+                            if count == 2 then
+                                entity:attach(id)
                             end
                         end
                     end

@@ -117,14 +117,14 @@ function add_smuggler_cache(self, tlevel)
             is_door = true
         end
         local id = world:get_id(e)
-        local is_dante_pillar = id == "dante_obelisk_01" or id == "dante_obelisk_02" or id == "dante_obelisk_03" or id == "dante_gap_obelisk_01_A" or id == "dante_gap_obelisk_01_B" or id == "dante_pillar" or id == "dante_pillar_blood"
-        if not (e.data and e.data.ai) and not e.hazard and not is_door and e.attributes and e.attributes.health and not e.armor and not e.attributes.is_light and not e:flag( EF_NOCORPSE ) and not is_dante_pillar then
+        local is_dante_furniture = id == "dante_obelisk_01" or id == "dante_obelisk_02" or id == "dante_obelisk_03" or id == "dante_gap_obelisk_01_A" or id == "dante_gap_obelisk_01_B" or id == "dante_pillar" or id == "dante_pillar_blood" or id == "dante_cage"
+        if not (e.data and e.data.ai) and not e.hazard and not is_door and e.attributes and e.attributes.health and not e.armor and not e.attributes.is_light and not e:flag( EF_NOCORPSE ) and not is_dante_furniture then
             if e.health.current == e.attributes.health then
                 table.insert(smuggler_entities, e)
             end
         end
     end
-    local cache_count = {1, 4, 4}
+    local cache_count = {1, 3, 3}
     local caches = {}
     local i = 0
     local total_available_entities = #smuggler_entities or 0
@@ -135,10 +135,11 @@ function add_smuggler_cache(self, tlevel)
         local cache = world:add_buff( e, "smuggler_cache" )
         cache.attributes.level = tlevel or 0
         if tlevel == 3 and i == 1 then
+            local caches_needed = 3
             cache.data.special_reward = true
-            if total_available_entities < 4 then
-                nova.log("Insufficient objects for caches, missing "..tostring(4 - total_available_entities))
-                cache.data.cache_missing = 4 - total_available_entities
+            if total_available_entities < caches_needed then
+                nova.log("Insufficient objects for caches, missing "..tostring(caches_needed - total_available_entities))
+                cache.data.cache_missing = caches_needed - total_available_entities
             end
         end
         world:add_buff( e, "smuggler_cache_outline" )
@@ -152,7 +153,7 @@ register_blueprint "ktrait_smuggler"
     text = {
         name   = "Smuggler",
         desc   = "Find ammo in special destructable environment objects.",
-        full   = "You know where the black market stashes items! Hit boxes, plants, urns and chairs containing a stash to find ammo for all carried weapons. Stashes are highlighted when out of sight.\n\n{!LEVEL 1} - {!1} object will contain a stash.\n{!LEVEL 2} - Up to {!4} objects will contain a stash depending on number of available objects\n{!LEVEL 3} - Guaranteed {!4} stashes worth of ammo across the available objects (as long as there is at least one object). {!1} stash will contain either an exotic/AV weapon or armor.",
+        full   = "You know where the black market stashes items! Hit boxes, plants, urns and chairs containing a stash to find ammo for all carried weapons - but no more than 2 stacks of the same ammo type. Stashes are highlighted when out of sight.\n\n{!LEVEL 1} - {!1} object will contain a stash.\n{!LEVEL 2} - Up to {!3} objects will contain a stash depending on number of available objects\n{!LEVEL 3} - Guaranteed {!3} stashes worth of ammo across the available objects (as long as there is at least one object). {!1} stash will contain either an exotic/AV weapon or armor.",
         abbr   = "Sm",
     },
     attributes = {
