@@ -365,7 +365,7 @@ register_blueprint "ktrait_berserk"
                 else
                     buff = world:add_buff( entity, "buff_inmate_berserk_base", duration )
                 end
-                if entity:attribute( "berserk_action_bonus" ) then
+                if entity:attribute( "berserk_action_bonus" ) and entity:attribute( "berserk_action_bonus" ) > 0 then
                     world:add_buff( entity, "buff_inmate_berserk_speed_boost", duration )
                 end
                 world:lua_callback( entity, "on_inmate_berserk" )
