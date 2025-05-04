@@ -402,21 +402,21 @@ function run_cutter_ui( self, user, level, return_entity )
     local list = {}
 
     local max_len = 1
-    if level >= 1 and world:has_item( user, "medkit_small" ) > 0 then
-        max_len = math.max( max_len, string.len( "Make combat pack" ) )
-        table.insert( list, {
-            name = "Make combat pack",
-            target = self,
-            parameter = world:create_entity("combatpack_small"),
-            confirm = true,
-       })
-    end
-    if level >= 2 and world:has_item( user, "medkit_small" ) > 0  then
+    if level >= 1 and world:has_item( user, "medkit_small" ) > 0  then
         max_len = math.max( max_len, string.len( "Make stimpack" ) )
         table.insert( list, {
             name = "Make stimpack",
             target = self,
             parameter = world:create_entity("stimpack_small"),
+            confirm = true,
+       })
+    end
+    if level >= 2 and world:has_item( user, "medkit_small" ) > 1 then
+        max_len = math.max( max_len, string.len( "Make combat pack" ) )
+        table.insert( list, {
+            name = "Make combat pack",
+            target = self,
+            parameter = world:create_entity("combatpack_small"),
             confirm = true,
        })
     end
@@ -437,7 +437,7 @@ function run_cutter_ui( self, user, level, return_entity )
     })
     list.title = "Convert medkits"
     list.size  = coord( math.max( 30, max_len + 6 ), 0 )
-    list.confirm = "Are you sure you want to convert a medkit?"
+    list.confirm = "Are you sure you want to convert?"
     ui:terminal( user, nil, list )
 end
 
@@ -466,12 +466,12 @@ register_blueprint "kskill_cutter"
                 nova.log("on activate")
                 if param then
                     nova.log("param"..tostring(param.text.name))
-                    if world:get_id(param) == "combatpack_small" and world:has_item( who, "medkit_small" ) > 0 then
-                        world:remove_items( who, "medkit_small", 1 )
-                        who:pickup( "combatpack_small", true )
-                    elseif world:get_id(param) == "stimpack_small" and world:has_item( who, "medkit_small" ) > 0  then
+                    if world:get_id(param) == "stimpack_small" and world:has_item( who, "medkit_small" ) > 0  then
                         world:remove_items( who, "medkit_small", 1 )
                         who:pickup( "stimpack_small", true )
+                    elseif world:get_id(param) == "combatpack_small" and world:has_item( who, "medkit_small" ) > 1 then
+                        world:remove_items( who, "medkit_small", 2 )
+                        who:pickup( "combatpack_small", true )
                     elseif world:get_id(param) == "medkit_small" and world:has_item( who, "medkit_large" ) > 0  then
                         world:remove_items( who, "medkit_large", 1 )
                         who:pickup( "medkit_small", true )
@@ -510,7 +510,7 @@ register_blueprint "ktrait_cutter"
     text = {
         name  = "Cutter",
         desc  = "You can convert medkits into better drugs.",
-        full  = "You know how to convert standard civilian medkits into something much more potent\n\n{!LEVEL 1} - Convert small medkits into combat packs\n{!LEVEL 2} - Convert small medkits into stimpacks\n{!LEVEL 3} - Convert large medkits into three small medkits",
+        full  = "You know how to convert standard civilian medkits into something much more potent\n\n{!LEVEL 1} - Convert small medkits into stimpacks\n{!LEVEL 2} - Convert 2 small medkits into 1 combat pack\n{!LEVEL 3} - Convert large medkits into three small medkits",
         abbr  = "Cut",
     },
     callbacks = {
