@@ -221,7 +221,7 @@ register_blueprint "adv_crowbar"
     blueprint = "crowbar",
     lists = {
         group    = "item",
-        keywords = { "weapon", "special", "melee" },
+        keywords = { "inmate", "weapon", "special", "melee" },
         weight   = 70,
         dmin     = 2,
         dmed     = 5,
@@ -262,7 +262,7 @@ register_blueprint "adv_axe"
     },
     lists = {
         group    = "item",
-        keywords = { "weapon", "special", "melee" },
+        keywords = { "inmate", "weapon", "special", "melee" },
         weight   = 70,
         dmin     = 8,
         dmed     = 15,
@@ -299,7 +299,7 @@ register_blueprint "adv_axe_large"
     },
     lists = {
         group    = "item",
-        keywords = { "weapon", "special", "melee" },
+        keywords = { "inmate", "weapon", "special", "melee" },
         weight   = 70,
         dmin     = 15,
         dmed     = 18,
