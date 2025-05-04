@@ -219,14 +219,6 @@ register_blueprint "exo_armor_inmate"
 register_blueprint "adv_crowbar"
 {
     blueprint = "crowbar",
-    lists = {
-        group    = "item",
-        keywords = { "inmate", "weapon", "special", "melee" },
-        weight   = 70,
-        dmin     = 2,
-        dmed     = 5,
-        dmax     = 8,
-    },
     text = {
         desc = "When scientists decide to make a better crowbar",
     },
@@ -260,14 +252,6 @@ register_blueprint "adv_axe"
     text = {
         desc = "For when you need to fell something.",
     },
-    lists = {
-        group    = "item",
-        keywords = { "inmate", "weapon", "special", "melee" },
-        weight   = 70,
-        dmin     = 8,
-        dmed     = 15,
-        dmax     = 18,
-    },
     ascii     = {
         glyph     = "/",
         color     = CYAN,
@@ -296,14 +280,6 @@ register_blueprint "adv_axe_large"
     blueprint = "axe_large",
     text = {
         desc = "Timber!",
-    },
-    lists = {
-        group    = "item",
-        keywords = { "inmate", "weapon", "special", "melee" },
-        weight   = 70,
-        dmin     = 15,
-        dmed     = 18,
-        dmax     = 25,
     },
     ascii     = {
         glyph     = "/",
