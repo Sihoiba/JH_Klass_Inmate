@@ -510,7 +510,7 @@ register_blueprint "ktrait_cutter"
     text = {
         name  = "Cutter",
         desc  = "You can convert medkits into better drugs.",
-        full  = "You know how to convert standard civilian medkits into something much more potent\n\n{!LEVEL 1} - Convert small medkits into stimpacks\n{!LEVEL 2} - Convert 2 small medkits into 1 combat pack\n{!LEVEL 3} - Convert large medkits into three small medkits",
+        full  = "You know how to convert standard civilian medkits into something much more potent\n\n{!LEVEL 1} - Convert 1 small medkit into 1 stimpack\n{!LEVEL 2} - Convert 2 small medkits into 1 combat pack\n{!LEVEL 3} - Convert 1 large medkit into 3 small medkits",
         abbr  = "Cut",
     },
     callbacks = {
@@ -950,7 +950,7 @@ register_blueprint "ktrait_desperado"
     text = {
         name = "Desperado",
         desc = "Damage bonus based on shot cost versus clip size, proportional bonus based on the amount of clip fired. No affect on melee.",
-        full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots in the clip, the fewer the better. Guns that fire their entire clip per shot get the full damage bonus, guns that don't get proportionally less.\n\n{!LEVEL 1} - {!+20%} times clip/shot cost\n{!LEVEL 2} - {!+40%} times clip/shot cost\n{!LEVEL 3} - {!+60%} times clip/shot cost",
+        full = "You have a history of gun crimes and desperate shoot outs. Guns gain flat bonus damage depending on how many shots can be fired from a full clip, the fewer the better. Guns that fire their entire clip per shot get the full damage bonus, guns that don't get proportionally less, for example a gun that consumes 1/4 of it's clip when it shoots gets 1/4 of the bonus.\n\n{!LEVEL 1} - {!+20%} maximum damage bonus\n{!LEVEL 2} - {!+40%} maximum damage bonus\n{!LEVEL 3} - {!+60%} maximum damage bonus",
         abbr = "Des",
     },
     attributes = {
