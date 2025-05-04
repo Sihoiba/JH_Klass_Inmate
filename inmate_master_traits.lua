@@ -874,7 +874,7 @@ register_blueprint "ktrait_master_fraudster"
     blueprint = "trait",
     text = {
         name   = "FRAUDSTER",
-        desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire within 4 spaces, gain crit bonus against enemies near decoys.",
+        desc   = "MASTER TRAIT - ACTIVE SKILL - create a decoy that attracts enemy fire within 4 spaces, crit bonus against enemies near decoys.",
         full   = "You were jailed for fraud; with a few modifications to your comms chip you were able to defraud the system into thinking you were somewhere else giving you all the freedom of Callisto.\n\n{!LEVEL 1} - cooldown {!20}, decoy health {!40}, {!50%} crit chance on enemies near decoys, reduced scent detection range, costs {!2} rage.\n{!LEVEL 2} - cooldown {!10}, decoy health {!80}, {!100%} crit chance and {!50}% crit damage on enemies near decoys, {!+10} max rage.\n{!LEVEL 3} - cooldown {!5}, decoy EMP explosion on death, {!100%} crit damage on enemies near decoys, {!+20} max rage.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MFr",
     },
