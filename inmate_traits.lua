@@ -916,6 +916,24 @@ register_blueprint "ktrait_dealer"
                 gtk.upgrade_trait( entity, "ktrait_dealer" )
             end
         ]=],
+        on_pre_command = [=[
+            function ( self, entity, command, item )
+                if command == COMMAND_USE then
+                    local increase = {0.5, 1.0, 2.0}
+                    if world:get_id(item) == "stimpack_small" then
+                        world:add_buff( entity, "buff_stimpack", 500 * increase[self.attributes.level])
+                    elseif world:get_id(item) == "stimpack_large" then
+                        world:add_buff( entity, "buff_stimpack", 3000 * increase[self.attributes.level])
+                    elseif world:get_id(item) == "combatpack_small" then
+                        world:add_buff( entity, "buff_combatpack", 500 * increase[self.attributes.level])
+                    elseif world:get_id(item) == "combatpack_large" then
+                        world:add_buff( entity, "buff_combatpack", 1500 * increase[self.attributes.level])
+                    elseif world:get_id(item) == "enviropack" then
+                        world:add_buff( entity, "buff_enviro", 5000 * increase[self.attributes.level])
+                    end
+                end
+            end
+        ]=],
     },
 }
 
