@@ -823,7 +823,7 @@ register_blueprint "ktrait_sucker_punch"
     text = {
         name   = "Sucker Punch",
         desc   = "They never see the first blow coming.",
-        full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non-bladed melee weapons (crowbars, pipe wrenchs, axes, and chainsaws) you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non-bladed one.\n\n{!LEVEL 1} - {!90%} attack time with non-bladed melee weapons\n{!LEVEL 2} - {!80%} attack time, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time, melee weapon lootboxes contain large axes",
+        full   = "The trick to winning a fight is to land the first blow before the other guy even knows a fight has started! With this trait when you wield non-bladed melee weapons (crowbars, pipe wrenchs, axes, and chainsaws) you hit faster. To ensure you have the right weapons, lootboxes with bladed weapons will include a non-bladed one. If the bladed weapon is AV, the non bladed weapon will also be AV of the same tier.\n\n{!LEVEL 1} - {!90%} attack time with non-bladed melee weapons, melee weapon lootboxes also contain Crowbars\n{!LEVEL 2} - {!80%} attack time, melee weapon lootboxes also contain Axes\n{!LEVEL 3} - {!60%} attack time, melee weapon lootboxes contain large axes",
         abbr   = "SPu",
     },
     attributes = {
@@ -879,7 +879,13 @@ register_blueprint "ktrait_sucker_punch"
                 if melee_adv_tier > 3 then
                     melee_adv_tier = 3
                 end
-                if tlevel == 2 and melee_box then
+                if tlevel == 1 and melee_box then
+                    if melee_adv then
+                        what:attach("adv_crowbar", nil, melee_adv_tier)
+                    else
+                        what:attach("crowbar")
+                    end
+                elseif tlevel == 2 and melee_box then
                     if melee_adv then
                         what:attach("adv_axe", nil, melee_adv_tier)
                     else
