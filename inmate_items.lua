@@ -396,48 +396,64 @@ register_blueprint "fragile_pipe_wrench"
 
 register_blueprint "damaged_pistol"
 {
-	blueprint = "base_pistol",
-	lists = {
-		group    = "item",
-		keywords = { "base_weapon", },
-		weight   = 20,
-		dmed     = 12,
-		dmax     = 18,
-	},
-	text = {
-		name = "damaged 9mm pistol",
-		desc = "Standard military sidearm, damaged but in better shape than the {?curse|poor sod|fucker} you stole it and the landing craft from in your escape attempt. The magazine is jammed so it can't be reloaded.",
-	},
-	ascii     = {
-		glyph     = "/",
-		color     = DARKGRAY,
-	},
-	clip = {
-		ammo  = "ammo_9mm",
-		count = 8,
-		reload_sound = "pistol_reload",
-		reload_count = -1,
-	},
-	attributes = {
-		swap_time = 0.5,
-		damage = 16,
-		shots = 1,
-		clip_size  = 8,
-		crit_damage = 50,
-		mod_capacity = 0,
-		opt_distance = 3,
-		max_distance = 6,
-	},
-	ui_target = {
-		type = "path",
-	},
-	noise = {
-		use = 10,
-	},
-	weapon = {
-		group = "pistols",
-		damage_type = "impact",
-		fire_sound = "pistol_shot",
-		hit_sound  = "bullet",
-	},
+    blueprint = "base_pistol",
+    lists = {
+        group    = "item",
+        keywords = { "base_weapon", },
+        weight   = 20,
+        dmed     = 12,
+        dmax     = 18,
+    },
+    text = {
+        name = "damaged 9mm pistol",
+        desc = "Standard military sidearm, damaged but in better shape than the {?curse|poor sod|fucker} you stole it and the landing craft from in your escape attempt. The magazine is jammed so it can't be reloaded.",
+    },
+    ascii     = {
+        glyph     = "/",
+        color     = DARKGRAY,
+    },
+    clip = {
+        ammo  = "ammo_9mm",
+        count = 8,
+        reload_sound = "pistol_reload",
+        reload_count = -1,
+    },
+    attributes = {
+        swap_time = 0.5,
+        damage = 16,
+        shots = 1,
+        clip_size  = 8,
+        crit_damage = 50,
+        mod_capacity = 0,
+        opt_distance = 3,
+        max_distance = 6,
+    },
+    ui_target = {
+        type = "path",
+    },
+    noise = {
+        use = 10,
+    },
+    weapon = {
+        group = "pistols",
+        damage_type = "impact",
+        fire_sound = "pistol_shot",
+        hit_sound  = "bullet",
+    },
+    callbacks = {
+        on_dropped = [=[
+            function( self, who )
+                if who == world:get_player() then
+                    local on_altar = self:get_position() == ivec2(27,15) or self:get_position() == ivec2(28,16) or  self:get_position() == ivec2(27,16) or self:get_position() == ivec2(28,15) or self:get_position() == ivec2(0,0)
+                    nova.log("damaged pistol drop position"..tostring(self:get_position()))
+                    if world:get_id(world:get_level()) == "level_io_cathedral" and on_altar then
+                        ui:set_hint( "{RDid you really bring that all the way here?}", 2001, -3 )
+                        ui:spawn_fx( nil, "fx_ancient_fade", nil, ivec2(27,15) )
+                        world:get_level():drop_entity( world:create_entity("unich_golden_gun"), ivec2(27,15))
+                        world:mark_destroy( self )
+                    end
+                end
+            end
+        ]=],
+    },
 }
