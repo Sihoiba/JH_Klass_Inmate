@@ -11,7 +11,7 @@ The inmates class resources is Rage, and this is restored as the Inmate takes da
 
 The inmates PASSIVE skill Always Angry, restores half his rage whenever he enters a new level and increases gun melee damage by 12.
 
-In addition to the new Klass, this mod adds AV versions of the Crowbar, Axe and Large Axe.
+In addition to the new Klass, this mod adds AV versions of the Crowbar, Axe and Large Axe they only drop if the player has taken the Sucker Punch skill.
 
 Adds a functionally identical alternate version of Angel Of New York Reloaded, as the standard version will crash if you use the decoy skill of Fraudster with that challenge specifically.
 
