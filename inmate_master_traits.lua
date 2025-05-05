@@ -760,7 +760,7 @@ register_blueprint "decoy_self_destruct_emp"
 }
 
 register_blueprint "decoy" {
-    flags = { EF_NOMOVE, EF_NOFLY, EF_TARGETABLE, EF_ALIVE, EF_NOCORPSE, EF_IFF },
+    flags = { EF_NOMOVE, EF_NOFLY, EF_TARGETABLE, EF_ALIVE, EF_NOCORPSE, EF_IFF, EF_NOFX },
     lists = {
         group = "env",
     },
