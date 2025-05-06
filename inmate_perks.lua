@@ -137,13 +137,13 @@ register_blueprint "buff_kneecapped"
     flags = { EF_NOPICKUP },
     text = {
         name  = "Kneecapped",
-        desc  = "reduces enemy move speed by 25%",
+        desc  = "reduces enemy move speed by 40%",
     },
     ui_buff = {
         color     = LIGHTRED,
     },
     attributes = {
-        move_time   = 1.5,
+        move_time   = 1.8,
     },
 }
 
@@ -166,13 +166,13 @@ register_blueprint "buff_panicked"
     flags = { EF_NOPICKUP },
     text = {
         name  = "Panicked",
-        desc  = "reduces enemy accuracy by 25%",
+        desc  = "reduces enemy accuracy by 40%",
     },
     ui_buff = {
         color     = LIGHTRED,
     },
     attributes = {
-        accuracy = -25,
+        accuracy = -40,
     },
 }
 
@@ -195,13 +195,13 @@ register_blueprint "buff_stunned"
     flags = { EF_NOPICKUP },
     text = {
         name  = "Stunned",
-        desc  = "damage dealt by this entity is reduced by 25%",
+        desc  = "damage dealt by this entity is reduced by 40%",
     },
     ui_buff = {
         color     = LIGHTRED,
     },
     attributes = {
-        damage_mult = 0.75,
+        damage_mult = 0.6,
     },
 }
 
