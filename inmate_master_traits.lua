@@ -236,7 +236,7 @@ register_blueprint "kperk_chemist"
                     end
                 end
 
-                if distance < 7 and not world:get_level():get_cell_flags( c )[ EF_NOMOVE ] then
+                local function place_pool(level, c, distance )
                     if distance < 1 then distance = 1 end
                     local pool = level:get_entity(c, "acid_pool" )
                     if not pool then
@@ -244,6 +244,14 @@ register_blueprint "kperk_chemist"
                     end
                     pool.attributes.acid_amount = 10
                     pool.lifetime.time_left = math.max( pool.lifetime.time_left, 400 + math.random(100) )
+                end
+
+                if not world:get_level():get_cell_flags( c )[ EF_NOMOVE ] then
+                    if weapon and weapon.ui_target and weapon.ui_target.type == world:hash("cone") and distance < 9 then
+                        place_pool(level, c, distance)
+                    else
+                        place_pool(level, c, distance)
+                    end
                 end
             end
         ]=],

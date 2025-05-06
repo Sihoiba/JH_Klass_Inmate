@@ -1008,7 +1008,7 @@ register_blueprint "ktrait_kneecap"
     text = {
         name   = "Kneecap",
         desc   = "PISTOL/SMG/SEMI/AUTO SKILL - weaken biological and semi-mechanical enemies on hit.",
-        full   = "You know where to shoot someone to give them a bad day!\n\n{!LEVEL 1} - biological and semi-mechanical enemies shot are slowed by {!25%}\n{!LEVEL 2} - biological and semi-mechanical enemies shot have {!-25%} accuracy\n{!LEVEL 3} - biological and semi-mechanical enemies shot do {!-25%} damage\n",
+        full   = "You know where to shoot someone to give them a bad day!\n\n{!LEVEL 1} - biological and semi-mechanical enemies shot are slowed by {!40%}\n{!LEVEL 2} - biological and semi-mechanical enemies shot have {!-40%} accuracy\n{!LEVEL 3} - biological and semi-mechanical enemies shot do {!-40%} damage\n",
         abbr   = "Kne",
     },
     attributes = {
