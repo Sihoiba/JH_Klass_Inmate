@@ -768,7 +768,7 @@ register_blueprint "decoy_self_destruct_emp"
 }
 
 register_blueprint "decoy" {
-    flags = { EF_NOMOVE, EF_NOFLY, EF_TARGETABLE, EF_ALIVE, EF_NOCORPSE, EF_IFF },
+    flags = { EF_NOMOVE, EF_NOFLY, EF_TARGETABLE, EF_ALIVE, EF_NOCORPSE, EF_IFF, EF_NOFX },
     lists = {
         group = "env",
     },
@@ -842,12 +842,9 @@ register_blueprint "kskill_fraudster_create_decoy"
     },
     ui_target = {
         type = "mortar",
-        range = 3,
-    },
-    attributes = {
         opt_distance = 8,
         max_distance = 8,
-        range = 4,
+        range = 3,
     },
     callbacks = {
         on_use = [=[
