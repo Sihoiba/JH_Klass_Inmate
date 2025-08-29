@@ -793,6 +793,13 @@ register_blueprint "decoy" {
         health = 40,
     },
     callbacks = {
+        on_receive_damage = [=[
+            function ( self, source, w, amount )
+                if w and source == world:get_player() and w and w.weapon.type == world:hash("melee") and w.weapon.group == world:hash("melee") then
+                    self.health.current = 0
+                end
+            end
+        ]=],
         on_pre_command = [=[
             function ( self, actor, cmt )
                 if cmt == COMMAND_WAIT then return 0 end
@@ -802,7 +809,7 @@ register_blueprint "decoy" {
         ]=],
         on_die = [=[
             function( self, killer, current, weapon )
-                if self.data.level == 3 then
+                if self.data.level == 3 and killer ~= world:get_player() then
                     local w_emp = world:create_entity( "decoy_self_destruct_emp" )
                     world:attach( self, w_emp )
                     world:get_level():fire( self, world:get_position( self ), w_emp, 200 )

@@ -32,7 +32,7 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
 ### Advanced Traits
  - Sucker Punch; requires Skilled 1: when using non bladed melee weapons (e.g. pipewrench, axe) attacker faster. Higher levels increase your attack speed, and ensure lootboxes containing melee weapons will drop Axes/Large Axes based on trait level.
  - First Rule; requires Brute 1: Level 1 highlights 3 most dangerous enemies on the minimap, level 2 also reveals exalted on the mini map, level 3 reveals all enemies.
- - Burglar; requires Smuggler 1: Open doors from a distance. Higher levels let you close doors from a distance and unlock locked doors and elevators for free.
+ - Burglar; requires Smuggler 1: Open doors from a distance, and detect enemies near doors. Higher levels let you close doors from a distance and unlock locked doors and elevators for free.
  - Dealer; requires Cutter 1: Increased the duration of the Juiced, Stimmed and Enviro buffs from Combat Packs, Stimpacks and Enviropacks.
  - Kneecap; requires Dash 1: PISTOL/SMG/SEMI/AUTO: Debuffs enemies on hit. Level 1 slowed, level 2 accuracy malus, level 3 damage malus
  - Desperado; requires Hitman = 1: 20/40/60% flat damage bonus multiplied by the proportion of the ammo clip a shot costs. Better on single shot weapons. E.g. a single shot 60 damage rocket launcher gets 12/24/36 damage increase, a 6 shot 24 damage revolver, would get 1/2/3 damage increase 

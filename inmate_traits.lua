@@ -105,7 +105,6 @@ register_blueprint "ktrait_mule"
 }
 
 function add_smuggler_cache(self, tlevel)
-    nova.log("tlevel"..tostring(tlevel))
     local level = world:get_level()
     local smuggler_entities = {}
     for e in level:entities() do
@@ -453,7 +452,6 @@ register_blueprint "kskill_cutter"
         on_use = [=[
             function( self, entity )
                 if entity == world:get_player() then
-                    nova.log("Run UI")
                     run_cutter_ui( self, entity, self.attributes.level, entity )
                     return -1
                 else
@@ -463,9 +461,7 @@ register_blueprint "kskill_cutter"
         ]=],
         on_activate = [=[
             function ( self, who, level, param )
-                nova.log("on activate")
                 if param then
-                    nova.log("param"..tostring(param.text.name))
                     if world:get_id(param) == "stimpack_small" and world:has_item( who, "medkit_small" ) > 0  then
                         world:remove_items( who, "medkit_small", 1 )
                         who:pickup( "stimpack_small", true )
@@ -653,9 +649,17 @@ function run_burgler_ui( self, user, level )
         parameter = world:create_entity("open"),
         confirm = false,
     })
-    if level == 3 then
+    if level == 2 then
         table.insert( list, {
         name = "Open visible locked doors",
+        target = self,
+        parameter = world:create_entity("unlock_open"),
+        confirm = false,
+    })
+    end
+    if level == 3 then
+        table.insert( list, {
+        name = "Open visible locked doors & elevators",
         target = self,
         parameter = world:create_entity("unlock_open"),
         confirm = false,
@@ -671,12 +675,82 @@ function run_burgler_ui( self, user, level )
     ui:terminal( user, nil, list )
 end
 
+function get_door(self, level, coord)
+    return level:get_entity(coord, "door") or level:get_entity(coord, "pdoor") or level:get_entity(coord, "door2") or level:get_entity(coord, "door2_l") or level:get_entity(coord, "door2_r")
+end
+
+function is_red_locked_door(self, door_entity)
+    return ecs:child( door_entity, "door_locked" ) or ecs:child( door_entity, "door2_locked_l" ) or ecs:child( door_entity, "door2_locked_r" ) or ecs:child( door_entity, "door_red_locked" ) or ecs:child( door_entity, "valhalla_red_locked" )
+end
+
+function is_locked_door(self, door_entity)
+    return ecs:child( door_entity, "door_locked" ) or ecs:child( door_entity, "door2_locked_l" ) or ecs:child( door_entity, "door2_locked_r" ) or ecs:child( door_entity, "door_red_locked" ) or ecs:child( door_entity, "valhalla_red_locked" ) or ecs:child( door_entity, "valhalla_valsec_locked" ) or ecs:child( d, "asterius_locked" ) or ecs:child( door_entity, "dig_zone_tyre_locked" )
+end
+
+function get_nearest_closed_unlocked_doors(self, level, entity)
+    local near_visible_doors = {}
+    for c in level:coords( {"door_frame","pdoor_frame","door_frame_l","door_frame_r" } ) do
+        local d = get_door( self, level, c )
+
+        if d then
+            local distance = level:distance(entity, d)
+            local visible = level:is_visible(c)
+            local closed = d.flags.data[ EF_NOMOVE ]
+            local broken = d.flags.data[ EF_KILLED ]
+            local locked = is_locked_door( self, d )
+
+
+            if distance < 4 and visible and closed and not broken and not locked then
+                table.insert(near_visible_doors, {dis = distance, door = d})
+                return_val = 1
+            end
+        end
+    end
+    if return_val == 1 then
+        table.sort( near_visible_doors, function ( a, b ) return a.dis < b.dis end )
+    end
+    return near_visible_doors
+end
+
+function get_nearest_closed_doors(self, level, entity)
+    local near_visible_doors = {}
+    for c in level:coords( {"door_frame","pdoor_frame","door_frame_l","door_frame_r" } ) do
+        local d = get_door( self, level, c )
+
+        if d then
+            local distance = level:distance(entity, d)
+            local visible = level:is_visible(c)
+            local closed = d.flags.data[ EF_NOMOVE ]
+            local broken = d.flags.data[ EF_KILLED ]
+
+            if distance < 4 and visible and closed and not broken then
+                table.insert(near_visible_doors, {dis = distance, door = d})
+                return_val = 1
+            end
+        end
+    end
+    if return_val == 1 then
+        table.sort( near_visible_doors, function ( a, b ) return a.dis < b.dis end )
+    end
+    return near_visible_doors
+end
+
+function track_near_door(self, level, door)
+    local ar = area.around( world:get_position( door ), 2 )
+    ar:clamp( level:get_area() )
+    for c in ar:coords() do
+        local e = level:get_entity(c)
+        if e and e.minimap and e:flag( EF_TARGETABLE ) and e.data and not e:child("temp_tracker") and not e:child("tracker") and not e:child("toughest_tracker") and not e:child("exalted_tracker") then
+            e:equip("temp_tracker")
+        end
+    end
+end
 
 register_blueprint "kskill_burglar_open_close"
 {
     blueprint = "trait",
     text = {
-        name  = "Open doors",
+        name  = "Open nearest door",
         name2 = "Open/close doors",
         name3 = "Open/close/unlock doors",
         desc  = "ACTIVE SKILL - open near by doors",
@@ -693,25 +767,13 @@ register_blueprint "kskill_burglar_open_close"
                     run_burgler_ui( self, entity, tlevel )
                     return -1
                 else
-                    for c in level:coords( {"door_frame","pdoor_frame","door_frame_l","door_frame_r" } ) do
-                        local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
-
-                        if d then
-                            local distance = level:distance(entity, d)
-                            local visible = level:is_visible(c)
-                            local closed = d.flags.data[ EF_NOMOVE ]
-                            local broken = d.flags.data[ EF_KILLED ]
-                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" ) or ecs:child( d, "valhalla_red_locked" ) or ecs:child( d, "valhalla_valsec_locked" ) or ecs:child( d, "asterius_locked" ) or ecs:child( d, "dig_zone_tyre_locked" )
-
-                            if distance < 3 and visible and closed and not broken and not locked then
-                                d.flags.data = { EF_ACTION },
-                                world:play_sound( "door_open", d )
-                                world:set_state( d, "open" )
-                                return_val = 1
-                            end
-                        end
-                    end
-                    if return_val == 0 then
+                    local near_visible_doors = get_nearest_closed_unlocked_doors( self, level, entity )
+                    if near_visible_doors[1] ~= nil then
+                        local d = near_visible_doors[1].door
+                        d.flags.data = { EF_ACTION }
+                        world:play_sound( "door_open", d )
+                        world:set_state( d, "open" )
+                    else
                         ui:set_hint( "No doors can be interacted with or the doors are too far away", 50, 1 )
                     end
                     return return_val
@@ -724,14 +786,14 @@ register_blueprint "kskill_burglar_open_close"
                 local tlevel = self.attributes.level
                 if param then
                     for c in level:coords( {"door_frame","pdoor_frame","door_frame_l","door_frame_r" } ) do
-                        local d = level:get_entity(c, "door") or level:get_entity(c, "pdoor") or level:get_entity(c, "door2") or level:get_entity(c, "door2_l") or level:get_entity(c, "door2_r")
+                        local d = get_door( self, level, c )
 
                         if d then
-                            local distance = level:distance(entity, d)
                             local visible = level:is_visible(c)
                             local closed = d.flags.data[ EF_NOMOVE ]
                             local broken = d.flags.data[ EF_KILLED ]
-                            local locked = ecs:child( d, "door_locked" ) or ecs:child( d, "door2_locked_l" ) or ecs:child( d, "door2_locked_r" ) or ecs:child( d, "door_red_locked" ) or ecs:child( d, "valhalla_red_locked" ) or ecs:child( d, "valhalla_valsec_locked" ) or ecs:child( d, "asterius_locked" ) or ecs:child( d, "dig_zone_tyre_locked" )
+                            local locked = is_locked_door( self, d )
+                            local red_locked = is_red_locked_door( self, d )
 
                             if param and world:get_id(param) == "open" and visible and closed and not broken and not locked then
                                 d.flags.data = { EF_ACTION }
@@ -744,11 +806,18 @@ register_blueprint "kskill_burglar_open_close"
                                 world:set_state( d, "closed" )
                                 worked = 1
                             end
-                            if param and world:get_id(param) == "unlock_open" and visible and not broken and locked then
-                                d.flags.data = { EF_ACTION }
-                                world:play_sound( "door_open", d )
-                                world:set_state( d, "open" )
-                                worked = 1
+                            if param and world:get_id(param) == "unlock_open" and visible and not broken then
+                                if self.attributes.level == 3 and locked then
+                                    d.flags.data = { EF_ACTION }
+                                    world:play_sound( "door_open", d )
+                                    world:set_state( d, "open" )
+                                    worked = 1
+                                elseif red_locked then
+                                    d.flags.data = { EF_ACTION }
+                                    world:play_sound( "door_open", d )
+                                    world:set_state( d, "open" )
+                                    worked = 1
+                                end
                             end
                         end
                         if tlevel == 3 then
@@ -794,7 +863,7 @@ register_blueprint "ktrait_burglar"
     text = {
         name   = "Burglar",
         desc   = "ACTIVE SKILL - open doors from a distance.",
-        full   = "There's almost nowhere you can't break into given enough time!\n\n{!LEVEL 1} - Open all doors within 2 distance instantly.\n{!LEVEL 2} - Open or close all doors in sight instantly\n{!LEVEL 3} - Open any locked doors, red key card locked elevators and open locked mini level elevators in sight instantly",
+        full   = "There's almost nowhere you can't break into given enough time! Additionally detect enemies near closed doors.\n\n{!LEVEL 1} - Open the nearest door within 3 distance {!instantly}. Detect enemies within 2 tiles of nearest closed door within 3 distance.\n{!LEVEL 2} - Open or close all doors in sight {!instantly}. Open locked vault and red key card locked doors. Detect enemies near closed doors in sight.\n{!LEVEL 3} - Open any locked doors, red key card locked elevators and open locked mini level elevators in sight {!instantly}",
         abbr   = "Bur",
     },
     callbacks = {
@@ -810,7 +879,26 @@ register_blueprint "ktrait_burglar"
                     burg.text.abbr = burg.text.name3
                 end
             end
-        ]=]
+        ]=],
+        on_action = [=[
+            function ( self, entity, time_passed, last )
+                local tlevel = self.attributes.level
+                local level = world:get_level()
+                local near_visible_doors = get_nearest_closed_doors( self, level, entity )
+
+                if tlevel == 1 and near_visible_doors[1] ~= nil then
+                    local d = near_visible_doors[1].door
+                    if level:distance(entity, d) then
+                        track_near_door( self, level, d )
+                    end
+                elseif tlevel > 1 and next(near_visible_doors) ~= nil then
+                    for _,v in ipairs( near_visible_doors ) do
+                        track_near_door( self, level, v.door )
+                    end
+                end
+                return 0
+            end
+        ]=],
     },
     attributes = {
         level = 1,
