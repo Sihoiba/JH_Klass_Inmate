@@ -1,5 +1,3 @@
-nova.require "libraries/bresenham"
-
 -- BERSERKER
 
 register_blueprint "ktrait_master_berserker"
@@ -68,32 +66,6 @@ register_blueprint "ktrait_master_berserker"
 }
 
 -- CHEMIST
-
-function corrode_along_line(self, level, source, end_point, tlevel)
-    local start_point = source:get_position()
-    local points, _ = line(start_point.x, start_point.y, end_point.x, end_point.y, function (x,y)
-        return true
-    end)
-    local corrode_point = source:get_position()
-    for _, v in ipairs(points) do
-        if not (v.x == start_point.x and v.y == start_point.y) then
-            corrode_point.x = v.x
-            corrode_point.y = v.y
-            for e in level:entities( corrode_point ) do
-                if e.data and e.data.ai then
-                    if tlevel == 3 then
-                        world:add_buff( e, "buff_corroded", 1000 )
-                    end
-                    local pool = level:get_entity(corrode_point, "acid_pool" )
-                    if not pool then
-                        pool = level:place_entity( "acid_pool", corrode_point )
-                    end
-                end
-            end
-        end
-    end
-end
-
 register_blueprint "buff_corroded"
 {
     flags = { EF_NOPICKUP },
@@ -221,16 +193,12 @@ register_blueprint "kperk_chemist"
             function ( self, weapon, level, c, damage, distance, center, source, is_repeat )
                 if not is_repeat then
                     local clevel = world:get_player():child("ktrait_master_chemist").attributes.level
-                    if weapon and weapon.ui_target and weapon.ui_target.type == world:hash("beam") then
-                        corrode_along_line(self, level, source, c, clevel)
-                    else
-                        for e in level:entities( c ) do
-                            if e.data and e.data.ai then
-                                if clevel == 2 and not e:child("buff_corroded_minor") then
-                                    world:add_buff( e, "buff_corroded_minor", 1000 )
-                                elseif clevel == 3 and not e:child("buff_corroded") then
-                                    world:add_buff( e, "buff_corroded", 1000 )
-                                end
+                    for e in level:entities( c ) do
+                        if e.data and e.data.ai then
+                            if clevel == 2 and not e:child("buff_corroded_minor") then
+                                world:add_buff( e, "buff_corroded_minor", 1000 )
+                            elseif clevel == 3 and not e:child("buff_corroded") then
+                                world:add_buff( e, "buff_corroded", 1000 )
                             end
                         end
                     end

@@ -11,7 +11,7 @@ register_blueprint "exo_axe"
         damage = 70,
         swap_time    = 0.5,
         crit_damage  = 50,
-        mod_capacity = 1,
+        mod_capacity = 2,
         gib_factor   = 2,
     },
     ui_target = {
@@ -72,9 +72,9 @@ register_blueprint "exo_kaxe_inmate"
         perk = {
             type          = "perk_w",
             subtype       = "melee",
-            damage_low    = 10,
-            damage_high   = 20,
-            damage_status = 10,
+            damage_low    = {10,14,20},
+            damage_high   = {20,24,30},
+            damage_status = {10,12,15},
             exotic        = "perk_we_axe_inmate",
         },
     },
