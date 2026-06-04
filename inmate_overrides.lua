@@ -39,7 +39,6 @@ register_blueprint "level_callisto_intro"
                     }
                     local list = rewards[ math.min( DIFFICULTY + 1, #rewards )]
                     generator.drop_marker_rewards( self, "mark_special", larea, list )
-                    result.no_elevator_check = true
                     for c in self:get_area():edges() do
                         self:set_cell_flag( c, EF_NOSPAWN, true )
                     end
