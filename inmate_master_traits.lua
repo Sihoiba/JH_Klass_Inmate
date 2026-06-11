@@ -389,6 +389,42 @@ register_blueprint "explosion_wrath_big"
     },
 }
 
+register_blueprint "kbuff_erupt"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name = "ERUPT",
+        desc = "Damage multiplier for your next attack"
+    },
+    ui_buff = {
+        color     = RED,
+        attribute = "value",
+        priority  = 150,
+    },
+    attributes = {
+        damage_mult = 1.0,
+        value = 0,
+    },
+    callbacks = {
+        on_post_command = [[
+            function ( self, actor, cmt, weapon, time )
+                if time <= 0 then return end
+                if cmt == COMMAND_USE then
+                    if weapon and weapon.weapon then
+                        world:destroy( self )
+                    end
+                end
+                return 0
+            end
+        ]],
+        on_enter_level = [[
+            function ( self, entity, reenter )
+                world:destroy( self )
+            end
+        ]],
+    }
+}
+
 register_blueprint "kskill_erupt"
 {
     flags = { EF_NOPICKUP },
@@ -399,17 +435,15 @@ register_blueprint "kskill_erupt"
     data = {
         is_free_use = true
     },
-    attributes = {
-        damage_mult = 1.0,
-    },
     skill = {
         cooldown = 0,
+        fail_vo  = "vo_no_rage",
     },
     callbacks = {
         is_usable = [[
             function ( self, user )
                 local agg_assault = user:child("ktrait_master_aggravated_assault")
-                if agg_assault.attributes.wrath > 0 then
+                if agg_assault.attributes.wrath > 0 and not user:child("kbuff_erupt") then
                     self.text.name = self.text.base_name.." "..tostring(agg_assault.attributes.wrath)
                     return 1
                 end
@@ -419,35 +453,40 @@ register_blueprint "kskill_erupt"
         ]],
         on_use = [[
             function ( self, entity )
-                nova.log("Use erupt")
                 local agg_assault = entity:child("ktrait_master_aggravated_assault")
-                local wrath = agg_assault.attributes.wrath
                 local wrath_floor = agg_assault.attributes.wrath_floor
-                nova.log("Use erupt wrath "..tostring(wrath))
-                nova.log("Use erupt wrath floor "..tostring(wrath_floor) )
-                if wrath > 0 then
-                    self.attributes.damage_mult = 1.0 + (agg_assault.attributes.wrath * 0.02)
-                    wrath = wrath_floor
-                    nova.log("Use erupt damage mult"..tostring(self.attributes.damage_mult) )
-                    nova.log("Use erupt wrath after"..tostring(wrath))
+                if agg_assault.attributes.wrath > 0 then
+                    local e = entity:attach("kbuff_erupt")
+                    e.attributes.value = agg_assault.attributes.wrath * 2
+                    e.attributes.damage_mult = 1.0 + (agg_assault.attributes.wrath * 0.02)
+                    agg_assault.attributes.wrath = wrath_floor
+                    local wrath_buff = entity:child( "kbuff_wrath" )
+                    wrath_buff.attributes.resist_display = agg_assault.attributes.wrath
                 end
-                return 1
-            end
-        ]],
-        on_post_command = [[
-            function ( self, actor, cmt, weapon, time )
-                nova.log("Post command erupt")
-                if cmt == COMMAND_USE then
-                    if weapon then
-                    nova.log("Post command erupt reset mult")
-                        self.attributes.damage_mult = 1.0
-                    end
-                end
+                return 10
             end
         ]],
     }
 }
 
+register_blueprint "kbuff_wrath"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name = "WRATH",
+        desc = "Damage resistance equal to current wrath"
+    },
+    ui_buff = {
+        color     = RED,
+        priority  = -1,
+        attribute = "resist_display",
+        name      = "name",
+    },
+    attributes = {
+        damage_mod = 1.0,
+        resist_display = 0,
+    }
+}
 
 register_blueprint "ktrait_master_aggravated_assault"
 {
@@ -456,7 +495,7 @@ register_blueprint "ktrait_master_aggravated_assault"
         name   = "AGGRAVATED ASSAULT",
         bname = "WRATH",
         desc   = "MASTER TRAIT - gain WRATH as you take damage, WRATH gives DR. ACTIVE SKILL: Erupt - Uses WRATH for bonus damage on next attack",
-        full   = "You have a temper, but you know how to hold it until you can unleash it for maximum effect and criminality!\n\n{!LEVEL 1} - Max {!50} WRATH. Gain DR equal to WRATH. {!Erupt} damage bonus {!2 x WRATH%}. Activate {!Berserk} spends WRATH to trigger explosion on self, more wrath bigger boom.\n{!LEVEL 2} - Max WRATH {!75}, Min WRATH {!15}. earn WRATH faster\n{!LEVEL 3} - even faster WRATH gain. Min WRATH {!25}.\n\nYou can pick only one MASTER trait per character.",
+        full   = "You have a temper, but you know how to hold it until you can unleash it for maximum effect and criminality! Though elevators always calm you down.\n\n{!LEVEL 1} - Max {!50} WRATH. Gain damage resistance equal to WRATH. {!Erupt} damage bonus {!2 x WRATH%}. Activate {!Berserk} spends WRATH to trigger explosion on self, more wrath bigger boom.\n{!LEVEL 2} - Max WRATH {!75}, Min WRATH {!15}. earn WRATH faster\n{!LEVEL 3} - even faster WRATH gain. Min WRATH {!25}.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MAG",
     },
     attributes = {
@@ -464,15 +503,7 @@ register_blueprint "ktrait_master_aggravated_assault"
         wrath    = 0,
         wrath_gain = 10,
         wrath_floor = 0,
-        wrath_max = 50,
-        damage_mod = 1.0,
-        resist_display = 0,
-    },
-    ui_buff = {
-        color     = RED,
-        priority  = -1,
-        attribute = "resist_display",
-        name      = "bname",
+        wrath_max = 50
     },
     callbacks = {
         on_activate = [[
@@ -481,6 +512,7 @@ register_blueprint "ktrait_master_aggravated_assault"
                 local attr  = t.attributes
                 if tlevel == 1 then
                     entity:attach( "kskill_erupt" )
+                    entity:attach( "kbuff_wrath" )
                 end
                 if tlevel == 2 then
                     attr.wrath_gain = 15
@@ -493,10 +525,18 @@ register_blueprint "ktrait_master_aggravated_assault"
                 end
             end
         ]],
+        on_enter_level = [[
+            function ( self, entity, reenter )
+                self.attributes.wrath = self.attributes.wrath_floor
+                local wrath_buff = entity:child( "kbuff_wrath" )
+                wrath_buff.attributes.resist_display = self.attributes.wrath
+            end
+        ]],
         on_incoming_damage = [[
             function ( self, entity, source )
                 local attr  = self.attributes
-                attr.damage_mod = 1.0 - (attr.wrath * 0.01)
+                local wrath_buff = entity:child( "kbuff_wrath" )
+                wrath_buff.attributes.damage_mod = 1.0 - (attr.wrath * 0.01)
             end
         ]],
         on_receive_damage = [[
@@ -505,8 +545,9 @@ register_blueprint "ktrait_master_aggravated_assault"
                 if not entity.data or not entity.data.is_player then return end
                 if amount < 1 then return end
                 local attr  = self.attributes
-                attr.wrath = math.min( attr.wrath + attr.wrath_gain, attr.wrath_max)
-                attr.resist_display = attr.wrath
+                attr.wrath = math.min( attr.wrath + attr.wrath_gain, attr.wrath_max )
+                local wrath_buff = entity:child( "kbuff_wrath" )
+                wrath_buff.attributes.resist_display = attr.wrath
             end
         ]],
         on_inmate_berserk = [[
@@ -530,7 +571,9 @@ register_blueprint "ktrait_master_aggravated_assault"
                         world:destroy( w )
                     end
                     attr.wrath = attr.wrath_floor
-                    attr.resist_display = attr.wrath
+                    local wrath_buff = entity:child( "kbuff_wrath" )
+                    wrath_buff.attributes.resist_display = attr.wrath
+                    world:flush_destroy()
                     return 1
                 end
             end

@@ -41,7 +41,7 @@ Adds a functionally identical alternate version of Angel Of New York Reloaded, a
 ### Master Traits
  - Berserker; requires Skilled 2: Automatically enter Berserk status on taking damage or on gibbing enemies. Higher levels can extend active berserk duration too.
  - Chemist; requires Cutter 1 and Grenadier 1: Acid immunity, acid pools created on hit and on area attacks including grenades.
- - GBH; requires Kneecap 1: Bleed immunity, attacks cause bleed, higher level increase bleed inflicted.
+ - Aggravated Assault; requires Dash 1 and Brute 1: Damage Reduction that increases as you take damage. Active skill that consumes the granted damage reduction for damage increase on next attack. Higher levels increases damage reduction cap and floor.
  - Fraudster; requires Burglar 1: Create decoys that distract enemies on cooldown, distracted enemies take more crits, cooldown is reduced on higher levels. Lvl 2 also increases Decoy health, lvl 3 makes Decoys explode on death
  - Ghost Gun; requires Juggler 1 and Mule 1: PISTOL/SMG: Active skill that when enabled causes you to fire your entire weapon clip. Higher levels reduce reload time on empty, and reduce reload ammo cost.
 
