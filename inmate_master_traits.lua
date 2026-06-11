@@ -330,84 +330,211 @@ register_blueprint "ktrait_master_chemist"
     },
 }
 
--- GBH
+-- AGGRAVATED ASSAULT
 
-register_blueprint "ktrait_master_gbh"
+register_blueprint "explosion_wrath_small"
+{
+    attributes = {
+        damage     = 75,
+        explosion  = -2,
+        xp_level   = 1,
+        gib_factor = 2.0,
+    },
+    weapon = {
+        group       = "env",
+        damage_type = "slash",
+        natural     = true,
+        fire_sound  = "explosion",
+    },
+    noise = {
+        use = 15,
+    },
+}
+
+register_blueprint "explosion_wrath_medium"
+{
+    attributes = {
+        damage     = 100,
+        explosion  = -3,
+        xp_level   = 1,
+        gib_factor = 2.0,
+    },
+    weapon = {
+        group       = "env",
+        damage_type = "slash",
+        natural     = true,
+        fire_sound  = "explosion",
+    },
+    noise = {
+        use = 15,
+    },
+}
+
+register_blueprint "explosion_wrath_big"
+{
+    attributes = {
+        damage     = 150,
+        explosion  = -4,
+        xp_level   = 1,
+        gib_factor = 2.0,
+    },
+    weapon = {
+        group       = "env",
+        damage_type = "slash",
+        natural     = true,
+        fire_sound  = "explosion",
+    },
+    noise = {
+        use = 15,
+    },
+}
+
+register_blueprint "kskill_erupt"
+{
+    flags = { EF_NOPICKUP },
+    text = {
+        name = "Erupt",
+        base_name = "Erupt"
+    },
+    data = {
+        is_free_use = true
+    },
+    attributes = {
+        damage_mult = 1.0,
+    },
+    skill = {
+        cooldown = 0,
+    },
+    callbacks = {
+        is_usable = [[
+            function ( self, user )
+                local agg_assault = user:child("ktrait_master_aggravated_assault")
+                if agg_assault.attributes.wrath > 0 then
+                    self.text.name = self.text.base_name.." "..tostring(agg_assault.attributes.wrath)
+                    return 1
+                end
+                self.text.name = self.text.base_name
+                return 0
+            end
+        ]],
+        on_use = [[
+            function ( self, entity )
+                nova.log("Use erupt")
+                local agg_assault = entity:child("ktrait_master_aggravated_assault")
+                local wrath = agg_assault.attributes.wrath
+                local wrath_floor = agg_assault.attributes.wrath_floor
+                nova.log("Use erupt wrath "..tostring(wrath))
+                nova.log("Use erupt wrath floor "..tostring(wrath_floor) )
+                if wrath > 0 then
+                    self.attributes.damage_mult = 1.0 + (agg_assault.attributes.wrath * 0.02)
+                    wrath = wrath_floor
+                    nova.log("Use erupt damage mult"..tostring(self.attributes.damage_mult) )
+                    nova.log("Use erupt wrath after"..tostring(wrath))
+                end
+                return 1
+            end
+        ]],
+        on_post_command = [[
+            function ( self, actor, cmt, weapon, time )
+                nova.log("Post command erupt")
+                if cmt == COMMAND_USE then
+                    if weapon then
+                    nova.log("Post command erupt reset mult")
+                        self.attributes.damage_mult = 1.0
+                    end
+                end
+            end
+        ]],
+    }
+}
+
+
+register_blueprint "ktrait_master_aggravated_assault"
 {
     blueprint = "trait",
     text = {
-        name   = "GBH",
-        desc   = "MASTER TRAIT - bleed immunity and afflict bleed on attacks.",
-        full   = "Grievous bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit (stacks with bleed perks on weapon/relics), range {!2} bleed aura when {!Berserk}\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - attacks apply bleed on enemies near the target on hit.\n\nYou can pick only one MASTER trait per character.",
-        abbr   = "MGB",
+        name   = "AGGRAVATED ASSAULT",
+        bname = "WRATH",
+        desc   = "MASTER TRAIT - gain WRATH as you take damage, WRATH gives DR. ACTIVE SKILL: Erupt - Uses WRATH for bonus damage on next attack",
+        full   = "You have a temper, but you know how to hold it until you can unleash it for maximum effect and criminality!\n\n{!LEVEL 1} - Max {!50} WRATH. Gain DR equal to WRATH. {!Erupt} damage bonus {!2 x WRATH%}. Activate {!Berserk} spends WRATH to trigger explosion on self, more wrath bigger boom.\n{!LEVEL 2} - Max WRATH {!75}, Min WRATH {!15}. earn WRATH faster\n{!LEVEL 3} - even faster WRATH gain. Min WRATH {!25}.\n\nYou can pick only one MASTER trait per character.",
+        abbr   = "MAG",
     },
     attributes = {
         level    = 1,
-        resist = {
-            bleed = 100,
-        },
-        affinity = {
-            bleed = 0,
-        },
+        wrath    = 0,
+        wrath_gain = 10,
+        wrath_floor = 0,
+        wrath_max = 50,
+        damage_mod = 1.0,
+        resist_display = 0,
+    },
+    ui_buff = {
+        color     = RED,
+        priority  = -1,
+        attribute = "resist_display",
+        name      = "bname",
     },
     callbacks = {
-        on_activate = [=[
+        on_activate = [[
             function(self, entity)
-                local tlevel, t = gtk.upgrade_master( entity, "ktrait_master_gbh" )
-                if tlevel >= 2 then
-                    t.attributes["bleed.affinity"] = 50
+                local tlevel, t = gtk.upgrade_master( entity, "ktrait_master_aggravated_assault" )
+                local attr  = t.attributes
+                if tlevel == 1 then
+                    entity:attach( "kskill_erupt" )
+                end
+                if tlevel == 2 then
+                    attr.wrath_gain = 15
+                    attr.wrath_floor = 15
+                    attr.wrath_max = 75
+                end
+                if tlevel == 3 then
+                    attr.wrath_gain = 25
+                    attr.wrath_floor = 25
                 end
             end
-        ]=],
-        on_apply_damage = [=[
-            function ( self, source, who )
-                if who and who.data and who.data.can_bleed then
-                    local slevel = core.get_status_value( 4, "bleed", source )
-                    core.apply_damage_status( who, "bleed", "bleed", slevel, source )
-
-                    if self.attributes.level == 3 then
-                        local level = world:get_level()
-                        local position = world:get_position( who )
-                        local ar       = area.around( position, 2 )
-                        ar:clamp( level:get_area() )
-
-                        for c in ar:coords() do
-                            for e in level:entities( c ) do
-                                if e.data and e.data.can_bleed then
-                                    core.apply_damage_status( e, "bleed", "bleed", slevel/2, source )
-                                end
-                            end
-                        end
+        ]],
+        on_incoming_damage = [[
+            function ( self, entity, source )
+                local attr  = self.attributes
+                attr.damage_mod = 1.0 - (attr.wrath * 0.01)
+            end
+        ]],
+        on_receive_damage = [[
+            function ( self, entity, source, weapon, amount )
+                if not entity then return end
+                if not entity.data or not entity.data.is_player then return end
+                if amount < 1 then return end
+                local attr  = self.attributes
+                attr.wrath = math.min( attr.wrath + attr.wrath_gain, attr.wrath_max)
+                attr.resist_display = attr.wrath
+            end
+        ]],
+        on_inmate_berserk = [[
+            function ( self, entity )
+                local attr  = self.attributes
+                if attr.wrath > 0 then
+                    if attr.wrath < 26 then
+                        local w   = world:create_entity( "explosion_wrath_small" )
+                        world:get_level():hard_place_entity( w, entity:get_position() )
+                        world:get_level():fire( w, entity:get_position(), w )
+                        world:destroy( w )
+                    elseif attr.wrath < 51 then
+                        local w   = world:create_entity( "explosion_wrath_medium" )
+                        world:get_level():hard_place_entity( w, entity:get_position() )
+                        world:get_level():fire( w, entity:get_position(), w )
+                        world:destroy( w )
+                    elseif attr.wrath < 76 then
+                        local w   = world:create_entity( "explosion_wrath_big" )
+                        world:get_level():hard_place_entity( w, entity:get_position() )
+                        world:get_level():fire( w, entity:get_position(), w )
+                        world:destroy( w )
                     end
+                    attr.wrath = attr.wrath_floor
+                    attr.resist_display = attr.wrath
+                    return 1
                 end
             end
-        ]=],
-        on_timer = [=[
-            function ( self, first )
-                if first then return 1 end
-                if not self then return 0 end
-                local level    = world:get_level()
-                local parent   = self:parent()
-
-                local berserk = parent:child("buff_inmate_berserk_base") or parent:child("buff_inmate_berserk_skill_1") or parent:child("buff_inmate_berserk_skill_2") or parent:child("buff_inmate_berserk_skill_3")
-
-                if berserk then
-                    local position = world:get_position( parent )
-                    local ar       = area.around( position, 2 )
-                    ar:clamp( level:get_area() )
-
-                    for c in ar:coords() do
-                        for e in level:entities( c ) do
-                            if e.data and e.data.can_bleed then
-                                local slevel = core.get_status_value( 5, "bleed", parent )
-                                core.apply_damage_status( e, "bleed", "bleed", slevel, parent )
-                            end
-                        end
-                    end
-                end
-                return 50
-            end
-        ]=],
+        ]],
     },
 }
 
@@ -915,3 +1042,86 @@ register_blueprint "ktrait_master_fraudster"
         ]=],
     },
 }
+
+------------------- REPLACED TRAITS -------------------------
+
+-- GBH
+
+-- register_blueprint "ktrait_master_gbh"
+-- {
+    -- blueprint = "trait",
+    -- text = {
+        -- name   = "GBH",
+        -- desc   = "MASTER TRAIT - bleed immunity and afflict bleed on attacks.",
+        -- full   = "Grievous bodily harm, it's what you are bloody good at!\n\n{!LEVEL 1} - {!immunity} to bleed status effect, inflict bleed on hit (stacks with bleed perks on weapon/relics), range {!2} bleed aura when {!Berserk}\n{!LEVEL 2} - bleed effects are {!50%} stronger\n{!LEVEL 3} - attacks apply bleed on enemies near the target on hit.\n\nYou can pick only one MASTER trait per character.",
+        -- abbr   = "MGB",
+    -- },
+    -- attributes = {
+        -- level    = 1,
+        -- resist = {
+            -- bleed = 100,
+        -- },
+        -- affinity = {
+            -- bleed = 0,
+        -- },
+    -- },
+    -- callbacks = {
+        -- on_activate = [=[
+            -- function(self, entity)
+                -- local tlevel, t = gtk.upgrade_master( entity, "ktrait_master_gbh" )
+                -- if tlevel >= 2 then
+                    -- t.attributes["bleed.affinity"] = 50
+                -- end
+            -- end
+        -- ]=],
+        -- on_apply_damage = [=[
+            -- function ( self, source, who )
+                -- if who and who.data and who.data.can_bleed then
+                    -- local slevel = core.get_status_value( 4, "bleed", source )
+                    -- core.apply_damage_status( who, "bleed", "bleed", slevel, source )
+
+                    -- if self.attributes.level == 3 then
+                        -- local level = world:get_level()
+                        -- local position = world:get_position( who )
+                        -- local ar       = area.around( position, 2 )
+                        -- ar:clamp( level:get_area() )
+
+                        -- for c in ar:coords() do
+                            -- for e in level:entities( c ) do
+                                -- if e.data and e.data.can_bleed then
+                                    -- core.apply_damage_status( e, "bleed", "bleed", slevel/2, source )
+                                -- end
+                            -- end
+                        -- end
+                    -- end
+                -- end
+            -- end
+        -- ]=],
+        -- on_timer = [=[
+            -- function ( self, first )
+                -- if first then return 1 end
+                -- if not self then return 0 end
+                -- local level    = world:get_level()
+                -- local parent   = self:parent()
+
+                -- local berserk = parent:child("buff_inmate_berserk_base") or parent:child("buff_inmate_berserk_skill_1") or parent:child("buff_inmate_berserk_skill_2") or parent:child("buff_inmate_berserk_skill_3")
+
+                -- if berserk then
+                    -- local position = world:get_position( parent )
+                    -- local ar       = area.around( position, 2 )
+                    -- ar:clamp( level:get_area() )
+
+                    -- for c in ar:coords() do
+                        -- for e in level:entities( c ) do
+                            -- if e.data and e.data.can_bleed then
+                                -- local slevel = core.get_status_value( 5, "bleed", parent )
+                                -- core.apply_damage_status( e, "bleed", "bleed", slevel, parent )
+                            -- end
+                        -- end
+                    -- end
+                -- end
+                -- return 50
+            -- end
+        -- ]=],
+    -- },
+-- }

@@ -414,3 +414,96 @@ register_gfx_blueprint "smuggler_cache_outline"
             visibility = "REVEAL",
     },
 }
+
+register_gfx_blueprint "fx_explosion_wrath_small"
+{
+    lifetime = {
+        duration = 2.0,
+    },
+    light = {
+        color       = vec4(4.0,1.0,1.0,1.0),
+        range       = 2.0,
+    },
+    fade = {
+        fade_out = 0.5,
+    },
+    physics_explosion = {
+        radius = 1.0,
+    },
+    camera_shake = {
+        power       = 0.495,
+        duration    = 0.35,
+    },
+    "ps_explosion_barrel",
+    "ps_explosion_crater",
+}
+
+register_gfx_blueprint "fx_explosion_wrath_medium"
+{
+    lifetime = {
+        duration = 2.0,
+    },
+    light = {
+        color       = vec4(4.0,1.0,1.0,1.0),
+        range       = 3.0,
+    },
+    fade = {
+        fade_out = 0.5,
+    },
+    physics_explosion = {
+        radius = 1.0,
+    },
+    camera_shake = {
+        power       = 0.495,
+        duration    = 0.35,
+    },
+    "ps_explosion_barrel",
+    "ps_explosion_crater",
+}
+
+register_gfx_blueprint "fx_explosion_wrath_large"
+{
+    lifetime = {
+        duration = 2.0,
+    },
+    light = {
+        color       = vec4(4.0,1.0,1.0,1.0),
+        range       = 4.0,
+    },
+    fade = {
+        fade_out = 0.5,
+    },
+    physics_explosion = {
+        radius = 1.0,
+    },
+    camera_shake = {
+        power       = 0.495,
+        duration    = 0.35,
+    },
+    "ps_explosion_barrel",
+    "ps_explosion_crater",
+}
+
+register_gfx_blueprint "explosion_wrath_small"
+{
+    weapon_fx = {
+        on_shot   = "fx_explosion_wrath_small",
+        on_damage = "fx_on_damage_shotgun",
+    },
+}
+
+register_gfx_blueprint "explosion_wrath_medium"
+{
+    weapon_fx = {
+        on_shot   = "fx_explosion_wrath_medium",
+        on_damage = "fx_on_damage_shotgun",
+    },
+}
+
+register_gfx_blueprint "explosion_wrath_big"
+{
+    weapon_fx = {
+        on_shot   = "fx_explosion_wrath_large",
+        on_damage = "fx_on_damage_shotgun",
+    },
+}
