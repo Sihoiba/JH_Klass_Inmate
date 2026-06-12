@@ -335,8 +335,8 @@ register_blueprint "ktrait_master_chemist"
 register_blueprint "explosion_wrath_small"
 {
     attributes = {
-        damage     = 75,
-        explosion  = -2,
+        damage     = 90,
+        explosion  = -3,
         xp_level   = 1,
         gib_factor = 2.0,
     },
@@ -354,10 +354,10 @@ register_blueprint "explosion_wrath_small"
 register_blueprint "explosion_wrath_medium"
 {
     attributes = {
-        damage     = 100,
-        explosion  = -3,
+        damage     = 135,
+        explosion  = -4,
         xp_level   = 1,
-        gib_factor = 2.0,
+        gib_factor = 2.5,
     },
     weapon = {
         group       = "env",
@@ -366,17 +366,17 @@ register_blueprint "explosion_wrath_medium"
         fire_sound  = "explosion",
     },
     noise = {
-        use = 15,
+        use = 20,
     },
 }
 
 register_blueprint "explosion_wrath_big"
 {
     attributes = {
-        damage     = 150,
-        explosion  = -4,
+        damage     = 180,
+        explosion  = -5,
         xp_level   = 1,
-        gib_factor = 2.0,
+        gib_factor = 3.0,
     },
     weapon = {
         group       = "env",
@@ -385,7 +385,7 @@ register_blueprint "explosion_wrath_big"
         fire_sound  = "explosion",
     },
     noise = {
-        use = 15,
+        use = 25,
     },
 }
 
@@ -425,6 +425,22 @@ register_blueprint "kbuff_erupt"
     }
 }
 
+function set_wrath_display_and_desc(self, current_wrath, wrath_buff)
+    if not current_wrath or not wrath_buff then
+        return
+    end
+    wrath_buff.attributes.resist_display = current_wrath
+    if current_wrath  == 0 then
+        wrath_buff.text.desc = wrath_buff.text.desc_none
+    elseif current_wrath < 26 then
+        wrath_buff.text.desc = wrath_buff.text.desc_small
+    elseif current_wrath < 51 then
+        wrath_buff.text.desc = wrath_buff.text.desc_medium
+    else
+        wrath_buff.text.desc = wrath_buff.text.desc_large
+    end
+end
+
 register_blueprint "kskill_erupt"
 {
     flags = { EF_NOPICKUP },
@@ -457,11 +473,10 @@ register_blueprint "kskill_erupt"
                 local wrath_floor = agg_assault.attributes.wrath_floor
                 if agg_assault.attributes.wrath > 0 then
                     local e = entity:attach("kbuff_erupt")
-                    e.attributes.value = agg_assault.attributes.wrath * 2
-                    e.attributes.damage_mult = 1.0 + (agg_assault.attributes.wrath * 0.02)
+                    e.attributes.value = agg_assault.attributes.wrath * 3
+                    e.attributes.damage_mult = 1.0 + (agg_assault.attributes.wrath * 0.03)
                     agg_assault.attributes.wrath = wrath_floor
-                    local wrath_buff = entity:child( "kbuff_wrath" )
-                    wrath_buff.attributes.resist_display = agg_assault.attributes.wrath
+                    set_wrath_display_and_desc( self, agg_assault.attributes.wrath, entity:child( "kbuff_wrath" ) )
                 end
                 return 10
             end
@@ -474,7 +489,11 @@ register_blueprint "kbuff_wrath"
     flags = { EF_NOPICKUP },
     text = {
         name = "WRATH",
-        desc = "Damage resistance equal to current wrath"
+        desc = "Damage resistance equal to current wrath",
+        desc_none = "Damage resistance equal to current wrath",
+        desc_small = "Damage resistance equal to current wrath. Berserk explosion 90 slash radius 3",
+        desc_medium = "Damage resistance equal to current wrath. Berserk explosion 135 slash radius 4",
+        desc_large = "Damage resistance equal to current wrath. Berserk explosion 180 slash radius 5"
     },
     ui_buff = {
         color     = RED,
@@ -494,16 +513,17 @@ register_blueprint "ktrait_master_aggravated_assault"
     text = {
         name   = "AGGRAVATED ASSAULT",
         bname = "WRATH",
-        desc   = "MASTER TRAIT - gain WRATH as you take damage, WRATH gives DR. ACTIVE SKILL: Erupt - Uses WRATH for bonus damage on next attack",
-        full   = "You have a temper, but you know how to hold it until you can unleash it for maximum effect and criminality! Though elevators always calm you down.\n\n{!LEVEL 1} - Max {!50} WRATH. Gain damage resistance equal to WRATH. {!Erupt} damage bonus {!2 x WRATH%}. Activate {!Berserk} spends WRATH to trigger explosion on self, more wrath bigger boom.\n{!LEVEL 2} - Max WRATH {!75}, Min WRATH {!15}. earn WRATH faster\n{!LEVEL 3} - even faster WRATH gain. Min WRATH {!25}.\n\nYou can pick only one MASTER trait per character.",
+        desc   = "MASTER TRAIT - injuries increase WRATH; WRATH fades over time. ACTIVE SKILL: Erupt: Use WRATH for bonus damage on next attack",
+        full   = "You have a temper, but you know how to use it for maximum effect and violent crime! Though elevators always calm you down.\n\n{!LEVEL 1} - Max {!40} WRATH. Gain damage resistance equal to WRATH. {!Erupt} damage bonus {!3 x WRATH%}. Activate {!Berserk} spends WRATH to trigger explosion on self, more wrath bigger boom.\n{!LEVEL 2} - Max WRATH {!55}, Min WRATH {!15}. earn WRATH faster\n{!LEVEL 3} - even faster WRATH gain. Max WRATH {!70}, Min WRATH {!25}.\n\nYou can pick only one MASTER trait per character.",
         abbr   = "MAG",
     },
     attributes = {
         level    = 1,
         wrath    = 0,
-        wrath_gain = 10,
+        wrath_gain = 4,
         wrath_floor = 0,
-        wrath_max = 50
+        wrath_max = 40,
+        decay_time = 0
     },
     callbacks = {
         on_activate = [[
@@ -515,28 +535,29 @@ register_blueprint "ktrait_master_aggravated_assault"
                     entity:attach( "kbuff_wrath" )
                 end
                 if tlevel == 2 then
-                    attr.wrath_gain = 15
+                    attr.wrath_gain = 5
                     attr.wrath_floor = 15
-                    attr.wrath_max = 75
+                    attr.wrath_max = 55
                 end
                 if tlevel == 3 then
-                    attr.wrath_gain = 25
+                    attr.wrath_gain = 11
                     attr.wrath_floor = 25
+                    attr.wrath_max = 70
                 end
             end
         ]],
         on_enter_level = [[
             function ( self, entity, reenter )
                 self.attributes.wrath = self.attributes.wrath_floor
-                local wrath_buff = entity:child( "kbuff_wrath" )
-                wrath_buff.attributes.resist_display = self.attributes.wrath
+                set_wrath_display_and_desc( self, self.attributes.wrath, entity:child( "kbuff_wrath" ) )
             end
         ]],
         on_incoming_damage = [[
             function ( self, entity, source )
-                local attr  = self.attributes
-                local wrath_buff = entity:child( "kbuff_wrath" )
-                wrath_buff.attributes.damage_mod = 1.0 - (attr.wrath * 0.01)
+                 local attr  = self.attributes
+                 local wrath_buff = entity:child( "kbuff_wrath" )
+                 wrath_buff.attributes.damage_mod = 1.0 - (attr.wrath * 0.01)
+                 set_wrath_display_and_desc( self, attr.wrath, wrath_buff )
             end
         ]],
         on_receive_damage = [[
@@ -546,8 +567,20 @@ register_blueprint "ktrait_master_aggravated_assault"
                 if amount < 1 then return end
                 local attr  = self.attributes
                 attr.wrath = math.min( attr.wrath + attr.wrath_gain, attr.wrath_max )
-                local wrath_buff = entity:child( "kbuff_wrath" )
-                wrath_buff.attributes.resist_display = attr.wrath
+                set_wrath_display_and_desc( self, attr.wrath, entity:child( "kbuff_wrath" ) )
+            end
+        ]],
+        on_action = [[
+            function ( self, entity, time_passed, last )
+                if time_passed > 0 then
+                    local attr  = self.attributes
+                    attr.decay_time = attr.decay_time + time_passed
+                    if attr.decay_time > 500 then
+                        attr.wrath = math.max( attr.wrath_floor, attr.wrath - 1 )
+                        attr.decay_time = 0
+                    end
+                    set_wrath_display_and_desc( self, attr.wrath, entity:child( "kbuff_wrath" ) )
+                end
             end
         ]],
         on_inmate_berserk = [[
@@ -564,15 +597,14 @@ register_blueprint "ktrait_master_aggravated_assault"
                         world:get_level():hard_place_entity( w, entity:get_position() )
                         world:get_level():fire( w, entity:get_position(), w )
                         world:destroy( w )
-                    elseif attr.wrath < 76 then
+                    else
                         local w   = world:create_entity( "explosion_wrath_big" )
                         world:get_level():hard_place_entity( w, entity:get_position() )
                         world:get_level():fire( w, entity:get_position(), w )
                         world:destroy( w )
                     end
                     attr.wrath = attr.wrath_floor
-                    local wrath_buff = entity:child( "kbuff_wrath" )
-                    wrath_buff.attributes.resist_display = attr.wrath
+                    set_wrath_display_and_desc( self, attr.wrath, entity:child( "kbuff_wrath" ) )
                     world:flush_destroy()
                     return 1
                 end
